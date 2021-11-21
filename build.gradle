@@ -26,9 +26,12 @@ test {
 }
 
 jar {
+	enabled = false
 	manifest {
 		attributes(
 				'Main-Class': 'org.springframework.boot.loader.JarLauncher'
 		)
 	}
 }
+
+
