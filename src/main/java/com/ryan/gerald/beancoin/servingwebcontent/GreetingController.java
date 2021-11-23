@@ -16,10 +16,4 @@ public class GreetingController {
         return "greeting";
     }
 
-    @RequestMapping("/")
-    @ResponseBody
-    String home() {
-        return "Hello World!";
-    }
-
 }
