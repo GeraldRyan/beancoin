@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+	<persistence-unit name="beancoin">
+		<class>com.ryan.gerald.beancoin.entity.Block</class>
+		<class>com.ryan.gerald.beancoin.entity.Blockchain</class>
+		<class>com.ryan.gerald.beancoin.entity.Transaction</class>
+		<class>com.ryan.gerald.beancoin.entity.Wallet</class>
+		<class>com.ryan.gerald.beancoin.entity.User</class>
+		<properties>
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:mysql://u3r5w4ayhxzdrw87.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/f5wvp1u840cyi24e?serverTimezone=UTC" />
+			<property name="javax.persistence.jdbc.user"
+				value="e9hhcvg1kn3ik6cr" />
+			<property name="javax.persistence.jdbc.password"
+				value="p0fhaapu58vhqvor" />
+			<property name="javax.persistence.jdbc.driver"
+				value="org.mariadb.jdbc.Driver" />
+			<property
+				name="javax.persistence.schema-generation.database.action"
+				value="create" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.dialect"
+				value="org.hibernate.dialect.MariaDB103Dialect" />
+			<property name="hibernate.format_sql" value="true" />
+		</properties>
+	</persistence-unit>
+
+	<!-- value="jdbc:mysql://localhost:3306/blockchain?serverTimezone=UTC" /> -->
+	<persistence-unit name="beancoin-dev">
+		<class>com.ryan.gerald.beancoin.entity.Block</class>
+		<class>com.ryan.gerald.beancoin.entity.Blockchain</class>
+		<class>com.ryan.gerald.beancoin.entity.Transaction</class>
+		<class>com.ryan.gerald.beancoin.entity.Wallet</class>
+		<class>com.ryan.gerald.beancoin.entity.User</class>
+		<properties>
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:mysql://localhost:3306/beancoin" />
+			<property name="javax.persistence.jdbc.user" value="root" />
+			<property name="javax.persistence.jdbc.password"
+				value="root" />
+			<property name="javax.persistence.jdbc.driver"
+				value="org.mariadb.jdbc.Driver" />
+			<property
+				name="javax.persistence.schema-generation.database.action"
+				value="create" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.dialect"
+				value="org.hibernate.dialect.MariaDB103Dialect" />
+			<property name="hibernate.format_sql" value="true" />
+		</properties>
+	</persistence-unit>
+</persistence>
+<!-- as config var on https://dashboard.heroku.com/apps/blocksjava/settings -->
+<!-- mysql://e9hhcvg1kn3ik6cr:b5wkq1kvydnyogrp@u3r5w4ayhxzdrw87.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/f5wvp1u840cyi24e -->
+
