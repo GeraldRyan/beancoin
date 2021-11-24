@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.datamodel;
+package com.ryan.gerald.beancoin.datamodelworkingexample;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
