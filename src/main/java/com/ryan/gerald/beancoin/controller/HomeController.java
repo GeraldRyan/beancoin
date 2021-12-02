@@ -121,7 +121,7 @@ public class HomeController {
 		if ((boolean) model.getAttribute(("isloggedin"))) {
 			return "redirect:/";
 		}
-		return "login/login";
+			return "login/login";
 	}
 
 	@PostMapping("/login")

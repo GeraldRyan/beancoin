@@ -27,9 +27,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-@Configuration
-@ComponentScan(basePackages = "com.gerald.ryan.beancoin")
-@EnableWebMvc
+
+/**
+ * Comment out three top level annotations turns this class off from Spring perspective effectively, avoiding collision with better Spring Boot Framework.
+ * This class is not necessary in Spring Boot Framework, will be removed.
+ */
+
+
+//@Configuration
+//@ComponentScan(basePackages = "com.ryan.gerald.beancoin")
+//@EnableWebMvc
 public class MvcConfiguration implements WebMvcConfigurer {
 // was extends WebMvcConfigurerAdapter but https://stackoverflow.com/questions/47552835/the-type-webmvcconfigureradapter-is-deprecated
 	@Bean
