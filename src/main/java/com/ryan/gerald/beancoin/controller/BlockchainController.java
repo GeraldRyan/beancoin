@@ -50,9 +50,9 @@ public class BlockchainController {
 
 	/**
 	 * Pulls up beancoin blockchain on startup.
-	 * 
+	 *
 	 * If no beancoin exists, create one and populate it with initial values
-	 * 
+	 *
 	 * Also syncs blockchain so should be updated
 	 */
 	@ModelAttribute("blockchain")
@@ -103,7 +103,7 @@ public class BlockchainController {
 	/**
 	 * This method order the chain properly according to timestamp if for some
 	 * reason it pulled it from the database out of order (JPA error)
-	 * 
+	 *
 	 * @param model
 	 */
 	public void refreshChain(Model model) {

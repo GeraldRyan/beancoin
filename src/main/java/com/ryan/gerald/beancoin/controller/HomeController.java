@@ -59,7 +59,7 @@ import com.ryan.gerald.beancoin.initializors.Config.*;
  * wallet, username, isloggedin=true, failed=false On Login(fail) -- Session:
  * failed=true, msg="various string" On logout -- Session: wallet=null,
  * username=null, isloggedin=false
- * 
+ *
  */
 
 @Controller
@@ -94,12 +94,12 @@ public class HomeController {
 	}
 
 	/**
-	 * 
+	 *
 	 * PubNub pubsub provider. Can be instantiated as needed for broadcast, but as
 	 * it is also a listener, should be instantiated right away as session variable
 	 * in order to responsond to incoming messages (part of being part of a
 	 * community. Hoping this is the right method of doing so
-	 * 
+	 *
 	 * @return
 	 * @throws InterruptedException
 	 */
@@ -110,11 +110,11 @@ public class HomeController {
 		}
 		return null;
 	}
-
-	@GetMapping("")
-	public String showIndex(Model model) {
-		return "index";
-	}
+//
+//	@GetMapping("")
+//	public String showIndex(Model model) {
+//		return "index";
+//	}
 
 	@GetMapping("/login")
 	public String showLoginPage(Model model, @ModelAttribute("login") Login login) {

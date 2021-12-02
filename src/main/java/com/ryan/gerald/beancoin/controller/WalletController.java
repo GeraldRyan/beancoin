@@ -61,7 +61,7 @@ public class WalletController {
 	/**
 	 * Display wallet console page. Sometimes wallet doesn't load due to session
 	 * state. Just click around, log in and out until loads (until fixed)
-	 * 
+	 *
 	 * @param model
 	 * @return
 	 */
@@ -101,7 +101,7 @@ public class WalletController {
 
 	/**
 	 * WIP to make a better wallet console.
-	 * 
+	 *
 	 * @param model
 	 * @return
 	 */
@@ -121,13 +121,13 @@ public class WalletController {
 
 	/**
 	 * This is a simulation of posting transactions from someone who is logged in.
-	 * 
+	 *
 	 * { "address":"recipient", "amount": "integer" } in future add { "username":
 	 * "username", "password": "password" } to make this official
-	 * 
+	 *
 	 * In reality login information would have to be provided to access their wallet
 	 * and post the transaction.
-	 * 
+	 *
 	 * @param model
 	 * @param body
 	 * @return
@@ -172,7 +172,7 @@ public class WalletController {
 	/**
 	 * Very important method, this is how you make a transaction with RequestParams
 	 * from /transact form posting
-	 * 
+	 *
 	 * @param w
 	 * @param model
 	 * @param address
@@ -219,7 +219,7 @@ public class WalletController {
 	 * random type dev transactions. Because over the network and server, this can
 	 * get buggy and consume resources. Easier to run dummy transactions in main
 	 * method of initializer. Safest to ignore
-	 * 
+	 *
 	 * @param model
 	 * @param body
 	 * @return
@@ -254,7 +254,7 @@ public class WalletController {
 
 	/**
 	 * Broadcast to pubnub wrapper method
-	 * 
+	 *
 	 * @param t
 	 * @throws InterruptedException
 	 */
