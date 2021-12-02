@@ -34,9 +34,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.pubnub.api.PubNubException;
 
-@Controller
-@SessionAttributes({ "blockchain", "minedblock", "wallet", "pnapp" })
-@RequestMapping("blockchain")
+//@Controller
+//@SessionAttributes({ "blockchain", "minedblock", "wallet", "pnapp" })
+//@RequestMapping("blockchain")
 public class BlockchainController {
 
 	TransactionService tService = new TransactionService();

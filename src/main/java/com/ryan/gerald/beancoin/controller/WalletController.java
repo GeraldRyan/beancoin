@@ -40,9 +40,9 @@ import com.ryan.gerald.beancoin.pubsub.PubNubApp;
 import com.google.gson.Gson;
 import com.pubnub.api.PubNubException;
 
-@Controller
-@RequestMapping("wallet")
-@SessionAttributes({ "wallet", "latesttransaction", "pool", "username", "user", "blockchain" })
+//@Controller
+//@RequestMapping("wallet")
+//@SessionAttributes({ "wallet", "latesttransaction", "pool", "username", "user", "blockchain" })
 
 /**
  * ./transact page is for making transactions, GET or POST Completing the form

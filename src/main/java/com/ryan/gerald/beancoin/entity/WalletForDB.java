@@ -3,6 +3,10 @@ package com.ryan.gerald.beancoin.entity;
 import javax.persistence.Embeddable;
 
 // DEPRECATED!!!!!
+
+/**
+ * If deprciated, consider deleting!!!
+ */
 @Embeddable
 public class WalletForDB {
 

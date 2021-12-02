@@ -34,6 +34,14 @@ public class RegistrationController {
 		return mv;
 	}
 
+	// THIS WORKS
+//	@GetMapping("")
+//	public String showRegisterPage() {
+////		ModelAndView mv = new ModelAndView("registration/register");
+////		model.addAttribute("user", new User());
+//		return "registration/register";
+//	}
+
 	@PostMapping("")
 	public String registerUser(Model model, @ModelAttribute("user") @Valid User user)
 			throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
