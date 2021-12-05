@@ -122,6 +122,7 @@ public class BlockchainController {
 		model.addAttribute("blockchain", blockchain);
 		pool.refreshBlockchainTransactionPool(blockchain);
 //		pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD
+		pool = refreshTransactionPool(); // COPIED FROM OLD BUT WHY DO WE NEED TO KEEP DOING THIS??
 		model.addAttribute("pool", pool);
 		return new_block.webworthyJson(tlist);
 	}
