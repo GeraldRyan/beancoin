@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.ryan.gerald.beancoin.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +22,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import com.ryan.gerald.beancoin.Service.BlockService;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
-import com.ryan.gerald.beancoin.entity.Block;
-import com.ryan.gerald.beancoin.entity.Blockchain;
-import com.ryan.gerald.beancoin.entity.Transaction;
-import com.ryan.gerald.beancoin.entity.TransactionPool;
 import com.ryan.gerald.beancoin.exceptions.BlocksInChainInvalidException;
 import com.ryan.gerald.beancoin.exceptions.ChainTooShortException;
 import com.ryan.gerald.beancoin.exceptions.GenesisBlockInvalidException;
@@ -34,13 +33,37 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.pubnub.api.PubNubException;
 
-//@Controller
+@Controller
 //@SessionAttributes({ "blockchain", "minedblock", "wallet", "pnapp" })
-//@RequestMapping("blockchain")
+@RequestMapping("blockchain")
 public class BlockchainController {
 
-	TransactionService tService = new TransactionService();
-	TransactionPool pool = tService.getAllTransactionsAsTransactionPoolService();
+	@Autowired
+	private BlockchainRepository blockchainRepository;
+	@Autowired
+	private TransactionRepository transactionRepository;
+
+//	TransactionService tService = new TransactionService(); // OLD STUFF - NEEDED FOR DAO CONNECTION
+//	TransactionPool pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD STUFF
+	TransactionPool pool;
+
+	TransactionPool refreshTransactionPool(){
+		List<Transaction> transactionList = transactionRepository.getListOfTransactions();
+		TransactionPool pool = new TransactionPool();
+		for (Transaction t : transactionList)
+		{
+			System.out.println(t.toString());
+			pool.putTransaction(t);
+		}
+		return pool;
+	}
+
+//	List<Transaction> resultsList = em.createQuery("select t from Transaction t").getResultList();
+//	for (Transaction t : resultsList) {
+//		pool.putTransaction(t);
+//	}
+
+
 
 	public BlockchainController() throws InterruptedException {
 	}
@@ -80,14 +103,17 @@ public class BlockchainController {
 	@ResponseBody
 	public String getMine(@ModelAttribute("blockchain") Blockchain blockchain, Model model)
 			throws NoSuchAlgorithmException, PubNubException, InterruptedException {
-		pool = tService.getAllTransactionsAsTransactionPoolService();
+//		pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD
+		pool = refreshTransactionPool();
 		if (pool.getMinableTransactionDataString() == null) {
 			return "No data to mine. Tell your friends to make transactions";
 		}
 		String transactionData = "MAIN INSTANCE STUBBED DATA";
 		transactionData = pool.getMinableTransactionDataString();
-		List<Transaction> tlist = tService.getAllTransactionsAsTransactionList();
-		Block new_block = blockchainApp.addBlockService("beancoin", transactionData);
+//		List<Transaction> tlist = tService.getAllTransactionsAsTransactionList(); // OLD
+		List<Transaction> tlist = transactionRepository.getListOfTransactions();
+		Block new_block = blockchainApp.addBlockService("beancoin"
+				, transactionData);
 		if (Config.BROADCASTING) {
 			new PubNubApp().broadcastBlock(new_block);
 		}
@@ -95,7 +121,7 @@ public class BlockchainController {
 		blockchain = blockchainApp.getBlockchainService("beancoin");
 		model.addAttribute("blockchain", blockchain);
 		pool.refreshBlockchainTransactionPool(blockchain);
-		pool = tService.getAllTransactionsAsTransactionPoolService();
+//		pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD
 		model.addAttribute("pool", pool);
 		return new_block.webworthyJson(tlist);
 	}
