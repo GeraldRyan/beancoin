@@ -79,7 +79,7 @@ public class HomeController {
 	@ModelAttribute("blockchain")
 	// this is probably right way to do it, this side of Dependency Injection.
 	// Initialized right away to avoid buggy sql call dependencies
-	public Blockchain bootupOrCreateBlockchain() {
+	public Blockchain bootupOrCreateBlockchain() throws NoSuchAlgorithmException {
 		Blockchain bc = new BlockchainService().getBlockchainService("beancoin");
 		if (bc == null) {
 			bc = new BlockchainService().newBlockchainService("beancoin");

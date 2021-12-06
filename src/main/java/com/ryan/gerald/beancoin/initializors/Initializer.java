@@ -9,11 +9,9 @@ import java.security.NoSuchProviderException;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.controller.Development;
-import com.ryan.gerald.beancoin.entity.Blockchain;
-import com.ryan.gerald.beancoin.entity.Transaction;
-import com.ryan.gerald.beancoin.entity.TransactionPool;
-import com.ryan.gerald.beancoin.entity.Wallet;
+import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.utilities.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +19,32 @@ import java.util.Random;
 
 public class Initializer {
 
+	@Autowired
+	static BlockchainRepository blockchainRepository;
+
+	@Autowired
+	static BlockRepository blockRepository;
+
 	/**
 	 * Used to load a new blockchain up with 5 valid blocks
 	 * 
 	 * @param nameOfBlockchain
 	 */
-	public static void loadBC(String nameOfBlockchain) {
-		BlockchainService blockchainApp = new BlockchainService();
-		blockchainApp.addBlockService(nameOfBlockchain, "Dance The Quickstep");
-		blockchainApp.addBlockService(nameOfBlockchain, "Dance The Waltz");
-		blockchainApp.addBlockService(nameOfBlockchain, "Dance The Tango");
-		blockchainApp.addBlockService(nameOfBlockchain, "Dance The Samba");
-		blockchainApp.addBlockService(nameOfBlockchain, "Dance With Us America");
+	public static void loadBC(String nameOfBlockchain) throws NoSuchAlgorithmException {
+//		BlockchainService blockchainApp = new BlockchainService();
+//		blockchainApp.addBlockService(nameOfBlockchain, "Dance The Quickstep");
+		Blockchain blockchain = blockchainRepository.getBlockchainByName("beancoin");
+		blockRepository.save(blockchain.add_block("Dance The Waltz"));
+		blockRepository.save(blockchain.add_block("Dance The Tango"));
+		blockRepository.save(blockchain.add_block("Dance The Foxtrot")	);
+		blockRepository.save(blockchain.add_block("Dance The Samba"));
+		blockRepository.save(blockchain.add_block("Dance With Us America"));
+
+//		blockchainApp.addBlockService(nameOfBlockchain, "Dance The Waltz");
+//
+//		blockchainApp.addBlockService(nameOfBlockchain, "Dance The Tango");
+//		blockchainApp.addBlockService(nameOfBlockchain, "Dance The Samba");
+//		blockchainApp.addBlockService(nameOfBlockchain, "Dance With Us America");
 	}
 
 	/**
