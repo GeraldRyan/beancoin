@@ -85,13 +85,13 @@ public class HomeController {
 	@ModelAttribute("blockchain")
 	// this is probably right way to do it, this side of Dependency Injection.
 	// Initialized right away to avoid buggy sql call dependencies
-	public Blockchain bootupOrCreateBlockchain() throws NoSuchAlgorithmException {
-		System.out.println("HERELKSDJFLKSJDFLKDJSF");
+	public Blockchain loadOrCreateBlockchain() throws NoSuchAlgorithmException {
 		Blockchain bc = blockchainRepository.getBlockchainByName("beancoin");
 		if (bc == null) {
 			bc = new Blockchain("beancoin");
 			blockchainRepository.save(bc);
 			initializer.loadBC(bc);
+			blockchainRepository.save(bc);
 		}
 		return bc;
 	}
@@ -118,11 +118,12 @@ public class HomeController {
 		}
 		return null;
 	}
-//
+
 //	@GetMapping("")
 //	public String showIndex(Model model) {
 //		return "index";
 //	}
+
 
 	@GetMapping("/login")
 	public String showLoginPage(Model model, @ModelAttribute("login") Login login) {
