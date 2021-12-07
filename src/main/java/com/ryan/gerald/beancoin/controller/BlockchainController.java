@@ -34,7 +34,7 @@ import com.google.gson.JsonElement;
 import com.pubnub.api.PubNubException;
 
 @Controller
-@SessionAttributes({"blockchain", "minedblock", "wallet", "pnapp"})
+//@SessionAttributes({"blockchain", "minedblock", "wallet", "pnapp"})
 @RequestMapping("blockchain")
 public class BlockchainController {
 
@@ -61,20 +61,42 @@ public class BlockchainController {
         return pool;
     }
 
+    /**
+     * This method order the chain properly according to timestamp if for some
+     * reason it pulled it from the database out of order (JPA error)
+     *
+     * @param model
+     */
+    public void refreshChain(Model model) throws NoSuchAlgorithmException, InterruptedException {
+//		Blockchain newer_blockchain_from_db = blockchainApp.getBlockchainService("beancoin");
+        Blockchain new_or_old_blockchain = makeBlockchainIfNull(model);
+        try {
+            ArrayList<Block> new_chain = new ArrayList<Block>(new_or_old_blockchain.getChain());
+            System.out.println("RE-SORTING ArrayList<Block>");
+            Collections.sort(new_chain, Comparator.comparingLong(Block::getTimestamp));
+            ((Blockchain) model.getAttribute("blockchain")).setChain(new_chain);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 //	List<Transaction> resultsList = em.createQuery("select t from Transaction t").getResultList();
 //	for (Transaction t : resultsList) {
 //		pool.putTransaction(t);
 //	}
 
 
-    public BlockchainController() throws InterruptedException { }
+    public BlockchainController() throws InterruptedException {
+    }
 //	BlockService blockApp = new BlockService();
 //	BlockchainService blockchainApp = new BlockchainService();
+
     /**
      * Pulls up beancoin blockchain on startup.
      * If no beancoin exists, create one and populate it with initial values
      */
-    @ModelAttribute("blockchain") // This pulls from database before any request handler method goes (but only after a request is made)
+    @ModelAttribute("blockchain")
+    // This pulls from database before any request handler method goes (but only after a request is made)
     public Blockchain makeBlockchainIfNull(Model model) throws NoSuchAlgorithmException, InterruptedException {
 //			Blockchain blockchain = blockchainApp.getBlockchainService("beancoin");
         Blockchain blockchain = blockchainRepository.getBlockchainByName("beancoin");
@@ -82,7 +104,7 @@ public class BlockchainController {
             return blockchain;
         } else {
             blockchain = new Blockchain("beancoin");
-			blockchainRepository.save(blockchain);
+            blockchainRepository.save(blockchain);
 //			Blockchain blockchain = blockchainApp.newBlockchainService("beancoin");
             initializer.loadBC(blockchain);
             blockchainRepository.save(blockchain);
@@ -96,7 +118,6 @@ public class BlockchainController {
     @ResponseBody
     public String serveBlockchain(Model model) throws NoSuchAlgorithmException, InterruptedException,
             ChainTooShortException, GenesisBlockInvalidException, BlocksInChainInvalidException {
-        System.out.println("REQUEST TO BLOCKCHAIN MADE");
         refreshChain(model);
         return ((Blockchain) model.getAttribute("blockchain")).toJSONtheChain();
     }
@@ -138,24 +159,6 @@ public class BlockchainController {
         return new_block.webworthyJson(tlist);
     }
 
-    /**
-     * This method order the chain properly according to timestamp if for some
-     * reason it pulled it from the database out of order (JPA error)
-     *
-     * @param model
-     */
-    public void refreshChain(Model model) throws NoSuchAlgorithmException, InterruptedException {
-//		Blockchain newer_blockchain_from_db = blockchainApp.getBlockchainService("beancoin");
-        Blockchain new_or_old_blockchain = makeBlockchainIfNull(model);
-        try {
-            ArrayList<Block> new_chain = new ArrayList<Block>(new_or_old_blockchain.getChain());
-            System.out.println("RE-SORTING ArrayList<Block>");
-            Collections.sort(new_chain, Comparator.comparingLong(Block::getTimestamp));
-            ((Blockchain) model.getAttribute("blockchain")).setChain(new_chain);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @RequestMapping(value = "/{n}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -168,8 +171,8 @@ public class BlockchainController {
             }
             List<TransactionRepr> tr = b.deserializeTransactionData();
             return b.webworthyJson(tr, "plug");
-        } catch (IndexOutOfBoundsException e) {
-            return "This index doens't exist yet in our chain. Try a different number";
+        } catch (Exception e) {
+            return "This index doesn't exist yet in our chain. Try a different number";
         }
 
     }
