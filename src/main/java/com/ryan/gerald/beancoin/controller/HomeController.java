@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.ryan.gerald.beancoin.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,12 +42,6 @@ import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.UserService;
 import com.ryan.gerald.beancoin.Service.WalletService;
-import com.ryan.gerald.beancoin.entity.Blockchain;
-import com.ryan.gerald.beancoin.entity.Login;
-import com.ryan.gerald.beancoin.entity.Transaction;
-import com.ryan.gerald.beancoin.entity.TransactionPool;
-import com.ryan.gerald.beancoin.entity.User;
-import com.ryan.gerald.beancoin.entity.Wallet;
 import com.ryan.gerald.beancoin.initializors.Config;
 import com.ryan.gerald.beancoin.initializors.Initializer;
 import com.ryan.gerald.beancoin.pubsub.PubNubApp;
@@ -66,11 +61,18 @@ import com.ryan.gerald.beancoin.initializors.Config.*;
 @Controller
 @SessionAttributes({ "blockchain", "wallet", "username", "isloggedin", "user", "msg", "transactionpool", "pubsubapp" })
 public class HomeController {
-	// This is not Inversion of Control/Loose coupling? Could refactor?
-	UserService userService = new UserService();
 
 	@Autowired
+	private BlockchainRepository blockchainRepository;
+	@Autowired
+	private TransactionRepository transactionRepository;
+	@Autowired
+	private BlockRepository blockRepository;
+	@Autowired
 	Initializer initializer;
+
+	// This is not Inversion of Control/Loose coupling? Could refactor?
+	UserService userService = new UserService();
 
 	public HomeController() throws InterruptedException {
 	}
@@ -84,12 +86,14 @@ public class HomeController {
 	// this is probably right way to do it, this side of Dependency Injection.
 	// Initialized right away to avoid buggy sql call dependencies
 	public Blockchain bootupOrCreateBlockchain() throws NoSuchAlgorithmException {
-		Blockchain bc = new BlockchainService().getBlockchainService("beancoin");
+		System.out.println("HERELKSDJFLKSJDFLKDJSF");
+		Blockchain bc = blockchainRepository.getBlockchainByName("beancoin");
 		if (bc == null) {
-			bc = new BlockchainService().newBlockchainService("beancoin");
+			bc = new Blockchain("beancoin");
+			blockchainRepository.save(bc);
 			initializer.loadBC(bc);
 		}
-		return new BlockchainService().getBlockchainService("beancoin");
+		return bc;
 	}
 
 	@ModelAttribute("transactionpool")

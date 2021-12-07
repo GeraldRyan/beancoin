@@ -99,6 +99,7 @@ public class BlockchainController {
     // This pulls from database before any request handler method goes (but only after a request is made)
     public Blockchain makeBlockchainIfNull(Model model) throws NoSuchAlgorithmException, InterruptedException {
 //			Blockchain blockchain = blockchainApp.getBlockchainService("beancoin");
+        System.out.println("NOT  HERESadsvsdvasdv");
         Blockchain blockchain = blockchainRepository.getBlockchainByName("beancoin");
         if (blockchain != null) {
             return blockchain;
