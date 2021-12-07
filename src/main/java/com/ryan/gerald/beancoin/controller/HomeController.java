@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -68,6 +69,9 @@ public class HomeController {
 	// This is not Inversion of Control/Loose coupling? Could refactor?
 	UserService userService = new UserService();
 
+	@Autowired
+	Initializer initializer;
+
 	public HomeController() throws InterruptedException {
 	}
 
@@ -83,7 +87,7 @@ public class HomeController {
 		Blockchain bc = new BlockchainService().getBlockchainService("beancoin");
 		if (bc == null) {
 			bc = new BlockchainService().newBlockchainService("beancoin");
-			Initializer.loadBC("beancoin");
+			initializer.loadBC(bc);
 		}
 		return new BlockchainService().getBlockchainService("beancoin");
 	}

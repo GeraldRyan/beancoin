@@ -74,7 +74,7 @@ public class Blockchain {
 	 * This ensures block is valid in itself, and is attached to end of local chain,
 	 * ensuring chain is valid.
 	 * 
-	 * @param data
+	 * @param
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 */
@@ -91,7 +91,7 @@ public class Blockchain {
 	 * incoming chain is longer than the local one - the incoming chain is formatted
 	 * properly
 	 * 
-	 * @param chain
+	 * @param
 	 * @throws NoSuchAlgorithmException
 	 * @throws ChainTooShortException
 	 * @throws BlocksInChainInvalidException
@@ -137,7 +137,7 @@ public class Blockchain {
 	 * incoming chain is longer than the local one - the incoming chain is formatted
 	 * properly
 	 * 
-	 * @param chain
+	 * @param
 	 * @throws NoSuchAlgorithmException
 	 * @throws ChainTooShortException
 	 * @throws BlocksInChainInvalidException
@@ -228,7 +228,7 @@ public class Blockchain {
 	 * Validate the incoming chain. Enforce the following rules: - the chain must
 	 * start with the genesis block - blocks must be formatted correctly
 	 * 
-	 * @param blockchain
+	 * @param
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 * @throws GenesisBlockInvalidException

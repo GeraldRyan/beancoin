@@ -44,6 +44,8 @@ public class BlockchainController {
     private TransactionRepository transactionRepository;
     @Autowired
     private BlockRepository blockRepository;
+    @Autowired
+    Initializer initializer;
 
     //	TransactionService tService = new TransactionService(); // OLD STUFF - NEEDED FOR DAO CONNECTION
 //	TransactionPool pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD STUFF
@@ -65,29 +67,25 @@ public class BlockchainController {
 //	}
 
 
-    public BlockchainController() throws InterruptedException {
-    }
-
+    public BlockchainController() throws InterruptedException { }
 //	BlockService blockApp = new BlockService();
 //	BlockchainService blockchainApp = new BlockchainService();
-
     /**
      * Pulls up beancoin blockchain on startup.
-     * <p>
      * If no beancoin exists, create one and populate it with initial values
-     * <p>
-     * Also syncs blockchain so should be updated
      */
-    @ModelAttribute("blockchain")
+    @ModelAttribute("blockchain") // This pulls from database before any request handler method goes (but only after a request is made)
     public Blockchain makeBlockchainIfNull(Model model) throws NoSuchAlgorithmException, InterruptedException {
 //			Blockchain blockchain = blockchainApp.getBlockchainService("beancoin");
         Blockchain blockchain = blockchainRepository.getBlockchainByName("beancoin");
         if (blockchain != null) {
             return blockchain;
         } else {
-			blockchainRepository.save(new Blockchain("beancoin")); // THIS IS CRAZY ABSTRACT. How do I implement custom logic in an interface?
+            blockchain = new Blockchain("beancoin");
+			blockchainRepository.save(blockchain);
 //			Blockchain blockchain = blockchainApp.newBlockchainService("beancoin");
-            Initializer.loadBC("beancoin");
+            initializer.loadBC(blockchain);
+            blockchainRepository.save(blockchain);
             Blockchain populated_blockchain = blockchainRepository.getBlockchainByName("beancoin");
 //			Blockchain populated_blockchain = blockchainApp.getBlockchainService("beancoin");
             return populated_blockchain;
@@ -98,6 +96,7 @@ public class BlockchainController {
     @ResponseBody
     public String serveBlockchain(Model model) throws NoSuchAlgorithmException, InterruptedException,
             ChainTooShortException, GenesisBlockInvalidException, BlocksInChainInvalidException {
+        System.out.println("REQUEST TO BLOCKCHAIN MADE");
         refreshChain(model);
         return ((Blockchain) model.getAttribute("blockchain")).toJSONtheChain();
     }
