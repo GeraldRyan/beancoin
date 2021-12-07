@@ -79,6 +79,7 @@ public class HomeController {
 
 	@ModelAttribute("isloggedin")
 	public boolean isLoggedIn() {
+		System.out.println("WE're HERE");
 		return false;
 	}
 
@@ -119,10 +120,10 @@ public class HomeController {
 		return null;
 	}
 
-//	@GetMapping("")
-//	public String showIndex(Model model) {
-//		return "index";
-//	}
+	@GetMapping("")
+	public String showIndex(Model model) {
+		return "index";
+	}
 
 
 	@GetMapping("/login")
