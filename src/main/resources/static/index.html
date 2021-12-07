@@ -1,13 +1,10 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-pageEncoding="ISO-8859-1"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="ISO-8859-1">
     <title>Index Page</title>
-    <!-- <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
-        rel="stylesheet"> -->
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
+        rel="stylesheet">
     <style type="text/css">
 body {
 	background-color: #3D3D3D;
@@ -51,12 +48,15 @@ h3, .h3 {
 	font-size: 1.5rem;
 	color: orange;
 }
-</style>
+
+
+
+    </style>
 
 </head>
 <body class="text-white">
-<jsp:include page="common/navbar.jsp"></jsp:include>
-<%-- 	<nav>
+<th:include page="common/navbar"></th:include>
+<nav>
     <c:if test="${isloggedin == true }">
         <a href="./logout">Logout</a>
     </c:if>
@@ -66,7 +66,7 @@ h3, .h3 {
         </nav>
     </c:if>
 
-</nav> --%>
+</nav>
 <c:if test="${isloggedin == false }">
     <div class="m-auto text-center">
         <!-- 			<p class="text-2xl m-auto text-center text-red-700">You are not
@@ -84,7 +84,6 @@ h3, .h3 {
         </div>
         <h3>Or just look around</h3>
         <div class="menu-ctn">
-
 
 
             <a href="./blockchain">Our live blockchain status</a> <a
