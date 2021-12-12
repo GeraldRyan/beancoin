@@ -25,6 +25,8 @@ public class User {
 	@JoinColumn(name = "ownerID")
 	Wallet wallet;
 
+	public User() {	}
+
 	public User(String username, String password, String hint, String answer, String email, Wallet wallet) {
 		super();
 		this.username = username;
@@ -41,10 +43,6 @@ public class User {
 		this.hint = hint;
 		this.answer = answer;
 		this.email = email;
-	}
-
-	public User() {
-
 	}
 
 	public String getUsername() {

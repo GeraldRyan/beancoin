@@ -120,6 +120,7 @@ public class HomeController {
 		return null;
 	}
 
+	@PostMapping("") // why not?
 	@GetMapping("")
 	public String showIndex(Model model) {
 		return "index";
