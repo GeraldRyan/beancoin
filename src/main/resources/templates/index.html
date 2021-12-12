@@ -49,12 +49,7 @@ h3, .h3 {
 	color: orange;
 }
 
-
-
-
-
     </style>
-
 </head>
 <body class="text-white">
 <th:include page="common/navbar"></th:include>
@@ -68,17 +63,16 @@ h3, .h3 {
             <a class="" href="./login">Login</a> <a class="" href="./register">Register</a>
         </nav>
     </th:block>
-
-
 </nav>
-<c:if test="${isloggedin == false }">
+
+
+<th:block th:if="${isloggedin == false }">
     <div class="m-auto text-center">
-        <!-- 			<p class="text-2xl m-auto text-center text-red-700">You are not
-            logged in.</p>
-         -->
-        <c:if test="${failed == true}">
-            <p class="text-red-300">${msg}</p>
-        </c:if>
+        <p class="text-2xl m-auto text-center text-red-700">You are not logged in.</p>
+
+<!--        <c:if test="${failed == true}">-->
+<!--            <p class="text-red-300">${msg}</p>-->
+<!--        </c:if>-->
 
         <div class="heading">
             <h1 class="salutations">
@@ -95,13 +89,14 @@ h3, .h3 {
             transactions)</a>
 
         </div>
-</c:if>
-</div>
+    </div>
+</th:block>
+
 <!-- 	<img class="m-auto rounded-full" alt="coffee bean close up"
     src="./resources/bean.png"> -->
 
 
-<c:if test="${isloggedin == true }">
+<th:block th:if="${isloggedin} == true">
     <h1 class="h1">Welcome to the club ${user.getUsername()}</h1>
 
     <h2 class="h2">Some things you can do</h2>
@@ -124,6 +119,6 @@ h3, .h3 {
     <br>
 
 
-</c:if>
+</th:block>
 </body>
 </html>

@@ -4,7 +4,7 @@
     <meta charset="ISO-8859-1">
     <title>Index Page</title>
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
-        rel="stylesheet">
+          rel="stylesheet">
     <style type="text/css">
 body {
 	background-color: #3D3D3D;
@@ -58,14 +58,14 @@ h3, .h3 {
 <div th:text="FOOBAR"></div>
 <th:include page="common/navbar"></th:include>
 <nav>
-<th:block>
-    <div th:if="${isloggedin} == true">At the Top</div>
-    <div th:text="${isloggedin}"/>
+    <th:block>
+        <div th:if="${isloggedin} == true">At the Top</div>
+        <div th:text="${isloggedin}"/>
 
-</th:block>
+    </th:block>
 
 
-        <a href="./logout">Logout</a>
+    <a href="./logout">Logout</a>
     </div>
     </th:if>
     <c:if test="${isloggedin == false}">
