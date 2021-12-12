@@ -79,7 +79,6 @@ public class HomeController {
 
 	@ModelAttribute("isloggedin")
 	public boolean isLoggedIn() {
-		System.out.println("WE're HERE");
 		return false;
 	}
 
@@ -120,12 +119,11 @@ public class HomeController {
 		return null;
 	}
 
-	@PostMapping("") // why not?
+//	@PostMapping("") // why not?
 	@GetMapping("")
 	public String showIndex(Model model) {
 		return "index";
 	}
-
 
 	@GetMapping("/login")
 	public String showLoginPage(Model model, @ModelAttribute("login") Login login) {

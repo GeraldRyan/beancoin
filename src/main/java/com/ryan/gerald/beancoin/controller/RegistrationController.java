@@ -27,7 +27,7 @@ import com.ryan.gerald.beancoin.entity.Wallet;
 
 @Controller
 @RequestMapping("/register")
-@SessionAttributes({ "user", "isloggedin", "wallet", "username" })
+@SessionAttributes({ "isloggedin", "wallet", "username" })
 public class RegistrationController {
 
 	@Autowired
@@ -59,13 +59,14 @@ public class RegistrationController {
 
 //		User existingUser = new UserService().getUserService(user.getUsername()); // old
 		Optional<User> existingUser = userRepository.findById(user.getUsername());
-		if (existingUser.isEmpty()) {
+		if (existingUser.isPresent()) {
 			model.addAttribute("regmsg", "User already exists. Choose another name");
 			return "registration/register";
 		}
 //		new UserService().addUserService(user); // old code
+		System.out.println("WE'RE HERE");
 		userRepository.save(user);
-		Wallet wallet = Wallet.createWallet(user.getUsername());
+		Wallet wallet = Wallet.createWallet(user.getUsername());  // TODO FIX THIS ERRS OUT
 //		new WalletService().addWalletService(wallet); // old code
 		walletRepository.save(wallet);
 		model.addAttribute("isloggedin", true);

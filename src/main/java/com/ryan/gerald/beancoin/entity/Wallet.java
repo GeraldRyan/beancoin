@@ -25,17 +25,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.utilities.StringUtils;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
 import com.google.gson.Gson;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * An individual wallet for a miner. Keeps track of miner's balance. Allows
@@ -57,6 +53,10 @@ public class Wallet {
 		return privatekey;
 	}
 
+	@Transient
+	@Autowired
+	private BlockchainRepository blockchainRepository;
+
 	@Id
 	String ownerId; // maps to username
 	@Lob
@@ -75,7 +75,8 @@ public class Wallet {
 
 	public Wallet(double balance, PrivateKey privatekey, PublicKey publickey, String address, String ownerId) {
 		super();
-		Blockchain bc = new BlockchainService().getBlockchainService("beancoin");
+//		Blockchain bc = new BlockchainService().getBlockchainService("beancoin"); // Old Code
+		Blockchain bc = blockchainRepository.getBlockchainByName("beancoin");
 		if (bc != null && !ownerId.equals("anon")) {
 			balance = Wallet.calculateBalance(bc, address);
 		}
