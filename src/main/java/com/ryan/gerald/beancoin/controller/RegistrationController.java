@@ -3,9 +3,13 @@ package com.ryan.gerald.beancoin.controller;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.ryan.gerald.beancoin.entity.UserRepository;
+import com.ryan.gerald.beancoin.entity.WalletRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +29,13 @@ import com.ryan.gerald.beancoin.entity.Wallet;
 @RequestMapping("/register")
 @SessionAttributes({ "user", "isloggedin", "wallet", "username" })
 public class RegistrationController {
+
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private WalletRepository walletRepository;
+
+
 	UserService userService = new UserService();
 
 	@GetMapping("")
@@ -46,14 +57,17 @@ public class RegistrationController {
 	public String registerUser(Model model, @ModelAttribute("user") @Valid User user)
 			throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
 
-		User existingUser = new UserService().getUserService(user.getUsername());
-		if (existingUser != null) {
+//		User existingUser = new UserService().getUserService(user.getUsername()); // old
+		Optional<User> existingUser = userRepository.findById(user.getUsername());
+		if (existingUser.isEmpty()) {
 			model.addAttribute("regmsg", "User already exists. Choose another name");
 			return "registration/register";
 		}
-		new UserService().addUserService(user);
+//		new UserService().addUserService(user); // old code
+		userRepository.save(user);
 		Wallet wallet = Wallet.createWallet(user.getUsername());
-		new WalletService().addWalletService(wallet);
+//		new WalletService().addWalletService(wallet); // old code
+		walletRepository.save(wallet);
 		model.addAttribute("isloggedin", true);
 		model.addAttribute("user", user);
 		model.addAttribute("wallet", wallet);
