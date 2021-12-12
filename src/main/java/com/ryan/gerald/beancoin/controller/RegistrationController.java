@@ -64,7 +64,6 @@ public class RegistrationController {
 			return "registration/register";
 		}
 //		new UserService().addUserService(user); // old code
-		System.out.println("WE'RE HERE");
 		userRepository.save(user);
 		Wallet wallet = Wallet.createWallet(user.getUsername());  // TODO FIX THIS ERRS OUT
 //		new WalletService().addWalletService(wallet); // old code

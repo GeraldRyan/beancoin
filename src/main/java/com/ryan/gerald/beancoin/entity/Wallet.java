@@ -53,9 +53,6 @@ public class Wallet {
 		return privatekey;
 	}
 
-	@Transient
-	@Autowired
-	private BlockchainRepository blockchainRepository;
 
 	@Id
 	String ownerId; // maps to username
@@ -76,10 +73,7 @@ public class Wallet {
 	public Wallet(double balance, PrivateKey privatekey, PublicKey publickey, String address, String ownerId) {
 		super();
 //		Blockchain bc = new BlockchainService().getBlockchainService("beancoin"); // Old Code
-		Blockchain bc = blockchainRepository.getBlockchainByName("beancoin");
-		if (bc != null && !ownerId.equals("anon")) {
-			balance = Wallet.calculateBalance(bc, address);
-		}
+
 		// can remove param 1 balance now or better yet add the blockchain as a
 		// dependency injection as this is tight coupling
 		this.balance = balance;
