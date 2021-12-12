@@ -1,8 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
+          rel="stylesheet">
     <meta charset="ISO-8859-1">
     <title>Insert title here</title>
     <style type="text/css">
@@ -12,8 +12,6 @@ body {
 }
 
 nav {
-	display: flex;
-	justify-content: space-around;
 	background-color: darkgreen;
 	color: white;
 	font-weight: bold;
@@ -45,7 +43,8 @@ h3, a, .h3 {
 </head>
 
 <body>
-<jsp:include page="../common/navbar.jsp"></jsp:include>
+<div th:replace="fragments/navbar"></div>
+
 <h1 class="h1">Welcome to the club ${user.getUsername() }</h1>
 
 <br>

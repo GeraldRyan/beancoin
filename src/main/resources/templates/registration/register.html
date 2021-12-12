@@ -12,15 +12,10 @@ body {
 }
 
 nav {
-	display: flex;
-	justify-content: space-around;
 	background-color: darkgreen;
 	color: white;
 	font-weight: bold;
 }
-
-
-
 
 
     </style>
@@ -44,58 +39,24 @@ nav {
         <form th:action="@{/register}" th:object="${user}" method="post">
             <input class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
                    type="text" th:field="*{username}" placeholder="username"/>
-            <label>Enter Password:</label>
+
 
             <input class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
                    type="text" th:field="*{password}" placeholder="password"/>
-            <label>Enter Password Hint:</label>
+
 
             <input class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
                    type="text" th:field="*{hint}" placeholder="hint"/>
 
-            <label>Enter Password Hint:</label>
 
             <input class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
                    type="text" th:field="*{answer}" placeholder="answer"/>
 
-            <label>Enter Password Hint:</label>
 
             <input class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
                    type="text" th:field="*{email}" placeholder="email"/>
 
-            <input type="checkbox" class="mr-2" name="agreement" value="agree">
-            <p class="text-grey">
-                Accept the <a href="#"
-                              class=" no-underline text-green-500 hover:text-green-400">Terms
-                and Conditions </a>
-            </p>
-            <input type="submit" value="Submit"/>
 
-        </form>
-
-        <!--        JSP form -->
-
-        <form:form modelAttribute="user" method="post">
-            <form:input path="username"
-                        class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
-                        type="text" placeholder="Username"/>
-            <form:errors path="username"/>
-            <form:input path="password"
-                        class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
-                        type="password" placeholder="password"/>
-            <form:errors path="password"/>
-            <form:input path="email"
-                        class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
-                        type="email" placeholder="email"/>
-            <form:errors path="email"/>
-            <form:input path="hint"
-                        class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
-                        type="hint" placeholder="hint"/>
-            <form:errors path="hint"/>
-            <form:input path="answer"
-                        class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
-                        type="password" placeholder="answer"/>
-            <form:errors path="answer"/>
             <div class="flex mt-4">
                 <input type="checkbox" class="mr-2" name="agreement" value="agree">
                 <p class="text-grey">
@@ -103,13 +64,15 @@ nav {
                                   class=" no-underline text-green-500 hover:text-green-400">Terms
                     and Conditions </a>
                 </p>
-            </div>
 
-            <form:button
+
+            </div>
+            <button
+                    type="submit" value="Submit"
                     class="shadow-lg pt-3 pb-3 mt-6 w-full text-white bg-green-500 hover:bg-green-400 rounded-full "
                     id="login" name="SIGN IN">Register
-            </form:button>
-        </form:form>
+            </button>
+        </form>
     </div>
     <div>
         <p class="mt-4 text-gray-500 text-sm">

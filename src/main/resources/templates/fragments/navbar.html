@@ -1,0 +1,16 @@
+<nav class="text-white">
+    <th:block th:if="${isloggedin} == true">
+        <nav class="text-4xl flex justify-around text-white">
+            <a class="text-white" href="/">Home</a>
+            <a class="text-white" href="./logout">Logout</a>
+        </nav>
+
+    </th:block>
+
+    <th:block th:if="${isloggedin} == false">
+        <nav class="text-4xl flex justify-around text-white">
+            <a class="text-white" href="/">Home</a>
+            <a class="" href="./login">Login</a> <a class="" href="./register">Register</a>
+        </nav>
+    </th:block>
+</nav>

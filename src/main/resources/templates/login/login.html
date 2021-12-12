@@ -1,9 +1,5 @@
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-pageEncoding="ISO-8859-1"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <title>Login</title>
@@ -14,8 +10,6 @@ body {
 	background-color: darkgray;
 }
 nav {
-	display: flex;
-	justify-content: space-around;
 	background-color: darkgreen;
 	color: white;
 	font-weight: bold;
@@ -24,7 +18,7 @@ nav {
 </head>
 
 <body>
-<th:include page="common/navbar"></th:include>
+<div th:replace="fragments/navbar"></div>
 <!-- 	<nav> <a href="./register">New here?</a> <a href="./">Home</a> </nav> -->
 
 <div
