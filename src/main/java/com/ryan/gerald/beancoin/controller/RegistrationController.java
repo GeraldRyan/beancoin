@@ -59,8 +59,9 @@ public class RegistrationController {
 
 //		User existingUser = new UserService().getUserService(user.getUsername()); // old
 		Optional<User> existingUser = userRepository.findById(user.getUsername());
+
 		if (existingUser.isPresent()) {
-			model.addAttribute("regmsg", "User already exists. Choose another name");
+			model.addAttribute("existsmsg", "User already exists. Choose another name or log in");
 			return "registration/register";
 		}
 //		new UserService().addUserService(user); // old code
