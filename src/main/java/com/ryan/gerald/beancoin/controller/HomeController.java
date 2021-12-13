@@ -152,6 +152,7 @@ public class HomeController {
 		model.addAttribute("isloggedin", false);
 		model.addAttribute("wallet", null);
 		model.addAttribute("username", null);
+		model.addAttribute("user", null);
 		HttpSession httpSession = request.getSession();
 		return "redirect:/";
 	}
@@ -181,6 +182,7 @@ public class HomeController {
 			return "user not found";
 		}
 		if (user.get().getPassword().equalsIgnoreCase(password)) {
+//			user.get().getUsername()
 			return "true";
 		}
 		return "false";
