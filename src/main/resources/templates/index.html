@@ -86,8 +86,18 @@ h3, .h3 {
 
 
 <th:block th:if="${isloggedin} == true">
-    <h1 class="h1">Welcome to the club ${user.getUsername()}</h1>
 
+
+    <th:block th:if="${user != null}">
+        <div class="text-4xl flex justify-around text-white">
+            USER EXISTS
+        </div>
+<!--        <h1 th:text="${user.username}" class="h1"></h1>-->
+    </th:block>
+
+
+
+    <h1 class="h1">Welcome to the club ${user.getUsername()}</h1>
     <h2 class="h2">Some things you can do</h2>
 
     <a class="text-4xl text-green-700" href="./wallet/">Open Your

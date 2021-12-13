@@ -64,10 +64,8 @@ public class RegistrationController {
 			model.addAttribute("existsmsg", "User already exists. Choose another name or log in");
 			return "registration/register";
 		}
-//		new UserService().addUserService(user); // old code
 		userRepository.save(user);
-		Wallet wallet = Wallet.createWallet(user.getUsername());  // TODO FIX THIS ERRS OUT
-//		new WalletService().addWalletService(wallet); // old code
+		Wallet wallet = Wallet.createWallet(user.getUsername());
 		walletRepository.save(wallet);
 		model.addAttribute("isloggedin", true);
 		model.addAttribute("user", user);

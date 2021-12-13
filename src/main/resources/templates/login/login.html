@@ -27,27 +27,24 @@ nav {
         <h2>Log in</h2>
     </div>
     <div>
-        <form:form id="loginForm" modelAttribute="login" method="post">
-            <form:input path="username"
-                        class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
-                        type="text" placeholder="Username" />
-            <form:input path="password"
-                        class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
-                        type="password" placeholder="password" />
-            <!-- 				<div class="flex mt-4">
-                <input type="checkbox" class="mr-2" name="agreement" value="agree">
-                <p class="text-grey">
-                    Accept the <a href="#"
-                        class=" no-underline text-green-500 hover:text-green-400">Terms
-                        and Conditions </a>
-                </p>
-            </div>
--->
-            <form:button
+
+        <!--    Thymeleaf Form-->
+        <form th:action="@{/login}" th:object="${login}" method="post">
+            <input class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
+                   type="text" th:field="*{username}" placeholder="username"/>
+
+
+            <input class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"
+                   type="text" th:field="*{password}" placeholder="password"/>
+
+
+            <button
+                    type="submit" value="Submit"
                     class="shadow-lg pt-3 pb-3 mt-6 w-full text-white bg-green-500 hover:bg-green-400 rounded-full "
                     id="login" name="SIGN IN">Sign In
-            </form:button>
-        </form:form>
+            </button>
+        </form>
+
     </div>
     <div>
         <p class="mt-4 text-gray-500 text-sm">

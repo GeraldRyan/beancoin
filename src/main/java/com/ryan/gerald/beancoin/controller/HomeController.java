@@ -8,13 +8,7 @@ import java.security.InvalidKeyException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,10 +32,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.ryan.gerald.beancoin.Service.BlockchainService;
+
 import com.ryan.gerald.beancoin.Service.TransactionService;
-import com.ryan.gerald.beancoin.Service.UserService;
-import com.ryan.gerald.beancoin.Service.WalletService;
 import com.ryan.gerald.beancoin.initializors.Config;
 import com.ryan.gerald.beancoin.initializors.Initializer;
 import com.ryan.gerald.beancoin.pubsub.PubNubApp;
@@ -62,17 +54,17 @@ import com.ryan.gerald.beancoin.initializors.Config.*;
 @SessionAttributes({ "blockchain", "wallet", "username", "isloggedin", "user", "msg", "transactionpool", "pubsubapp" })
 public class HomeController {
 
-	@Autowired
-	private BlockchainRepository blockchainRepository;
-	@Autowired
-	private TransactionRepository transactionRepository;
-	@Autowired
-	private BlockRepository blockRepository;
+	@Autowired private BlockchainRepository blockchainRepository;
+	@Autowired private TransactionRepository transactionRepository;
+	@Autowired private BlockRepository blockRepository;
+	@Autowired private UserRepository userRepository;
+	@Autowired private WalletRepository walletRepository;
+
 	@Autowired
 	Initializer initializer;
 
-	// This is not Inversion of Control/Loose coupling? Could refactor?
-	UserService userService = new UserService();
+	// This is not Inversion of Control/Loose coupling? Could refactor? DONE!!!!!! with repository. Good catch.
+//	UserService userService = new UserService();
 
 	public HomeController() throws InterruptedException {
 	}
@@ -140,9 +132,9 @@ public class HomeController {
 		if (result == "true") {
 			model.addAttribute("username", login.getUsername());
 			model.addAttribute("isloggedin", true);
-			model.addAttribute("user", new UserService().getUserService(login.getUsername()));
+			model.addAttribute("user", userRepository.findById(login.getUsername()));
 			model.addAttribute("failed", false);
-			model.addAttribute("wallet", new WalletService().getWalletService(login.getUsername()));
+			model.addAttribute("wallet", walletRepository.findById(login.getUsername()));
 		} else if (result == "user not found") {
 			System.out.println("User not found in records");
 			model.addAttribute("failed", true);
@@ -184,11 +176,11 @@ public class HomeController {
 	}
 
 	public String validateUserAndPassword(String username, String password) {
-		User user = userService.getUserService(username);
-		if (user == null) {
+		Optional<User> user = userRepository.findById(username);
+		if (user.isEmpty()) {
 			return "user not found";
 		}
-		if (user.getPassword().equalsIgnoreCase(password)) {
+		if (user.get().getPassword().equalsIgnoreCase(password)) {
 			return "true";
 		}
 		return "false";
