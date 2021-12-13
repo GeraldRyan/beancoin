@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Login</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
+          rel="stylesheet">
+    <style type="text/css">
+body {
+	background-color: darkgray;
+}
+nav {
+	background-color: darkgreen;
+	color: white;
+	font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1 class="h1">Your Wallet</h1>
+
+<!--<div th:replace="fragments/navbar"></div>-->
+<!--&lt;!&ndash; 	<nav> <a href="./register">New here?</a> <a href="./">Home</a> </nav> &ndash;&gt;-->
+
+<!--<div-->
+<!--        class="login-form text-center mx-auto my-4 w-64 flex shadow-lg flex-col bg-cover bg-center justify-content bg-white p-6 rounded pt-8 pb-8">-->
+<!--    <div class="text-center text-gray-500 mb-6">-->
+<!--        <h2>Log in</h2>-->
+<!--    </div>-->
+<!--    <div>-->
+
+<!--        &lt;!&ndash;    Thymeleaf Form&ndash;&gt;-->
+<!--        <form th:action="@{/login}" th:object="${login}" method="post">-->
+<!--            <input class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"-->
+<!--                   type="text" th:field="*{username}" placeholder="username"/>-->
+
+
+<!--            <input class="bg-transparent border-b m-auto block border-gray-500 w-full mb-6 text-gray-500 pb-1"-->
+<!--                   type="text" th:field="*{password}" placeholder="password"/>-->
+
+
+<!--            <button-->
+<!--                    type="submit" value="Submit"-->
+<!--                    class="shadow-lg pt-3 pb-3 mt-6 w-full text-white bg-green-500 hover:bg-green-400 rounded-full "-->
+<!--                    id="login" name="SIGN IN">Sign In-->
+<!--            </button>-->
+<!--        </form>-->
+
+<!--    </div>-->
+<!--    <div>-->
+<!--        <p class="mt-4 text-gray-500 text-sm">-->
+<!--            Need an account? <a href="./register"-->
+<!--                                class="no-underline text-green-500 hover:text-green-400">Register-->
+<!--        </a>-->
+<!--        </p>-->
+<!--    </div>-->
+<!--</div>-->
+</body>
+
+</html>
+
+
+
+<!--<body>-->
+<!--<h1 class="h1">Your Wallet</h1>-->
+
+<!--&lt;!&ndash;<div class="card">&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="inline">&ndash;&gt;-->
+<!--&lt;!&ndash;        <p class="inline">&ndash;&gt;-->
+<!--&lt;!&ndash;            Address: <span id="address">${wallet.getAddress() }</span>&ndash;&gt;-->
+<!--&lt;!&ndash;        </p>&ndash;&gt;-->
+<!--&lt;!&ndash;        <button id="cpy"&ndash;&gt;-->
+<!--&lt;!&ndash;                class=" inline shadow bg-gray-500&ndash;&gt;-->
+<!--&lt;!&ndash;				ml-4 px-4 text-whitehover:bg-gray-400">copy&ndash;&gt;-->
+<!--&lt;!&ndash;            to clipboard</button>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    <p>&ndash;&gt;-->
+<!--&lt;!&ndash;        Balance:&ndash;&gt;-->
+<!--&lt;!&ndash;        <fmt:formatNumber type="number" maxFractionDigits="0"&ndash;&gt;-->
+<!--&lt;!&ndash;                          value="${wallet.getBalance()}">&ndash;&gt;-->
+<!--&lt;!&ndash;        </fmt:formatNumber>&ndash;&gt;-->
+<!--&lt;!&ndash;    </p>&ndash;&gt;-->
+<!--&lt;!&ndash;    <p>Get Public Key</p>&ndash;&gt;-->
+<!--&lt;!&ndash;    <p>public key: ${wallet.getPublickey().toString() }</p>&ndash;&gt;-->
+<!--&lt;!&ndash;    <br> <br>&ndash;&gt;-->
+<!--&lt;!&ndash;    <p>Get your Private Key emailed to you</p>&ndash;&gt;-->
+<!--&lt;!&ndash;    <form action="./" method="POST">&ndash;&gt;-->
+<!--&lt;!&ndash;        <input type="submit" value="Submit">&ndash;&gt;-->
+<!--&lt;!&ndash;    </form>&ndash;&gt;-->
+
+<!--&lt;!&ndash;    <%&#45;&#45; <p>private key: ${wallet.getPrivatekey().toString() }</p> &#45;&#45;%>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<h3 class="h3">&ndash;&gt;-->
+<!--&lt;!&ndash;    <a class="text-green-700" href="./transact/">Make a transaction</a>&ndash;&gt;-->
+<!--&lt;!&ndash;</h3>&ndash;&gt;-->
+<!--&lt;!&ndash;<br>&ndash;&gt;-->
+<!--&lt;!&ndash;<br>&ndash;&gt;-->
+<!--&lt;!&ndash;<br>&ndash;&gt;-->
+<!--&lt;!&ndash;<br>&ndash;&gt;-->
+<!--&lt;!&ndash;<br>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<br>&ndash;&gt;-->
+<!--&lt;!&ndash;<p>Or send a post request to (/wallet/transact") in the following&ndash;&gt;-->
+<!--&lt;!&ndash;    JSON format</p>&ndash;&gt;-->
+<!--&lt;!&ndash;<p>{ "address": "foo", "amount": 500 }</p>&ndash;&gt;-->
+
+
+<!--&lt;!&ndash; 	<div class="flex bg-green-200 p-4">-->
+<!--    <div class="mr-4">-->
+<!--        <div-->
+<!--            class="h-10 w-10 text-white bg-green-600 rounded-full flex justify-center items-center">-->
+<!--            <i class="material-icons">done</i>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="flex justify-between w-full">-->
+<!--        <div class="text-green-600">-->
+<!--            <p class="mb-2 font-bold">Succes alert</p>-->
+<!--            <p class="text-xs">description text</p>-->
+<!--        </div>-->
+<!--        <div class="text-sm text-gray-500">-->
+<!--            <span>x</span>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--&ndash;&gt;-->
+<!--</body>-->
+
+
+<!--</html>-->
