@@ -1,0 +1,42 @@
+body {
+
+}
+
+nav {
+	background-color: darkgreen;
+	color: white;
+	font-weight: bold;
+	font-size: 1.5rem;
+}
+
+.salutations a {
+	font-weight: bold;
+}
+
+.heading {
+	margin: 4rem;
+}
+
+h1, .h1 {
+	font-size: 3rem;
+}
+
+h2, .h2 {
+	font-size: 2.6rem;
+}
+
+h3, .h3 {
+	font-weight: bold;
+	font-size: 2.5rem;
+}
+
+.menu-ctn {
+	display: flex;
+	flex-direction: column;
+}
+
+.menu-ctn a {
+	margin: 5px 0;
+	font-size: 1.5rem;
+	color: orange;
+}
