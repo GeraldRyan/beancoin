@@ -45,12 +45,11 @@ input {
     Pool</a> <br>
 </nav>
 <h1 class="text-5xl mb-8">Transact on the blockchain</h1>
-<form th:action="@{/transaction}" method="get" class="border-gray-200 border-2 gap-2">
+<form th:action="@{/wallet/transaction}" method="get" class="border-gray-200 border-2 gap-2">
     <div>Address to send money to</div>
     <div><input type="text" name="address"></div>
     <div>Amount to send</div>
     <div><input type="text" name="amount" ></div>
-    <div><input type="text" name="random" ></div>
     <div><input type="submit" name="transact"
                 class="mb-3 rounded-full my-4 shadow bg-green-700 px-4 py-2 text-white hover:bg-green-600"></div>
 </form>

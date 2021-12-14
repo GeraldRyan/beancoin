@@ -1,15 +1,13 @@
 package com.ryan.gerald.beancoin.controller;
 
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.*;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.ryan.gerald.beancoin.entity.*;
+import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.GsonBuilderUtils;
@@ -63,6 +61,10 @@ public class WalletController {
     TransactionPool pool;
     WalletService ws = new WalletService();
 
+    @ModelAttribute("wallet")
+    public Wallet initWalletIfNotPresent(Model m) {
+        return walletRepository.findById(String.valueOf(m.getAttribute("username"))).get();
+    }
 
     public WalletController() throws InterruptedException {
     }
@@ -208,27 +210,40 @@ public class WalletController {
                                   @RequestParam("address") String address, @RequestParam("amount") double amount, HttpServletRequest request)
             throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
             InterruptedException {
-        System.out.println("CALLED POST TRANSACTION WITH AMT AND ADDRESS: " + amount + address);
-        Transaction nu = new Transaction(w, address, amount);
+        Transaction neu = new Transaction(w, address, amount);
         pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
-        Transaction alt = pool.findExistingTransactionByWallet(nu.getSenderAddress());
+        Transaction alt = pool.findExistingTransactionByWallet(neu.getSenderAddress());
         if (alt == null) {
             System.err.println("Transaction 2 is null. there is no existing transaction of that sender"
-                    + nu.getSenderAddress() + "==" + w.getAddress());
-            model.addAttribute("latesttransaction", nu);
-            new TransactionService().addTransactionService(nu);
+                    + neu.getSenderAddress() + "==" + w.getAddress());
+            model.addAttribute("latesttransaction", neu);
+            transactionRepository.save(neu);
+//            new TransactionService().addTransactionService(neu);
             if (Config.BROADCASTING) {
-                broadcastTransaction(nu);
+                broadcastTransaction(neu);
             }
-            return nu.toJSONtheTransaction();
+            return neu.toJSONtheTransaction();
         } else {
             System.out.println("Existing transaction found!");
-            Transaction updated = new TransactionService().updateTransactionService(nu, alt);
-            model.addAttribute("latesttransaction", updated);
-            if (Config.BROADCASTING) {
-                broadcastTransaction(updated);
+//            Transaction updated = new TransactionService().updateTransactionService(neu, alt);
+
+            Transaction merged = transactionRepository.findById(alt.getUuid()).get(); // guaranteed to exist.
+//            Transaction merged = em.find(Transaction.class, alt.getUuid());
+            merged.rebuildOutputInput();
+            try {
+                merged.update(neu.getSenderWallet(), neu.getRecipientAddress(), neu.getAmount());
+            } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
+                    | TransactionAmountExceedsBalance | IOException e) {
+                e.printStackTrace();
+            } finally {
+
             }
-            return updated.toJSONtheTransaction();
+
+            model.addAttribute("latesttransaction", merged);
+            if (Config.BROADCASTING) {
+                broadcastTransaction(merged);
+            }
+            return merged.toJSONtheTransaction();
         }
     }
 

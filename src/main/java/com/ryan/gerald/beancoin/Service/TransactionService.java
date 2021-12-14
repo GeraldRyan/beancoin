@@ -33,12 +33,12 @@ public class TransactionService {
 	 * Updates Transaction of given wallet so that you can append recipients and
 	 * increase amounts to existing recipients
 	 * 
-	 * @param newT
-	 * @param original
+	 * @param neu
+	 * @param alt
 	 * @return
 	 */
-	public Transaction updateTransactionService(Transaction nu, Transaction alt) {
-		return transactionD.updateTransaction(nu, alt);
+	public Transaction updateTransactionService(Transaction neu, Transaction alt) {
+		return transactionD.updateTransaction(neu, alt);
 	}
 
 	public Transaction removeTransactionService(String UUID) {
