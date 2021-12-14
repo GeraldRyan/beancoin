@@ -238,6 +238,7 @@ public class WalletController {
             } finally {
 
             }
+            transactionRepository.save(merged);
 
             model.addAttribute("latesttransaction", merged);
             if (Config.BROADCASTING) {
