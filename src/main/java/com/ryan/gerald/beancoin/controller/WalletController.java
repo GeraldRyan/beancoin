@@ -129,8 +129,9 @@ public class WalletController {
     @GetMapping("/transact")
     public String getTransact(Model model)
             throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
-        Wallet w = (Wallet) model.getAttribute("wallet");
-        w = ws.getWalletService((String) model.getAttribute("username"));
+//        Wallet w = (Wallet) model.getAttribute("wallet");
+        Wallet w = walletRepository.findById((String) model.getAttribute("username")).get();
+//        w = ws.getWalletService((String) model.getAttribute("username"));
         model.addAttribute("wallet", w);
         return "wallet/transact";
     }
