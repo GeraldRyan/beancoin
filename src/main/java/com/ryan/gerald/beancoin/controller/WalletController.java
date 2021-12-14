@@ -208,6 +208,7 @@ public class WalletController {
                                   @RequestParam("address") String address, @RequestParam("amount") double amount, HttpServletRequest request)
             throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
             InterruptedException {
+        System.out.println("CALLED POST TRANSACTION WITH AMT AND ADDRESS: " + amount + address);
         Transaction nu = new Transaction(w, address, amount);
         pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
         Transaction alt = pool.findExistingTransactionByWallet(nu.getSenderAddress());
