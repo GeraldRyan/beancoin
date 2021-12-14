@@ -35,15 +35,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * An individual wallet for a miner. Keeps track of miner's balance. Allows
- * miner to authorize Transactions.
- * 
+ * miner to authorize Transactions via application logic.
+ * (Public and Private keys handled implicitly by application)
+ *
  * NOTE- HAVING A SETTER FOR ADDRESS FIELD WILL BREAK THIS BEAN at present
  * related to instantiating new transactions with request param page.
  * setAddress() breaks bean. Maybe setThisAddress will work fine but setAddress
  * will break the
  *
- * 
- * 
  * @author Gerald Ryan
  *
  */
@@ -52,7 +51,6 @@ public class Wallet {
 	public PrivateKey getPrivatekey() {
 		return privatekey;
 	}
-
 
 	@Id
 	String ownerId; // maps to username
@@ -244,7 +242,6 @@ public class Wallet {
 		// entire chain (minus the dummy data chains)
 		System.err.println("String address" + adds);
 		if (bc == null) {
-			System.err.println("BLOCKCHAIN IS NULL");
 			System.err.println("BLOCKCHAIN IS NULL");
 			System.err.println("String address" + adds);
 			return -1; // if -1 in caller function, leave balance same. Should this have been non

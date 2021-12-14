@@ -3,52 +3,9 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Index Page</title>
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
-          rel="stylesheet">
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
     <style type="text/css">
-body {
-	background-color: #3D3D3D;
-}
-
-nav {
-	background-color: darkgreen;
-	color: white;
-	font-weight: bold;
-	font-size: 1.5rem;
-}
-
-.salutations a {
-	font-weight: bold;
-}
-
-.heading {
-	margin: 4rem;
-}
-
-h1, .h1 {
-	font-size: 3rem;
-}
-
-h2, .h2 {
-	font-size: 2.6rem;
-}
-
-h3, .h3 {
-	font-weight: bold;
-	font-size: 2.5rem;
-}
-
-.menu-ctn {
-	display: flex;
-	flex-direction: column;
-}
-
-.menu-ctn a {
-	margin: 5px 0;
-	font-size: 1.5rem;
-	color: orange;
-}
-
     </style>
 </head>
 <body class="text-white">
@@ -59,9 +16,9 @@ h3, .h3 {
     <div class="m-auto text-center">
         <p class="text-2xl m-auto text-center text-red-700">You are not logged in.</p>
 
-<!--        <c:if test="${failed == true}">-->
-<!--            <p class="text-red-300">${msg}</p>-->
-<!--        </c:if>-->
+        <!--        <c:if test="${failed == true}">-->
+        <!--            <p class="text-red-300">${msg}</p>-->
+        <!--        </c:if>-->
 
         <div class="heading">
             <h1 class="salutations">
@@ -92,7 +49,7 @@ h3, .h3 {
         <div class="text-4xl flex justify-around text-white">
             USER EXISTS
         </div>
-<!--        <h1 th:text="${user.username}" class="h1"></h1>-->
+        <!--        <h1 th:text="${user.username}" class="h1"></h1>-->
     </th:block>
 
 
