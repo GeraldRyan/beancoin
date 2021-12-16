@@ -173,7 +173,8 @@ public class HomeController {
 	@ResponseBody
 	public String postTransactionPool(Model model) {
 
-		TransactionPool pool = new TransactionService().getAllTransactionsAsTransactionPoolService();
+//		TransactionPool pool = new TransactionService().getAllTransactionsAsTransactionPoolService();
+		TransactionPool pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
 		if (pool.getMinableTransactionDataString() == null) {
 			return "No transactions in the pool. Tell your friends to make transactions";
 		}
