@@ -160,13 +160,14 @@ public class HomeController {
 	@GetMapping("/transactionpool")
 	public String getTransactionPool(Model model) {
 //		List<Transaction> transactionList = new TransactionService().getAllTransactionsAsTransactionList();
-		TransactionPool pool = new TransactionPool();
-		List<Transaction> resultsList = transactionRepository.getListOfTransactions();
-		for (Transaction t : resultsList) {
-			pool.putTransaction(t);
-		}
+//		TransactionPool pool = new TransactionPool();
+//		List<Transaction> resultsList = transactionRepository.getListOfTransactions();
+//		for (Transaction t : resultsList) {
+//			pool.putTransaction(t);
+//		}
+		TransactionPool pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
 		model.addAttribute("transactionpoollist", pool);
-		return "transactionpool";
+		return "home/transactionpool";
 	}
 
 	@PostMapping("/transactionpool")
