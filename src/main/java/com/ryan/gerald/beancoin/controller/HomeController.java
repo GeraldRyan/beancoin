@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 
 import com.ryan.gerald.beancoin.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -62,6 +63,9 @@ public class HomeController {
 
 	@Autowired
 	Initializer initializer;
+
+	@Autowired
+	private Environment env;
 
 	// This is not Inversion of Control/Loose coupling? Could refactor? DONE!!!!!! with repository. Good catch.
 //	UserService userService = new UserService();
@@ -114,6 +118,8 @@ public class HomeController {
 //	@PostMapping("") // why not?
 	@GetMapping("")
 	public String showIndex(Model model) {
+//		System.out.println("SPRING DATASOURCE URL IS : " + env.getProperty("spring.datasource.url"));
+
 		return "index";
 	}
 
