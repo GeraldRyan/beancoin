@@ -68,9 +68,9 @@ public class Transaction {
 	 */
 	@Transient
 	HashMap<String, Object> input; // like wire transfer document
-	@Column(columnDefinition = "varchar(2000) default 'John Snow'")
+	@Column(columnDefinition = "varchar(2000) default 'Jon Snow'")
 	String outputjson;
-	@Column(columnDefinition = "varchar(2000) default 'John Snow'")
+	@Column(columnDefinition = "varchar(2000) default 'Jon Snow'")
 	String inputjson;
 
 	/**

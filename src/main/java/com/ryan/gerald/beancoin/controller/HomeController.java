@@ -171,16 +171,18 @@ public class HomeController {
 //		for (Transaction t : resultsList) {
 //			pool.putTransaction(t);
 //		}
-		TransactionPool pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
-		model.addAttribute("transactionpoollist", pool);
+		List<Transaction> tpl = transactionRepository.getListOfTransactions();
+		for (Transaction t : tpl) {
+			t.rebuildOutputInput();
+		}
+		model.addAttribute("transactionpoollist", tpl);
+		System.out.println("TPL SIZE: " + tpl.size());
 		return "home/transactionpool";
 	}
 
 	@PostMapping("/transactionpool")
 	@ResponseBody
 	public String postTransactionPool(Model model) {
-
-//		TransactionPool pool = new TransactionService().getAllTransactionsAsTransactionPoolService();
 		TransactionPool pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
 		if (pool.getMinableTransactionDataString() == null) {
 			return "No transactions in the pool. Tell your friends to make transactions";
@@ -188,6 +190,13 @@ public class HomeController {
 		String transactionData = pool.getMinableTransactionDataString();
 		return pool.getMinableTransactionDataString();
 	}
+
+
+
+
+
+
+
 
 	public String validateUserAndPassword(String username, String password) {
 		Optional<User> user = userRepository.findById(username);
