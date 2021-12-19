@@ -29,6 +29,7 @@ tr:nth-child(odd) {
 
 
 
+
 </style>
 <body>
 <div th:replace="fragments/navbar"></div>
@@ -86,20 +87,6 @@ tr:nth-child(odd) {
 
 </table>
 <br>
-<p>Note: Each record or row does not represent a single transaction but an aggreggate per users Hard to display other
-    important data columns for two
-    reasons--- one transaction might have multiple recipients. (Would just
-    have to split using plain old java function. Wouldn't technically
-    represent a "transaction" object as processed, but a more human
-    readable rendering of the same info). Also, the lookup key values are
-    also often not known in advance. They represent wallet addresses,
-    which can be iterated through and gotten but otherwise are not
-    constant.</p>
-<p>In other words- displaying values whose lookup keys are
-    constants, and which relate to one other value</p>
-
-
-<%-- <h3>${transactionList} }</h3> --%>
 
 </body>
 </html>

@@ -38,12 +38,12 @@ input {
 <body class="mx-auto text-center">
 <div th:replace="fragments/navbar"></div>
 
-<nav class="flex justify-around mb-10 text-2xl">
+<!--<nav class="flex justify-around mb-10 text-2xl">-->
 
-    <a href="/blocks">Home</a> <br> <a href="/blocks/blockchain/">Our
-    Chain</a> <br> <a href="/blocks/transactionpool/">Transaction
-    Pool</a> <br>
-</nav>
+<!--    <a href="/">Home</a> <br> <a href="/blocks/blockchain/">Our-->
+<!--    Chain</a> <br> <a href="/transactionpool/">Transaction-->
+<!--    Pool</a> <br>-->
+<!--</nav>-->
 <h1 class="text-5xl mb-8">Transact on the blockchain</h1>
 <form th:action="@{/wallet/transaction}" method="get" class="border-gray-200 border-2 gap-2">
     <div>Address to send money to</div>
@@ -54,14 +54,14 @@ input {
                 class="mb-3 rounded-full my-4 shadow bg-green-700 px-4 py-2 text-white hover:bg-green-600"></div>
 </form>
 
-<form action="../transaction" class="border-gray-200 border-2 gap-2">
-    <div>Address to send money to</div>
-    <div><input type="text" name="address"></div>
-    <div>Amount to send</div>
-    <div><input type="text" name="amount"></div>
-    <div><input type="submit" name="transact"
-                class="mb-3 rounded-full my-4 shadow bg-green-700 px-4 py-2 text-white hover:bg-green-600"></div>
-</form>
+<!--<form action="../transaction" class="border-gray-200 border-2 gap-2">-->
+<!--    <div>Address to send money to</div>-->
+<!--    <div><input type="text" name="address"></div>-->
+<!--    <div>Amount to send</div>-->
+<!--    <div><input type="text" name="amount"></div>-->
+<!--    <div><input type="submit" name="transact"-->
+<!--                class="mb-3 rounded-full my-4 shadow bg-green-700 px-4 py-2 text-white hover:bg-green-600"></div>-->
+<!--</form>-->
 
 <br>
 <br>
