@@ -48,6 +48,7 @@ public class Blockchain {
 	long date_last_modified;
 	int length_of_chain;
 	@OneToMany(targetEntity = Block.class, cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	@JoinTable(name="bc_blocks")
 	List<Block> chain;
 
 	/**
