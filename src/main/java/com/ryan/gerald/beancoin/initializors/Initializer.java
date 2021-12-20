@@ -22,11 +22,8 @@ import java.util.Random;
 @Service
 public class Initializer {
 
-    @Autowired
-    BlockchainRepository blockchainRepository;
-
-    @Autowired
-    BlockRepository blockRepository;
+    @Autowired BlockchainRepository blockchainRepository;
+    @Autowired BlockRepository blockRepository;
 
 
     /**

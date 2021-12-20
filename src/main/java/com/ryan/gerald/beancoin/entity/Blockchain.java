@@ -33,7 +33,7 @@ import com.google.gson.Gson;
  * 
  * @author Gerald Ryan Blockchain class of blockchain app. Blockchain class.
  *         Instantiate blockchain with a name as string
- *
+ * TODO Remove id and make name the id field
  *
  */
 @Entity

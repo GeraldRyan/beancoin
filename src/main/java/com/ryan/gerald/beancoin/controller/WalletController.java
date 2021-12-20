@@ -166,20 +166,20 @@ public class WalletController {
         // important as it skips blockchain traversal for balance calculation, which is
         // still buggy with non stored wallets
 
-        Transaction nu = new Transaction(randomWallet, (String) body.get("address"),
+        Transaction neu = new Transaction(randomWallet, (String) body.get("address"),
                 (double) ((Integer) body.get("amount")));
         pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
         model.addAttribute("pool", pool);
-        Transaction alt = pool.findExistingTransactionByWallet(nu.getSenderAddress());
+        Transaction alt = pool.findExistingTransactionByWallet(neu.getSenderAddress());
         if (alt == null) {
-            model.addAttribute("latesttransaction", nu);
-            new TransactionService().addTransactionService(nu);
+            model.addAttribute("latesttransaction", neu);
+            new TransactionService().addTransactionService(neu);
             if (Config.BROADCASTING) {
-                broadcastTransaction(nu);
+                broadcastTransaction(neu);
             }
-            return nu.toJSONtheTransaction();
+            return neu.toJSONtheTransaction();
         } else {
-            Transaction updated = new TransactionService().updateTransactionService(nu, alt);
+            Transaction updated = new TransactionService().updateTransactionService(neu, alt);
             model.addAttribute("latesttransaction", updated);
             if (Config.BROADCASTING) {
                 broadcastTransaction(updated);
@@ -235,8 +235,6 @@ public class WalletController {
             } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
                     | TransactionAmountExceedsBalance | IOException e) {
                 e.printStackTrace();
-            } finally {
-
             }
             transactionRepository.save(merged);
 

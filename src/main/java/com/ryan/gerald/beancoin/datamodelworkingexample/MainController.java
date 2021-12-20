@@ -11,6 +11,7 @@ public class MainController {
     @Autowired // This means to get the bean called userRepository
     private UserExampleRepository userRepository;
 
+
     @GetMapping(path="/add") // Map ONLY POST Requests
     public @ResponseBody String addNewUser (@RequestParam String name
             , @RequestParam String email) {

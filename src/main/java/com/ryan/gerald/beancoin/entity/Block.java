@@ -37,7 +37,7 @@ import com.google.gson.reflect.TypeToken;
 public class Block {
 
 	@Id
-	long timestamp;
+	Long timestamp;
 	protected String hash;
 	protected String lastHash;
 	@Lob

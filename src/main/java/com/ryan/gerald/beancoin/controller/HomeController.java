@@ -42,7 +42,7 @@ import com.google.gson.Gson;
 import com.pubnub.api.PubNubException;
 import com.ryan.gerald.beancoin.initializors.Config.*;
 
-/* - DEV ONLY, not JAVADOC
+/** - DEV ONLY, not JAVADOC
  * Key Data Model Session attributes: On register -- should be logged in, hence
  * everything that login has plus ?nothing else? On Login(success) -- Session:
  * wallet, username, isloggedin=true, failed=false On Login(fail) -- Session:
@@ -85,7 +85,7 @@ public class HomeController {
 		Blockchain bc = blockchainRepository.getBlockchainByName("beancoin");
 		if (bc == null) {
 			bc = new Blockchain("beancoin");
-			blockchainRepository.save(bc);
+//			blockchainRepository.save(bc);
 			initializer.loadBC(bc);
 			blockchainRepository.save(bc);
 		}
@@ -190,12 +190,6 @@ public class HomeController {
 		String transactionData = pool.getMinableTransactionDataString();
 		return pool.getMinableTransactionDataString();
 	}
-
-
-
-
-
-
 
 
 	public String validateUserAndPassword(String username, String password) {

@@ -34,26 +34,24 @@ import com.google.gson.JsonElement;
 import com.pubnub.api.PubNubException;
 
 @Controller
-//@SessionAttributes({"blockchain", "minedblock", "wallet", "pnapp"})
+@SessionAttributes({"blockchain", "minedblock", "wallet", "pnapp"})
 @RequestMapping("blockchain")
 public class BlockchainController {
 
-    @Autowired
-    private BlockchainRepository blockchainRepository;
-    @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
-    private BlockRepository blockRepository;
-    @Autowired
-    Initializer initializer;
+    @Autowired private BlockchainRepository blockchainRepository;
+    @Autowired private TransactionRepository transactionRepository;
+    @Autowired private BlockRepository blockRepository;
+    @Autowired Initializer initializer;
+    @Autowired TransactionPool pool; // REQUIRED for transactionRepo or else can inject dependency self
 
     //	TransactionService tService = new TransactionService(); // OLD STUFF - NEEDED FOR DAO CONNECTION
 //	TransactionPool pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD STUFF
-    TransactionPool pool;
+
 
     TransactionPool refreshTransactionPool() {
         List<Transaction> transactionList = transactionRepository.getListOfTransactions();
-        TransactionPool pool = new TransactionPool();
+        System.out.println("SIZE: " + transactionList.size());
+//        TransactionPool pool = new TransactionPool();
         for (Transaction t : transactionList) {
             System.out.println(t.toString());
             pool.putTransaction(t);
@@ -104,7 +102,7 @@ public class BlockchainController {
             return blockchain;
         } else {
             blockchain = new Blockchain("beancoin");
-            blockchainRepository.save(blockchain);
+//            blockchainRepository.save(blockchain);
 //			Blockchain blockchain = blockchainApp.newBlockchainService("beancoin");
             initializer.loadBC(blockchain);
             blockchainRepository.save(blockchain);
@@ -122,9 +120,10 @@ public class BlockchainController {
         return ((Blockchain) model.getAttribute("blockchain")).toJSONtheChain();
     }
 
+    // TODO LATER FACTOR and minify
     @RequestMapping(value = "mine", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String getMine(@ModelAttribute("blockchain") Blockchain blockchain, Model model)
+    public String getMine(Model model)
             throws NoSuchAlgorithmException, PubNubException, InterruptedException {
 //		pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD
         pool = refreshTransactionPool();
@@ -133,28 +132,23 @@ public class BlockchainController {
         }
         String transactionData = "MAIN INSTANCE STUBBED DATA";
         transactionData = pool.getMinableTransactionDataString();
-//		List<Transaction> tlist = tService.getAllTransactionsAsTransactionList(); // OLD
-        List<Transaction> tlist = transactionRepository.getListOfTransactions();
-        blockchain = blockchainRepository.getBlockchainByName("beancoin");
-//		try {
-        Block new_block = blockchain.add_block(transactionData);
-        blockRepository.save(new_block);
-//		}
-//		catch (Exception e){
-//			e.printStackTrace();
-//		}
 
-//		Block new_block = blockchainApp.addBlockService("beancoin", transactionData);
+        List<Transaction> tlist = transactionRepository.getListOfTransactions();
+        Blockchain blockchain = blockchainRepository.getBlockchainByName("beancoin");
+
+        Block new_block = blockchain.add_block(transactionData);
+        System.out.println("NEW BLOCK DATA: " + new_block.toStringConsole());
+        blockRepository.save(new_block);  // TODO SOLVED BY CHANGING CASCADE TO MERGE, BUT FIGURE OUT WHY
+        model.addAttribute("minedblock", new_block);//		Block new_block = blockchainApp.addBlockService("beancoin", transactionData);
         if (Config.BROADCASTING) {
             new PubNubApp().broadcastBlock(new_block);
         }
-        model.addAttribute("minedblock", new_block);
         blockchain = blockchainRepository.getBlockchainByName("beancoin");
 //		blockchain = blockchainApp.getBlockchainService("beancoin");
         model.addAttribute("blockchain", blockchain);
-        pool.refreshBlockchainTransactionPool(blockchain);
+        pool.refreshBlockchainTransactionPool(blockchain); // TODO
 //		pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD
-        pool = refreshTransactionPool(); // COPIED FROM OLD BUT WHY DO WE NEED TO KEEP DOING THIS??
+//        pool = refreshTransactionPool(); // COPIED FROM OLD BUT WHY DO WE NEED TO KEEP DOING THIS??
         model.addAttribute("pool", pool);
         return new_block.webworthyJson(tlist);
     }
