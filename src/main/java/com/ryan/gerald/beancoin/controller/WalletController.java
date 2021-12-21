@@ -76,9 +76,8 @@ public class WalletController {
         if (walletOptional.isPresent()) {
             w = walletOptional.get();
             Wallet walletFromRepo = walletRepository.findById((String) model.getAttribute("username")).get();
-            walletRepository.save(w);
             Blockchain blockchain = (Blockchain) model.getAttribute("blockchain");
-            double newBalance = Wallet.calculateBalance(blockchain, w.getAddress());
+            double newBalance = Wallet.calculateBalance(blockchain, w.getAddress());  // TODO Make this work at the transaction level not at the mined block level
             w.setBalance(newBalance);
             walletRepository.save(w);
             model.addAttribute("wallet", w);
