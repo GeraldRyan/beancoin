@@ -127,26 +127,22 @@ public class BlockchainController {
             throws NoSuchAlgorithmException, PubNubException, InterruptedException {
 //		pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD
         pool = refreshTransactionPool();
-        if (pool.getMinableTransactionDataString() == null) {
-            return "No data to mine. Tell your friends to make transactions";
-        }
-        String transactionData = "MAIN INSTANCE STUBBED DATA";
-        transactionData = pool.getMinableTransactionDataString();
-
+        String transactionData = pool.getMinableTransactionDataString();
+        if (transactionData == null){ return "No data to mine. Tell your friends to make transactions";}
         List<Transaction> tlist = transactionRepository.getListOfTransactions();
         Blockchain blockchain = blockchainRepository.getBlockchainByName("beancoin");
 
         Block new_block = blockchain.add_block(transactionData);
-        System.out.println("NEW BLOCK DATA: " + new_block.toStringConsole());
-        blockRepository.save(new_block);  // TODO SOLVED BY CHANGING CASCADE TO MERGE, BUT FIGURE OUT WHY
+        System.out.println("NEW BLOCK MINED: " + new_block.toStringConsole());
+        blockchainRepository.save(blockchain);
         model.addAttribute("minedblock", new_block);//		Block new_block = blockchainApp.addBlockService("beancoin", transactionData);
-        if (Config.BROADCASTING) {
+        if (Config.BROADCASTING) { // TODO CHANGE TO KAFKA
             new PubNubApp().broadcastBlock(new_block);
         }
         blockchain = blockchainRepository.getBlockchainByName("beancoin");
 //		blockchain = blockchainApp.getBlockchainService("beancoin");
         model.addAttribute("blockchain", blockchain);
-        pool.refreshBlockchainTransactionPool(blockchain); // TODO
+        pool.refreshBlockchainTransactionPool(blockchain);
 //		pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD
 //        pool = refreshTransactionPool(); // COPIED FROM OLD BUT WHY DO WE NEED TO KEEP DOING THIS??
         model.addAttribute("pool", pool);

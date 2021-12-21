@@ -158,17 +158,8 @@ public class TransactionPool {
                 if (this.getTransactionMap().containsKey(t.getId())) {
                     try {
                         System.out.println("Removing Transaction: " + t.getId());
-//                        Transaction tt = transactionRepository.findById(t.getId()).get();
-//                        System.out.println("TRANSACTION TO STRING: " + tt.toString());
-
-//                        transactionRepository.delete(t.getId());
-//						Transaction tx = transactionRepository.findById(t.getId()).get();
-//						transactionRepository.delete(tx);
                         transactionRepository.deleteById(t.getId());
-//						this.getTransactionMap().remove (t.getId());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    } catch (Exception e) { e.printStackTrace(); }
                 }
             }
         }

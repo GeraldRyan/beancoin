@@ -89,8 +89,7 @@ public class Block {
 		this.nonce = nonce;
 	}
 
-	public Block() {
-	}
+	public Block() { }
 
 	/**
 	 * 
@@ -124,7 +123,7 @@ public class Block {
 	 * @param tlist
 	 * @return
 	 */
-	public <Transation> String webworthyJson(List<Transaction> tlist) {
+	public String webworthyJson(List<Transaction> tlist) {
 		HashMap<String, Object> serializeThisBundle = new HashMap<String, Object>();
 		List<TransactionRepr> treprlist = new ArrayList();
 		for (Transaction t : tlist) {
@@ -139,7 +138,7 @@ public class Block {
 		return new Gson().toJson(serializeThisBundle);
 	}
 
-	public <Transation> String webworthyJson(List<TransactionRepr> tlist, String foo) {
+	public String webworthyJson(List<TransactionRepr> tlist, String foo) {
 		HashMap<String, Object> serializeThisBundle = new HashMap<String, Object>();
 		serializeThisBundle.put("timestamp", timestamp);
 		serializeThisBundle.put("hash", hash);

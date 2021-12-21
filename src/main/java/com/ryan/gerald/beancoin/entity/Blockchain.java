@@ -40,6 +40,7 @@ import com.google.gson.Gson;
 @Table(name = "blockchain")
 public class Blockchain {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(unique = true)
 	@Id
 	int id;
 	@Column(unique = true)
@@ -47,7 +48,7 @@ public class Blockchain {
 	long date_created;
 	long date_last_modified;
 	int length_of_chain;
-	@OneToMany(targetEntity = Block.class, cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	@OneToMany(targetEntity = Block.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.EAGER)
 	@JoinTable(name="bc_blocks")
 	List<Block> chain;
 
