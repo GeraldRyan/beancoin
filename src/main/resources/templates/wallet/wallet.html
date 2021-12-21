@@ -3,37 +3,26 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <title>Wallet</title>
-
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
     <link th:href="@{/styles/main.css}" rel="stylesheet"/>
-    <style type="text/css">
-        body {
-          background-color: white;
-        }
-
-    </style>
+    <style type="text/css"> body { background-color: white; } </style>
 </head>
-
 <body>
-
 <div th:replace="fragments/navbar"></div>
-
 <h1>Your Wallet</h1>
-<p style="color: red">Note: for using this app service, you don't need access to your own key. it is stored encrypted on our Servers!</p>
+<p style="color: red">Note: for using this app service, you don't need access to your own key. it is stored encrypted on
+    our Servers!</p>
 <br>
 <br>
 
 <div class="card">
     <div class="inline">
-
-        <h2 class="text-5xl font-medium">Balance: <span th:text="${wallet.balance}"></span></h2>
+        <h2 class="text-5xl font-medium">Balance: <span th:text="${wallet.balance}"></span></h2><br>
+        <h3 class="inline text-4xl font-medium"> Address: <span th:text="${wallet.address}"></span></h3><br>
         <br>
-        <h3 class="inline text-4xl font-medium"> Address: <span th:text="${wallet.address}"></span></h3>
-        <br>
-        <br>
-<!--    TODO -->
-<!--        <button id="cpy" class=" inline shadow bg-gray-500 ml-4 px-4 text-whitehover:bg-gray-400">copy to clipboard</button>-->
-<!--    TODO-->
+        <!--    TODO -->
+        <!--        <button id="cpy" class=" inline shadow bg-gray-500 ml-4 px-4 text-whitehover:bg-gray-400">copy to clipboard</button>-->
+        <!--    TODO-->
 
     </div>
 
@@ -42,26 +31,22 @@
     <!--        </fmt:formatNumber>-->
     </p>
 
-    <p><span class="font-medium">public key:</span> <span th:text="${wallet.publickey}"></span></p>
+    <p><span class="font-medium">public key:</span> <span th:text="${wallet.publickey}"></span></p><br>
     <br>
-    <br>
 
-
-
-
-<!--    TODO AT LATER DATE -->
-<!--    <p>Get your Private Key emailed to you</p>-->
-<!--    <form action="./" method="POST"><input type="submit" value="Submit"></form>-->
-<!--    TODO AT LATER DATE-->
+    <!--    TODO AT LATER DATE -->
+    <!--    <p>Get your Private Key emailed to you</p>-->
+    <!--    <form action="./" method="POST"><input type="submit" value="Submit"></form>-->
+    <!--    TODO AT LATER DATE-->
 
     <br>
     <br>
 
     <!--    TODO AT LATER DATE-->
-<!--    <H3>Reveal Private Key: </H3>-->
-<!--    <h4>DO NOT SHARE</h4>-->
-<!--    <p> Private Key: <span th:text="${wallet.privatekey}"></spanth:text> </span></p>-->
-<!--    <h4>DO NOT SHARE</h4>-->
+    <!--    <H3>Reveal Private Key: </H3>-->
+    <!--    <h4>DO NOT SHARE</h4>-->
+    <!--    <p> Private Key: <span th:text="${wallet.privatekey}"></spanth:text> </span></p>-->
+    <!--    <h4>DO NOT SHARE</h4>-->
     <!--    TODO AT LATER DATE-->
 
 </div>

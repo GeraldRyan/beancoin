@@ -45,29 +45,22 @@ import com.pubnub.api.PubNubException;
  */
 public class WalletController {
 
-    @Autowired
-    private BlockchainRepository blockchainRepository;
-    @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
-    private BlockRepository blockRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private WalletRepository walletRepository;
+    @Autowired private BlockchainRepository blockchainRepository;
+    @Autowired private TransactionRepository transactionRepository;
+    @Autowired private BlockRepository blockRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private WalletRepository walletRepository;
 
 //	TransactionPool poolOLD = new TransactionService().getAllTransactionsAsTransactionPoolService();
-
+    @Autowired
     TransactionPool pool;
-    WalletService ws = new WalletService();
 
     @ModelAttribute("wallet")
     public Wallet initWalletIfNotPresent(Model m) {
         return walletRepository.findById(String.valueOf(m.getAttribute("username"))).get();
     }
 
-    public WalletController() throws InterruptedException {
-    }
+    public WalletController() throws InterruptedException { }
 
     /**
      * Display wallet console page. Sometimes wallet doesn't load due to session
@@ -78,19 +71,19 @@ public class WalletController {
      */
     @GetMapping("")
     public String getWallet(Model model) {
-//		Wallet w = (Wallet) model.getAttribute("wallet");
+        Wallet w;
         Optional<Wallet> walletOptional = walletRepository.findById(String.valueOf(model.getAttribute("username")));
         if (walletOptional.isPresent()) {
-            Wallet w = walletOptional.get();
-            System.out.println("WALLET IS NULL: " + w.toString());
-            w = walletRepository.findById((String) model.getAttribute("username")).get();
-            System.out.println("WALLET IS NOT NULL: " + w.toString());
+            w = walletOptional.get();
+            Wallet walletFromRepo = walletRepository.findById((String) model.getAttribute("username")).get();
+            walletRepository.save(w);
+            Blockchain blockchain = (Blockchain) model.getAttribute("blockchain");
+            double newBalance = Wallet.calculateBalance(blockchain, w.getAddress());
+            w.setBalance(newBalance);
+            walletRepository.save(w);
             model.addAttribute("wallet", w);
-//			System.out.println("ERROR WITH WALLET");
 //			return "redirect:/";
         }
-//		w = ws.updateWalletBalanceService(w); // TODO FIX THIS WIRE IT INTO REPO
-
         return "wallet/wallet";
     }
 
