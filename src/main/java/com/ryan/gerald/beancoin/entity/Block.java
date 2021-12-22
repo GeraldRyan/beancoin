@@ -159,13 +159,12 @@ public class Block {
 	}
 
 	public List<TransactionRepr> deserializeTransactionData() {
-		List<TransactionRepr> lt = new ArrayList();
 		java.lang.reflect.Type t = new TypeToken<List<TransactionRepr>>() {
 		}.getType();
-		List<TransactionRepr> listTR = null;
-		System.out.println(this.getData());
-		listTR = new Gson().fromJson(this.getData(), t);
-		return listTR;
+		return new Gson().fromJson(this.getData(), t);
+//		List<TransactionRepr> listTR = null;
+//		System.out.println(this.getData());
+//		return listTR;
 	}
 
 	/**

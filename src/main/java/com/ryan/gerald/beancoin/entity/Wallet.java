@@ -12,26 +12,19 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import javax.persistence.*;
 
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.utilities.StringUtils;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
-import com.google.gson.Gson;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * An individual wallet for a miner. Keeps track of miner's balance. Allows
@@ -90,7 +83,7 @@ public class Wallet {
 	 */
 	public Wallet(double balance, PublicKey publickey, String address) {
 		super();
-		balance = Wallet.calculateBalance(new BlockchainService().getBlockchainService("beancoin"), address);
+		balance = Wallet.calculateWalletBalance(new BlockchainService().getBlockchainService("beancoin"), address);
 		// can remove param 1 balance now or better yet add the blockchain as a
 		// dependency injection as this is tight coupling
 		this.balance = balance;
@@ -202,7 +195,7 @@ public class Wallet {
 	 * Restores a public key object in your chosen language from either a Base64
 	 * String or a byte[] as received over the wire (contains X.509 standard)
 	 * 
-	 * @param pk
+	 * @param publickey
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchProviderException
@@ -226,7 +219,7 @@ public class Wallet {
 	}
 
 	/**
-	 * Calculates balance of address based on blockchain history.
+	 * Calculates balance of address based on blockchain history (only counts MINED BLOCKS)
 	 * 
 	 * Two ways to find balance: calculate all transactions to and fro or trusting
 	 * output values
@@ -235,8 +228,7 @@ public class Wallet {
 	 * @param adds
 	 * @return
 	 */
-	public static double calculateBalance(Blockchain bc, String adds) {
-
+	public static double calculateWalletBalance(Blockchain bc, String adds) {
 		double balance = STARTING_BALANCE; // starting balance. static means not touching real wallet.
 		// loop through transactions - yes, every transaction of every block of the
 		// entire chain (minus the dummy data chains)
@@ -247,28 +239,73 @@ public class Wallet {
 			return -1; // if -1 in caller function, leave balance same. Should this have been non
 						// static perhaps?
 		}
-		List<TransactionRepr> trList;
+
 		int i = 0;
 		for (Block b : bc.getChain()) {
 			i++;
-			if (i < 7) { // dummy data blocks - crashes gson. ALso don't let them get readded. Why I even
-							// have them?
-				continue;
-			}
-			trList = b.deserializeTransactionData();
-			for (TransactionRepr t : trList) {
+			if (i < 7) { continue; } // dummy data blocks
+			// would for (i=0; i<7; i++) {continue;} work?
+			List<TransactionRepr> trListMinedBlocks = b.deserializeTransactionData();
+			for (TransactionRepr t : trListMinedBlocks) {
 				if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance
 					// reset balance after each transaction
-					System.err.println("HERE> SHOULD BE ADDING");
 					balance = (double) t.getOutput().get(adds);
 				} else if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
 					balance += (double) t.getOutput().get(adds);
 				}
 			}
 		}
+		List<TransactionRepr> trListUnmined = new ArrayList();;
+		for (TransactionRepr t : trListUnmined){
+			if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance
+				// reset balance after each transaction
+				balance = (double) t.getOutput().get(adds);
+			} else if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
+				balance += (double) t.getOutput().get(adds);
+			}
+		}
+
 		return balance;
 	}
+	public static double calculateWalletBalance(Blockchain bc, String adds, List<TransactionRepr> pendingTransactions) {
+		double balance = STARTING_BALANCE; // starting balance. static means not touching real wallet.
+		// loop through transactions - yes, every transaction of every block of the
+		// entire chain (minus the dummy data chains)
+		System.out.println("String address" + adds);
+		if (bc == null) {
+			System.err.println("BLOCKCHAIN IS NULL");
+			System.err.println("String address" + adds);
+			return -1; // if -1 in caller function, leave balance same. Should this have been non
+			// static perhaps?
+		}
 
+		int i = 0;
+		for (Block b : bc.getChain()) {
+			i++;
+			if (i < 7) { continue; } // dummy data blocks
+			// would for (i=0; i<7; i++) {continue;} work?
+			List<TransactionRepr> trListMinedBlocks = b.deserializeTransactionData();
+			for (TransactionRepr t : trListMinedBlocks) {
+				if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance
+					// reset balance after each transaction
+					balance = (double) t.getOutput().get(adds);
+				} else if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
+					balance += (double) t.getOutput().get(adds);
+				}
+			}
+		}
+
+		for (TransactionRepr t : pendingTransactions){
+			if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance
+				// reset balance after each transaction
+				balance = (double) t.getOutput().get(adds);
+			} else if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
+				balance += (double) t.getOutput().get(adds);
+			}
+		}
+
+		return balance;
+	}
 	public double getBalance() {
 		return balance;
 	}

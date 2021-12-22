@@ -8,9 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
-import org.apache.logging.log4j.Logger;
+import com.ryan.gerald.beancoin.utilities.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +23,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.ryan.gerald.beancoin.Service.TransactionService;
-import com.ryan.gerald.beancoin.Service.UserService;
-import com.ryan.gerald.beancoin.Service.WalletService;
 //import com.ryan.gerald.beancoin.entity.EmailSender;
 import com.ryan.gerald.beancoin.initializors.Config;
 import com.ryan.gerald.beancoin.initializors.Initializer;
@@ -50,10 +47,10 @@ public class WalletController {
     @Autowired private BlockRepository blockRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private WalletRepository walletRepository;
+    @Autowired private TransactionService transactionService;
 
 //	TransactionPool poolOLD = new TransactionService().getAllTransactionsAsTransactionPoolService();
-    @Autowired
-    TransactionPool pool;
+    @Autowired TransactionPool pool;
 
     @ModelAttribute("wallet")
     public Wallet initWalletIfNotPresent(Model m) {
@@ -75,9 +72,10 @@ public class WalletController {
         Optional<Wallet> walletOptional = walletRepository.findById(String.valueOf(model.getAttribute("username")));
         if (walletOptional.isPresent()) {
             w = walletOptional.get();
+            List<TransactionRepr> listTransactionsPending = transactionService.getTransactionReprList();
             Wallet walletFromRepo = walletRepository.findById((String) model.getAttribute("username")).get();
             Blockchain blockchain = (Blockchain) model.getAttribute("blockchain");
-            double newBalance = Wallet.calculateBalance(blockchain, w.getAddress());  // TODO Make this work at the transaction level not at the mined block level
+            double newBalance = Wallet.calculateWalletBalance(blockchain, w.getAddress(), listTransactionsPending);  // TODO Make this work at the transaction level not at the mined block level
             w.setBalance(newBalance);
             walletRepository.save(w);
             model.addAttribute("wallet", w);
