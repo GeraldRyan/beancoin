@@ -105,8 +105,6 @@ public class HomeController {
 //	@PostMapping("") // why not?
 	@GetMapping("")
 	public String showIndex(Model model) {
-//		System.out.println("SPRING DATASOURCE URL IS : " + env.getProperty("spring.datasource.url"));
-
 		return "index";
 	}
 

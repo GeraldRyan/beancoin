@@ -36,7 +36,6 @@ public class WalletController {
 
     public WalletController() throws InterruptedException {}
 
-
     @ModelAttribute("wallet")
     public Wallet initWalletIfNotPresent(Model m) throws UsernameNotLoaded {
         try {
