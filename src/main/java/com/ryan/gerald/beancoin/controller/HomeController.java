@@ -137,7 +137,7 @@ public class HomeController {
 			model.addAttribute("failed", true);
 			model.addAttribute("msg", "Password incorrect. Please try again");
 		}
-		return "index";
+		return "redirect:/";
 	}
 
 	@GetMapping("/logout")
