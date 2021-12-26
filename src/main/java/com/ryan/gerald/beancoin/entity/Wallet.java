@@ -76,14 +76,11 @@ public class Wallet {
 
 	/**
 	 * used to recreate what's known of wallet without the private key info
-	 * 
-	 * @param balance
-	 * @param publickey
-	 * @param address
+	 *
 	 */
 	public Wallet(double balance, PublicKey publickey, String address) {
 		super();
-		balance = Wallet.calculateWalletBalance(new BlockchainService().getBlockchainService("beancoin"), address);
+		balance = Wallet.calculateWalletBalanceByTraversingChain(new BlockchainService().getBlockchainService("beancoin"), address);
 		// can remove param 1 balance now or better yet add the blockchain as a
 		// dependency injection as this is tight coupling
 		this.balance = balance;
@@ -107,12 +104,7 @@ public class Wallet {
 
 	/**
 	 * Generate a signature based on data using local private key
-	 * 
-	 * @param data
-	 * @throws NoSuchProviderException
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeyException
-	 * @throws SignatureException
+	 *
 	 */
 	public byte[] sign(byte[] data)
 			throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
@@ -137,15 +129,6 @@ public class Wallet {
 
 	/**
 	 * Verifies signature of data of given public key
-	 * 
-	 * @param signatureBytes
-	 * @param data
-	 * @param publickey
-	 * @return
-	 * @throws SignatureException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchProviderException
-	 * @throws InvalidKeyException
 	 */
 	public static boolean verifySignature(byte[] signatureBytes, byte[] data, PublicKey publickey)
 			throws SignatureException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
@@ -228,7 +211,7 @@ public class Wallet {
 	 * @param adds
 	 * @return
 	 */
-	public static double calculateWalletBalance(Blockchain bc, String adds) {
+	public static double calculateWalletBalanceByTraversingChain(Blockchain bc, String adds) {
 		double balance = STARTING_BALANCE; // starting balance. static means not touching real wallet.
 		// loop through transactions - yes, every transaction of every block of the
 		// entire chain (minus the dummy data chains)
@@ -267,18 +250,8 @@ public class Wallet {
 
 		return balance;
 	}
-	public static double calculateWalletBalance(Blockchain bc, String adds, List<TransactionRepr> pendingTransactions) {
-		double balance = STARTING_BALANCE; // starting balance. static means not touching real wallet.
-		// loop through transactions - yes, every transaction of every block of the
-		// entire chain (minus the dummy data chains)
-		System.out.println("String address" + adds);
-		if (bc == null) {
-			System.err.println("BLOCKCHAIN IS NULL");
-			System.err.println("String address" + adds);
-			return -1; // if -1 in caller function, leave balance same. Should this have been non
-			// static perhaps?
-		}
-
+	public static double calculateWalletBalanceByTraversingChain(Blockchain bc, String adds, List<TransactionRepr> pendingTransactions) {
+		double balance = STARTING_BALANCE;
 		int i = 0;
 		for (Block b : bc.getChain()) {
 			i++;

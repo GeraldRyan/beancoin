@@ -27,25 +27,20 @@ import com.ryan.gerald.beancoin.entity.Wallet;
 
 @Controller
 @RequestMapping("/register")
-@SessionAttributes({ "isloggedin", "wallet", "username" })
+@SessionAttributes({"isloggedin", "wallet", "username"})
 public class RegistrationController {
 
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private WalletRepository walletRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private WalletRepository walletRepository;
 
+    @GetMapping("")
+    public ModelAndView showRegisterPage(Model model) {
+        ModelAndView mv = new ModelAndView("registration/register");
+        model.addAttribute("user", new User());
+        return mv;
+    }
 
-	UserService userService = new UserService();
-
-	@GetMapping("")
-	public ModelAndView showRegisterPage(Model model) {
-		ModelAndView mv = new ModelAndView("registration/register");
-		model.addAttribute("user", new User());
-		return mv;
-	}
-
-	// THIS WORKS
+    // THIS WORKS
 //	@GetMapping("")
 //	public String showRegisterPage() {
 ////		ModelAndView mv = new ModelAndView("registration/register");
@@ -53,34 +48,32 @@ public class RegistrationController {
 //		return "registration/register";
 //	}
 
-	@PostMapping("")
-	public String registerUser(Model model, @ModelAttribute("user") @Valid User user)
-			throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+    @PostMapping("")
+    public String registerUser(Model model, @ModelAttribute("user") @Valid User user) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
 
-//		User existingUser = new UserService().getUserService(user.getUsername()); // old
-		Optional<User> existingUser = userRepository.findById(user.getUsername());
+        Optional<User> existingUser = userRepository.findById(user.getUsername());
 
-		if (existingUser.isPresent()) {
-			model.addAttribute("existsmsg", "User already exists. Choose another name or log in");
-			return "registration/register";
-		}
-		userRepository.save(user);
-		Wallet wallet = Wallet.createWallet(user.getUsername());
-		walletRepository.save(wallet);
-		model.addAttribute("isloggedin", true);
-		model.addAttribute("user", user);
-		model.addAttribute("wallet", wallet);
-		model.addAttribute("username", user.getUsername());
-		return "registration/welcomepage";
-	}
+        if (existingUser.isPresent()) {
+            model.addAttribute("existsmsg", "User already exists. Choose another name or log in");
+            return "registration/register";
+        }
+        Wallet wallet = Wallet.createWallet(user.getUsername());
+        userRepository.save(user);
+        walletRepository.save(wallet);
+        model.addAttribute("isloggedin", true);
+        model.addAttribute("user", user);
+        model.addAttribute("wallet", wallet);
+        model.addAttribute("username", user.getUsername());
+        return "registration/welcomepage";
+    }
 
-	@GetMapping("welcome")
-	public String getWelcome(Model model) {
-		User u = ((User) model.getAttribute("user"));
-		Wallet w = (Wallet) new WalletService().getWalletService(u.getUsername()); // I find that extra protection
-																					// prevents unexpected crashes
-		model.addAttribute("wallet", w);
-		return "registration/welcomepage";
-	}
+    @GetMapping("welcome")
+    public String getWelcome(Model model) {
+        User u = ((User) model.getAttribute("user"));
+        Wallet w = (Wallet) new WalletService().getWalletService(u.getUsername()); // I find that extra protection
+        // prevents unexpected crashes
+        model.addAttribute("wallet", w);
+        return "registration/welcomepage";
+    }
 
 }

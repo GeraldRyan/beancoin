@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import org.hibernate.mapping.Map;
 
 import com.ryan.gerald.beancoin.Service.TransactionService;
@@ -166,7 +167,7 @@ public class TransactionPool {
     }
 
     public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException,
-            NoSuchProviderException, IOException, InvalidAlgorithmParameterException {
+            NoSuchProviderException, IOException, InvalidAlgorithmParameterException, TransactionAmountExceedsBalance {
         TransactionPool pool = new TransactionPool();
         Wallet w = Wallet.createWallet("sender");
         Wallet unusedWallet = Wallet.createWallet("u");

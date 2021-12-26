@@ -6,26 +6,17 @@ import java.util.*;
 
 import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
+import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
 import com.ryan.gerald.beancoin.Service.TransactionService;
 //import com.ryan.gerald.beancoin.entity.EmailSender;
 import com.ryan.gerald.beancoin.initializors.Config;
-import com.ryan.gerald.beancoin.initializors.Initializer;
 import com.ryan.gerald.beancoin.pubsub.PubNubApp;
-import com.google.gson.Gson;
 import com.pubnub.api.PubNubException;
 
 @Controller
@@ -34,45 +25,45 @@ import com.pubnub.api.PubNubException;
 
 public class WalletController {
 
-    @Autowired
-    private BlockchainRepository blockchainRepository;
-    @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
-    private BlockRepository blockRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private WalletRepository walletRepository;
-    @Autowired
-    private TransactionService transactionService;
+    @Autowired private BlockchainRepository blockchainRepository;
+    @Autowired private TransactionRepository transactionRepository;
+    @Autowired private BlockRepository blockRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private WalletRepository walletRepository;
+    @Autowired private TransactionService transactionService;
 
-    @Autowired
-    TransactionPool pool;
+    @Autowired TransactionPool pool;
 
-    public WalletController() throws InterruptedException {
-    }
+    public WalletController() throws InterruptedException {}
+
 
     @ModelAttribute("wallet")
-    public Wallet initWalletIfNotPresent(Model m) {
-        return walletRepository.findById(String.valueOf(m.getAttribute("username"))).get();
+    public Wallet initWalletIfNotPresent(Model m) throws UsernameNotLoaded {
+        try {
+            return walletRepository.findById(String.valueOf(m.getAttribute("username"))).get();
+        }
+        catch (Exception e){
+            throw new UsernameNotLoaded("USER NAME IS NOT LOADED");
+        }
     }
 
     @GetMapping("")
     public String getWallet(Model model) {
         Wallet w;
-        Optional<Wallet> walletOptional = walletRepository.findById(String.valueOf(model.getAttribute("username")));
-        if (walletOptional.isPresent()) {
-            w = walletOptional.get();
-            List<TransactionRepr> listTransactionsPending = transactionService.getTransactionReprList();
-            Wallet walletFromRepo = walletRepository.findById((String) model.getAttribute("username")).get();
-            Blockchain blockchain = (Blockchain) model.getAttribute("blockchain");
-            double newBalance = Wallet.calculateWalletBalance(blockchain, w.getAddress(), listTransactionsPending);  // TODO Make this work at the transaction level not at the mined block level
-            w.setBalance(newBalance);
-            walletRepository.save(w);
-            model.addAttribute("wallet", w);
-//			return "redirect:/";
+        try {
+            w = (Wallet) model.getAttribute("wallet");
+            if (w == null)  w = walletRepository.findById(String.valueOf(model.getAttribute("username"))).get();
         }
+        catch (Exception e){
+            return "redirect:/";
+        }
+        List<TransactionRepr> listTransactionsPending = transactionService.getTransactionReprList();
+        Blockchain blockchain = (Blockchain) model.getAttribute("blockchain");
+        w.setBalance(Wallet.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress(),
+                listTransactionsPending)); // chain is the sourceOfTruth
+        walletRepository.save(w);
+        model.addAttribute("wallet", w);
+//			return "redirect:/";
         return "wallet/wallet";
     }
 
@@ -108,15 +99,17 @@ public class WalletController {
 //    }
 
     @GetMapping("/transact")
-    public String getTransact(Model model)
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+    public String getTransact(Model model) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
         Wallet w;
         try {
             w = (Wallet) model.getAttribute("wallet");
         } catch (Exception e) {
             w = walletRepository.findById((String) model.getAttribute("username")).get();
         }
+        w.setBalance(Wallet.calculateWalletBalanceByTraversingChain(blockchainRepository.getBlockchainByName(
+                "beancoin"), w.getAddress(), transactionService.getTransactionReprList()));
         model.addAttribute("wallet", w);
+        walletRepository.save(w);
         return "wallet/transact";
     }
 
@@ -153,71 +146,65 @@ public class WalletController {
 
     @RequestMapping(value = "/transaction", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String makeTransaction(@ModelAttribute("wallet") Wallet w, Model model,
-                                  @RequestParam("address") String address, @RequestParam("amount") double amount)
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
-            InterruptedException {
-        Transaction neu = new Transaction(w, address, amount);
-        pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
-        Transaction old = pool.findExistingTransactionByWallet(neu.getSenderAddress());
-        if (old == null) {
-            model.addAttribute("latesttransaction", neu);
-            transactionRepository.save(neu);
-            if (Config.BROADCASTING) {
-                broadcastTransaction(neu);
-            }
-            return neu.toJSONtheTransaction();
-        } else {
-            System.out.println("Existing transaction found!");
-            Transaction merged = transactionRepository.findById(old.getUuid()).get();
-            merged.rebuildOutputInput();
-            try {
+    public String makeTransaction(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, InvalidKeyException {
+        try {
+            Transaction neu = new Transaction(w, address, amount);
+            pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
+            Transaction old = pool.findExistingTransactionByWallet(neu.getSenderAddress());
+            if (old == null) {
+                model.addAttribute("latesttransaction", neu);
+                transactionRepository.save(neu);
+                if (Config.BROADCASTING) {broadcastTransaction(neu);}
+                return neu.toJSONtheTransaction();
+            } else {
+                System.out.println("Existing transaction found!");
+                Transaction merged = transactionRepository.findById(old.getUuid()).get();
                 merged.update(neu.getSenderWallet(), neu.getRecipientAddress(), neu.getAmount());
-            } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
-                    | TransactionAmountExceedsBalance | IOException e) {
-                e.printStackTrace();
+                merged.rebuildOutputInput();
+                transactionRepository.save(merged);
+                model.addAttribute("latesttransaction", merged);
+                if (Config.BROADCASTING) {broadcastTransaction(merged);}
+                return merged.toJSONtheTransaction();
             }
-            transactionRepository.save(merged);
-            model.addAttribute("latesttransaction", merged);
-            if (Config.BROADCASTING) {
-                broadcastTransaction(merged);
-            }
-            return merged.toJSONtheTransaction();
+        } catch (TransactionAmountExceedsBalance e) {
+            System.out.println("Transaction Amount Exceeds Balance");
+            model.addAttribute("exceedsBalance", "Transaction Amount Exceeds Balance. Please enter a lower amount");
+            return "Transaction Amount Exceeds Balance. Please enter a lower amount";
+        } catch (Exception e) {
+            e.printStackTrace();
+//            alert(Unkonwn Error occurred)
+            return "index";
         }
     }
 
-    /**
-     * Dev method, not necessary. Able to post various combinations to make multiple
-     * random type dev transactions. Because over the network and server, this can
-     * get buggy and consume resources. Easier to run dummy transactions in main
-     * method of initializer. Safest to ignore
-     */
-    @PostMapping("/transactt")
-    @ResponseBody
-    public String postDummyTransactions(Model model, @RequestBody Map<String, Object> body) throws InvalidKeyException,
-            NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidAlgorithmParameterException {
+//    /**
+//     * Dev method, not necessary. Able to post various combinations to make multiple
+//     * random type dev transactions. Because over the network and server, this can
+//     * get buggy and consume resources. Easier to run dummy transactions in main
+//     * method of initializer. Safest to ignore
+//     */
+//    @PostMapping("/transactt")
+//    @ResponseBody
+//    public String postDummyTransactions(Model model, @RequestBody Map<String, Object> body) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidAlgorithmParameterException {
+//
+//        String numString = (String) body.get("number");
+//        List<Transaction> list = new ArrayList();
+//        int n = 1;
+//        if (numString != null) {
+//            n = new Random().nextInt(999);
+//        }
+//        String fromaddress = (String) body.get("fromaddress");
+//        if (fromaddress == null) {
+//            list = new Initializer().postNTransactions(n);
+//        } else {
+//            list = new Initializer().postNTransactions(n, fromaddress);
+//        }
+//
+//        pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
+//        model.addAttribute("pool", pool);
+//        return new Gson().toJson(list);
+//    }
 
-        String numString = (String) body.get("number");
-        List<Transaction> list = new ArrayList();
-        int n = 1;
-        if (numString != null) {
-            n = new Random().nextInt(999);
-        }
-        String fromaddress = (String) body.get("fromaddress");
-        if (fromaddress == null) {
-            list = new Initializer().postNTransactions(n);
-        } else {
-            list = new Initializer().postNTransactions(n, fromaddress);
-        }
-
-        pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
-        model.addAttribute("pool", pool);
-        return new Gson().toJson(list);
-    }
-
-    /**
-     * Broadcast to pubnub wrapper method
-     */
     public void broadcastTransaction(Transaction t) throws InterruptedException {
         try {
             new PubNubApp().broadcastTransaction(t);

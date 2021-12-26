@@ -45,6 +45,7 @@ input {
 <!--    Pool</a> <br>-->
 <!--</nav>-->
 <h1 class="text-5xl mb-8">Transact on the blockchain</h1>
+<h2 class="text-red">Current Balance: <span th:text="${wallet.balance}"></span></h2>
 <form th:action="@{/wallet/transaction}" method="get" class="border-gray-200 border-2 gap-2">
     <div>Address to send money to</div>
     <div><input type="text" name="address"></div>

@@ -34,7 +34,7 @@ public class WalletDao extends DBConnection implements WalletDaoI {
 	public Wallet updateWallet(Wallet wallet) {
 		this.connect();
 		em.getTransaction().begin();
-		double newBalance = Wallet.calculateWalletBalance(new BlockchainService().getBlockchainService("beancoin"),
+		double newBalance = Wallet.calculateWalletBalanceByTraversingChain(new BlockchainService().getBlockchainService("beancoin"),
 				wallet.getAddress());
 		wallet.setBalance(newBalance);
 		em.getTransaction().commit();

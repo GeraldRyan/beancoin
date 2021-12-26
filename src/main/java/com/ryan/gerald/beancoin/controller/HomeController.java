@@ -112,9 +112,7 @@ public class HomeController {
 
 	@GetMapping("/login")
 	public String showLoginPage(Model model, @ModelAttribute("login") Login login) {
-		if ((boolean) model.getAttribute(("isloggedin"))) {
-			return "redirect:/";
-		}
+		if ((boolean) model.getAttribute(("isloggedin"))) { return "redirect:/"; }
 			return "login/login";
 	}
 
