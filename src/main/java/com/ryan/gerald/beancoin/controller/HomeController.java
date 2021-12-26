@@ -42,15 +42,6 @@ import com.google.gson.Gson;
 import com.pubnub.api.PubNubException;
 import com.ryan.gerald.beancoin.initializors.Config.*;
 
-/** - DEV ONLY, not JAVADOC
- * Key Data Model Session attributes: On register -- should be logged in, hence
- * everything that login has plus ?nothing else? On Login(success) -- Session:
- * wallet, username, isloggedin=true, failed=false On Login(fail) -- Session:
- * failed=true, msg="various string" On logout -- Session: wallet=null,
- * username=null, isloggedin=false
- *
- */
-
 @Controller
 @SessionAttributes({ "blockchain", "wallet", "username", "isloggedin", "user", "msg", "transactionpool", "pubsubapp" })
 public class HomeController {
@@ -67,9 +58,6 @@ public class HomeController {
 	@Autowired
 	private Environment env;
 
-	// This is not Inversion of Control/Loose coupling? Could refactor? DONE!!!!!! with repository. Good catch.
-//	UserService userService = new UserService();
-
 	public HomeController() throws InterruptedException {
 	}
 
@@ -85,7 +73,6 @@ public class HomeController {
 		Blockchain bc = blockchainRepository.getBlockchainByName("beancoin");
 		if (bc == null) {
 			bc = new Blockchain("beancoin");
-//			blockchainRepository.save(bc);
 			initializer.loadBC(bc);
 			blockchainRepository.save(bc);
 		}

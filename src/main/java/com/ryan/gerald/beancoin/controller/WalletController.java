@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.security.*;
 import java.util.*;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
@@ -34,38 +32,32 @@ import com.pubnub.api.PubNubException;
 @RequestMapping("wallet")
 @SessionAttributes({"wallet", "latesttransaction", "isloggedin", "pool", "username", "user", "blockchain"})
 
-/**
- * ./transact page is for making transactions, GET or POST Completing the form
- * sends you to /transaction GET page, and completes the transaction through
- * requestparams. You can also post to /transaction but it can be buggy with
- * Spring and synchronization
- */
 public class WalletController {
 
-    @Autowired private BlockchainRepository blockchainRepository;
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private BlockRepository blockRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private WalletRepository walletRepository;
-    @Autowired private TransactionService transactionService;
+    @Autowired
+    private BlockchainRepository blockchainRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
+    @Autowired
+    private BlockRepository blockRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private WalletRepository walletRepository;
+    @Autowired
+    private TransactionService transactionService;
 
-//	TransactionPool poolOLD = new TransactionService().getAllTransactionsAsTransactionPoolService();
-    @Autowired TransactionPool pool;
+    @Autowired
+    TransactionPool pool;
+
+    public WalletController() throws InterruptedException {
+    }
 
     @ModelAttribute("wallet")
     public Wallet initWalletIfNotPresent(Model m) {
         return walletRepository.findById(String.valueOf(m.getAttribute("username"))).get();
     }
 
-    public WalletController() throws InterruptedException { }
-
-    /**
-     * Display wallet console page. Sometimes wallet doesn't load due to session
-     * state. Just click around, log in and out until loads (until fixed)
-     *
-     * @param model
-     * @return
-     */
     @GetMapping("")
     public String getWallet(Model model) {
         Wallet w;
@@ -106,119 +98,78 @@ public class WalletController {
 //		String password = System.getenv("password");
 //		EmailSender.sendEmail(sender, password, userEmail, body);
 //	}
-
-    /**
-     * WIP to make a better wallet console.
-     *
-     * @param model
-     * @return
-     */
-    @GetMapping("/betterwallet")
-    public String getBetterWallet(Model model) {
-        return "wallet/betterwallet";
-    }
+//
+//    /**
+//     * WIP to make a better wallet console.
+//     */
+//    @GetMapping("/betterwallet")
+//    public String getBetterWallet(Model model) {
+//        return "wallet/betterwallet";
+//    }
 
     @GetMapping("/transact")
     public String getTransact(Model model)
             throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
-//        Wallet w = (Wallet) model.getAttribute("wallet");
-        Wallet w = walletRepository.findById((String) model.getAttribute("username")).get();
-//        w = ws.getWalletService((String) model.getAttribute("username"));
+        Wallet w;
+        try {
+            w = (Wallet) model.getAttribute("wallet");
+        } catch (Exception e) {
+            w = walletRepository.findById((String) model.getAttribute("username")).get();
+        }
         model.addAttribute("wallet", w);
         return "wallet/transact";
     }
 
-    /**
-     * This is a simulation of posting transactions from someone who is logged in.
-     * <p>
-     * { "address":"recipient", "amount": "integer" } in future add { "username":
-     * "username", "password": "password" } to make this official
-     * <p>
-     * In reality login information would have to be provided to access their wallet
-     * and post the transaction.
-     *
-     * @param model
-     * @param body
-     * @return
-     * @throws InvalidKeyException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchProviderException
-     * @throws IOException
-     * @throws InvalidAlgorithmParameterException
-     * @throws InterruptedException
-     */
-    @PostMapping("/transact")
-    @ResponseBody
-    public String postTransact(Model model, @RequestBody Map<String, Object> body)
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
-            InvalidAlgorithmParameterException, InterruptedException {
-        Wallet randomWallet = Wallet.createWallet("anon"); // simulate anon wallet on the wire. This exact name is
-        // important as it skips blockchain traversal for balance calculation, which is
-        // still buggy with non stored wallets
+//    @PostMapping("/transact")
+//    @ResponseBody
+//    public String postTransact(Model model, @RequestBody Map<String, Object> body)
+//            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
+//            InvalidAlgorithmParameterException, InterruptedException {
+//        Wallet randomWallet = Wallet.createWallet("anon"); // simulate anon wallet on the wire. This exact name is
+//        // important as it skips blockchain traversal for balance calculation, which is
+//        // still buggy with non stored wallets
+//
+//        Transaction neu = new Transaction(randomWallet, (String) body.get("address"),
+//                (double) ((Integer) body.get("amount")));
+//        pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
+//        model.addAttribute("pool", pool);
+//        Transaction alt = pool.findExistingTransactionByWallet(neu.getSenderAddress());
+//        if (alt == null) {
+//            model.addAttribute("latesttransaction", neu);
+//            new TransactionService().addTransactionService(neu);
+//            if (Config.BROADCASTING) {
+//                broadcastTransaction(neu);
+//            }
+//            return neu.toJSONtheTransaction();
+//        } else {
+//            Transaction updated = new TransactionService().updateTransactionService(neu, alt);
+//            model.addAttribute("latesttransaction", updated);
+//            if (Config.BROADCASTING) {
+//                broadcastTransaction(updated);
+//            }
+//            return updated.toJSONtheTransaction();
+//        }
+//    }
 
-        Transaction neu = new Transaction(randomWallet, (String) body.get("address"),
-                (double) ((Integer) body.get("amount")));
-        pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
-        model.addAttribute("pool", pool);
-        Transaction alt = pool.findExistingTransactionByWallet(neu.getSenderAddress());
-        if (alt == null) {
-            model.addAttribute("latesttransaction", neu);
-            new TransactionService().addTransactionService(neu);
-            if (Config.BROADCASTING) {
-                broadcastTransaction(neu);
-            }
-            return neu.toJSONtheTransaction();
-        } else {
-            Transaction updated = new TransactionService().updateTransactionService(neu, alt);
-            model.addAttribute("latesttransaction", updated);
-            if (Config.BROADCASTING) {
-                broadcastTransaction(updated);
-            }
-            return updated.toJSONtheTransaction();
-        }
-    }
-
-    /**
-     * Very important method, this is how you make a transaction with RequestParams
-     * from /transact form posting
-     *
-     * @param w
-     * @param model
-     * @param address
-     * @param amount
-     * @param request
-     * @return
-     * @throws InvalidKeyException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchProviderException
-     * @throws IOException
-     * @throws InterruptedException
-     */
     @RequestMapping(value = "/transaction", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String postTransaction(@ModelAttribute("wallet") Wallet w, Model model,
-                                  @RequestParam("address") String address, @RequestParam("amount") double amount, HttpServletRequest request)
+    public String makeTransaction(@ModelAttribute("wallet") Wallet w, Model model,
+                                  @RequestParam("address") String address, @RequestParam("amount") double amount)
             throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
             InterruptedException {
         Transaction neu = new Transaction(w, address, amount);
         pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
-        Transaction alt = pool.findExistingTransactionByWallet(neu.getSenderAddress());
-        if (alt == null) {
-            System.err.println("Transaction 2 is null. there is no existing transaction of that sender"
-                    + neu.getSenderAddress() + "==" + w.getAddress());
+        Transaction old = pool.findExistingTransactionByWallet(neu.getSenderAddress());
+        if (old == null) {
             model.addAttribute("latesttransaction", neu);
             transactionRepository.save(neu);
-//            new TransactionService().addTransactionService(neu);
             if (Config.BROADCASTING) {
                 broadcastTransaction(neu);
             }
             return neu.toJSONtheTransaction();
         } else {
             System.out.println("Existing transaction found!");
-//            Transaction updated = new TransactionService().updateTransactionService(neu, alt);
-
-            Transaction merged = transactionRepository.findById(alt.getUuid()).get(); // guaranteed to exist.
-//            Transaction merged = em.find(Transaction.class, alt.getUuid());
+            Transaction merged = transactionRepository.findById(old.getUuid()).get();
             merged.rebuildOutputInput();
             try {
                 merged.update(neu.getSenderWallet(), neu.getRecipientAddress(), neu.getAmount());
@@ -227,7 +178,6 @@ public class WalletController {
                 e.printStackTrace();
             }
             transactionRepository.save(merged);
-
             model.addAttribute("latesttransaction", merged);
             if (Config.BROADCASTING) {
                 broadcastTransaction(merged);
@@ -241,15 +191,6 @@ public class WalletController {
      * random type dev transactions. Because over the network and server, this can
      * get buggy and consume resources. Easier to run dummy transactions in main
      * method of initializer. Safest to ignore
-     *
-     * @param model
-     * @param body
-     * @return
-     * @throws InvalidKeyException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchProviderException
-     * @throws IOException
-     * @throws InvalidAlgorithmParameterException
      */
     @PostMapping("/transactt")
     @ResponseBody
@@ -276,9 +217,6 @@ public class WalletController {
 
     /**
      * Broadcast to pubnub wrapper method
-     *
-     * @param t
-     * @throws InterruptedException
      */
     public void broadcastTransaction(Transaction t) throws InterruptedException {
         try {
