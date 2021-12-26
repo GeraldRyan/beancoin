@@ -5,6 +5,7 @@ import java.security.*;
 import java.util.*;
 
 import com.ryan.gerald.beancoin.entity.*;
+import com.ryan.gerald.beancoin.exceptions.EntityNotLoadedException;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
@@ -50,10 +51,15 @@ public class WalletController {
     public String getWallet(Model model) {
         Wallet w;
         try {
-            w = (Wallet) model.getAttribute("wallet");
-            if (w == null)  w = walletRepository.findById(String.valueOf(model.getAttribute("username"))).get();
+            try{
+                w = (Wallet) model.getAttribute("wallet");
+            }
+            catch (Exception e){
+                w = walletRepository.findById(String.valueOf(model.getAttribute("username"))).get();
+            }
         }
         catch (Exception e){
+            e.printStackTrace();
             return "redirect:/";
         }
         List<TransactionRepr> listTransactionsPending = transactionService.getTransactionReprList();
