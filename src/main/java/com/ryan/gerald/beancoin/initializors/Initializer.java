@@ -8,7 +8,6 @@ import java.security.NoSuchProviderException;
 
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
-import com.ryan.gerald.beancoin.controller.Development;
 import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.utilities.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +82,6 @@ public class Initializer {
         return l;
     }
 
-    @Development
     public static List<Transaction> postNTransactions(int n, String senderAddress) throws NoSuchAlgorithmException,
             NoSuchProviderException, InvalidAlgorithmParameterException, InvalidKeyException, IOException {
         List<Transaction> l = new ArrayList();
