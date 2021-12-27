@@ -4,9 +4,10 @@ import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.dbConnection.DBConnection;
 import com.ryan.gerald.beancoin.entity.Wallet;
 
-public class WalletDao extends DBConnection implements WalletDaoI {
+@Deprecated
+public class WalletDao extends DBConnection {
 
-	@Override
+	
 	public Wallet addWallet(Wallet w) {
 		this.connect();
 		em.getTransaction().begin();
@@ -16,7 +17,7 @@ public class WalletDao extends DBConnection implements WalletDaoI {
 		return w;
 	}
 
-	@Override
+	
 	public Wallet getWallet(String walletId) {
 		this.connect();
 		Wallet w = em.find(Wallet.class, walletId);
@@ -24,13 +25,13 @@ public class WalletDao extends DBConnection implements WalletDaoI {
 		return w;
 	}
 
-	@Override
+	
 	public Wallet removeWallet(String walletId) {
 
 		return null;
 	}
 
-	@Override
+	
 	public Wallet updateWallet(Wallet wallet) {
 		this.connect();
 		em.getTransaction().begin();

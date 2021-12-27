@@ -12,16 +12,17 @@ import com.ryan.gerald.beancoin.entity.Transaction;
 import com.ryan.gerald.beancoin.entity.TransactionPoolMap;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 
-public class TransactionDao extends DBConnection implements TransactionDaoI {
+@Deprecated
+public class TransactionDao extends DBConnection {
 
-	@Override
+	
 	public Transaction getTransaction(String uuid) {
 		// TODO Auto-generated method stub
 		// might not be needed
 		return null;
 	}
 
-	@Override
+	
 	public Transaction addTransaction(Transaction t) {
 		this.connect();
 		em.getTransaction().begin();
@@ -31,7 +32,7 @@ public class TransactionDao extends DBConnection implements TransactionDaoI {
 		return t;
 	}
 
-	@Override
+	
 	public Transaction updateTransaction(Transaction nu, Transaction alt) {
 		this.connect();
 		em.getTransaction().begin();
@@ -50,7 +51,7 @@ public class TransactionDao extends DBConnection implements TransactionDaoI {
 		return merged;
 	}
 
-	@Override
+	
 	public Transaction removeTransaction(String UUID) {
 		this.connect();
 		em.getTransaction().begin();
@@ -69,7 +70,7 @@ public class TransactionDao extends DBConnection implements TransactionDaoI {
 		return null;
 	}
 
-	@Override
+	
 	public TransactionPoolMap getAllTransactionsAsTransactionPool() {
 		this.connect();
 		TransactionPoolMap pool = new TransactionPoolMap();
@@ -81,7 +82,7 @@ public class TransactionDao extends DBConnection implements TransactionDaoI {
 		return pool;
 	}
 
-	@Override
+	
 	public List<Transaction> getAllTransactionsAsTransactionList() {
 		this.connect();
 		List<Transaction> resultsList = em.createQuery("select t from Transaction t").getResultList();

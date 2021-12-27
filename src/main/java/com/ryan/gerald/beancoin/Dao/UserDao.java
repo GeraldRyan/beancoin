@@ -7,11 +7,10 @@ import com.ryan.gerald.beancoin.entity.User;
 import com.ryan.gerald.beancoin.entity.Wallet;
 import com.ryan.gerald.beancoin.entity.WalletForDB;
 
+@Deprecated
+public class UserDao extends DBConnection {
 
-
-public class UserDao extends DBConnection implements UserDaoI {
-
-	@Override
+	
 	public User addUser(User user) {
 		this.connect();
 		User existing = em.find(User.class, user.getUsername());
@@ -27,7 +26,7 @@ public class UserDao extends DBConnection implements UserDaoI {
 		return null;
 	}
 
-	@Override
+	
 	public User getUser(String username) {
 		this.connect();
 		User u = em.find(User.class, username);
@@ -35,13 +34,13 @@ public class UserDao extends DBConnection implements UserDaoI {
 		return u;
 	}
 
-//	@Override
+//	
 //	public User updateUser(User user) {
 //		// TODO Auto-generated method stub
 //		return null;
 //	}
 
-	@Override
+	
 	public User removeUser(String username) {
 		this.connect();
 		User u = em.find(User.class, username);
@@ -50,7 +49,7 @@ public class UserDao extends DBConnection implements UserDaoI {
 		return u;
 	}
 
-	@Override
+	
 	public Wallet addWallet(String username, Wallet wallet) {
 		WalletForDB w = new WalletForDB(wallet);
 		this.connect();
@@ -62,7 +61,7 @@ public class UserDao extends DBConnection implements UserDaoI {
 		return wallet;
 	}
 
-	@Override
+	
 	public boolean authenticateUser(String username, String password) {
 		this.connect();
 		User u = em.find(User.class, username);
