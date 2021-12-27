@@ -1,5 +1,6 @@
 package com.ryan.gerald.beancoin.controller;
 
+import com.ryan.gerald.beancoin.DTO.Login;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.UserService;

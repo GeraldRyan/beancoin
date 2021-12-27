@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.entity;
+package com.ryan.gerald.beancoin.DTO;
 
 public class Login {
 
