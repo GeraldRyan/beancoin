@@ -3,7 +3,7 @@ package com.ryan.gerald.beancoin.Dao;
 import java.util.List;
 
 import com.ryan.gerald.beancoin.entity.Transaction;
-import com.ryan.gerald.beancoin.entity.TransactionPool;
+import com.ryan.gerald.beancoin.entity.TransactionPoolMap;
 
 public interface TransactionDaoI {
 
@@ -15,7 +15,7 @@ public interface TransactionDaoI {
 
 	public Transaction removeTransaction(String UUID);
 
-	public TransactionPool getAllTransactionsAsTransactionPool();
+	public TransactionPoolMap getAllTransactionsAsTransactionPool();
 
 	public List<Transaction> getAllTransactionsAsTransactionList();
 

@@ -9,8 +9,7 @@ import java.util.List;
 
 import com.ryan.gerald.beancoin.dbConnection.DBConnection;
 import com.ryan.gerald.beancoin.entity.Transaction;
-import com.ryan.gerald.beancoin.entity.TransactionPool;
-import com.ryan.gerald.beancoin.entity.Wallet;
+import com.ryan.gerald.beancoin.entity.TransactionPoolMap;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 
 public class TransactionDao extends DBConnection implements TransactionDaoI {
@@ -71,9 +70,9 @@ public class TransactionDao extends DBConnection implements TransactionDaoI {
 	}
 
 	@Override
-	public TransactionPool getAllTransactionsAsTransactionPool() {
+	public TransactionPoolMap getAllTransactionsAsTransactionPool() {
 		this.connect();
-		TransactionPool pool = new TransactionPool();
+		TransactionPoolMap pool = new TransactionPoolMap();
 		List<Transaction> resultsList = em.createQuery("select t from Transaction t").getResultList();
 		for (Transaction t : resultsList) {
 			pool.putTransaction(t);

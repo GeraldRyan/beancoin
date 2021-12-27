@@ -1,15 +1,36 @@
 package com.ryan.gerald.beancoin.Service;
 
+import com.ryan.gerald.beancoin.Dao.UserDao;
+import com.ryan.gerald.beancoin.entity.User;
+import com.ryan.gerald.beancoin.entity.UserRepository;
+import com.ryan.gerald.beancoin.entity.Wallet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
-import com.ryan.gerald.beancoin.Dao.UserDao;
-import com.ryan.gerald.beancoin.entity.User;
-import com.ryan.gerald.beancoin.entity.Wallet;
-
+@Service
 public class UserService {
+
+	@Autowired
+	UserRepository userRepository;
+
+
+	public User getUserByUsername(String username){
+		return userRepository.findById(username).get();
+	}
+
+
+
+
+
+
+	@Deprecated
 	private UserDao userD = new UserDao();
+
+
 
 	/**
 	 * Adds new user to Database, user object to be provided and returned

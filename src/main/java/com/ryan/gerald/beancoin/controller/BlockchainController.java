@@ -1,37 +1,24 @@
 package com.ryan.gerald.beancoin.controller;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
+import com.google.gson.Gson;
+import com.pubnub.api.PubNubException;
 import com.ryan.gerald.beancoin.entity.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
-import com.ryan.gerald.beancoin.Service.BlockService;
-import com.ryan.gerald.beancoin.Service.BlockchainService;
-import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.exceptions.BlocksInChainInvalidException;
 import com.ryan.gerald.beancoin.exceptions.ChainTooShortException;
 import com.ryan.gerald.beancoin.exceptions.GenesisBlockInvalidException;
 import com.ryan.gerald.beancoin.initializors.Config;
 import com.ryan.gerald.beancoin.initializors.Initializer;
-import com.ryan.gerald.beancoin.pubsub.PubNubApp;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.pubnub.api.PubNubException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Controller
 @SessionAttributes({"blockchain", "minedblock", "wallet", "pnapp"})
@@ -42,13 +29,13 @@ public class BlockchainController {
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private BlockRepository blockRepository;
     @Autowired Initializer initializer;
-    @Autowired TransactionPool pool; // REQUIRED for transactionRepo or else can inject dependency self
+    @Autowired TransactionPoolMap pool; // REQUIRED for transactionRepo or else can inject dependency self
 
     //	TransactionService tService = new TransactionService(); // OLD STUFF - NEEDED FOR DAO CONNECTION
 //	TransactionPool pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD STUFF
 
 
-    TransactionPool refreshTransactionPool() {
+    TransactionPoolMap refreshTransactionPool() {
         List<Transaction> transactionList = transactionRepository.getListOfTransactions();
         System.out.println("SIZE: " + transactionList.size());
 //        TransactionPool pool = new TransactionPool();
@@ -137,7 +124,7 @@ public class BlockchainController {
         blockchainRepository.save(blockchain);
         model.addAttribute("minedblock", new_block);//		Block new_block = blockchainApp.addBlockService("beancoin", transactionData);
         if (Config.BROADCASTING) { // TODO CHANGE TO KAFKA
-            new PubNubApp().broadcastBlock(new_block);
+//            new PubNubApp().broadcastBlock(new_block);
         }
         blockchain = blockchainRepository.getBlockchainByName("beancoin");
 //		blockchain = blockchainApp.getBlockchainService("beancoin");

@@ -8,18 +8,14 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
-import org.hibernate.mapping.Map;
 
-import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
@@ -28,41 +24,27 @@ import org.springframework.stereotype.Service;
  */
 // TODO Not really a proper service I believe. Used to be able to autowire the repository. Not stateless
 @Service
-public class TransactionPool {
+public class TransactionPoolMap {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
+    @Autowired private TransactionRepository transactionRepository;
 
     HashMap<String, Object> transactionMap = new HashMap<String, Object>();
 
-    public TransactionPool() {
-    }
+    public TransactionPoolMap() {}
 
-    /**
-     * Set a transaction in this pool
-     *
-     * @param transaction
-     * @return
-     */
     public Transaction putTransaction(Transaction transaction) {
         transactionMap.put(transaction.getUuid(), transaction);
         return transaction;
     }
 
-    public void syncTransactionPool() {
+    public void syncTransactionPool() {}
 
-    }
+    public void broadcastTransactionPool() {}
 
-    public void broadcastTransactionPool() {
+    public void TransactionPool() {}
 
-    }
-
-    public void TransactionPool() {
-
-    }
-
-    public static TransactionPool fillTransactionPool(List<Transaction> transactionList) {
-        TransactionPool tp = new TransactionPool();
+    public static TransactionPoolMap fillTransactionPool(List<Transaction> transactionList) {
+        TransactionPoolMap tp = new TransactionPoolMap();
         for (Transaction t : transactionList) {
             t.rebuildOutputInput();
             tp.putTransaction(t);
@@ -160,7 +142,7 @@ public class TransactionPool {
                     try {
                         System.out.println("Removing Transaction: " + t.getId());
                         transactionRepository.deleteById(t.getId());
-                    } catch (Exception e) { e.printStackTrace(); }
+                    } catch (Exception e) {e.printStackTrace();}
                 }
             }
         }
@@ -168,7 +150,7 @@ public class TransactionPool {
 
     public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException,
             NoSuchProviderException, IOException, InvalidAlgorithmParameterException, TransactionAmountExceedsBalance {
-        TransactionPool pool = new TransactionPool();
+        TransactionPoolMap pool = new TransactionPoolMap();
         Wallet w = Wallet.createWallet("sender");
         Wallet unusedWallet = Wallet.createWallet("u");
         pool.putTransaction(new Transaction(w, "foo", 15));

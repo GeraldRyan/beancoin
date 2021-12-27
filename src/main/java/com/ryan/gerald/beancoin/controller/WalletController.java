@@ -1,31 +1,27 @@
 package com.ryan.gerald.beancoin.controller;
 
-import java.io.IOException;
-import java.security.*;
-import java.util.*;
-
+import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.entity.*;
-import com.ryan.gerald.beancoin.exceptions.EntityNotLoadedException;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
+import com.ryan.gerald.beancoin.initializors.Config;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import com.ryan.gerald.beancoin.Service.TransactionService;
-//import com.ryan.gerald.beancoin.entity.EmailSender;
-import com.ryan.gerald.beancoin.initializors.Config;
-import com.ryan.gerald.beancoin.pubsub.PubNubApp;
-import com.pubnub.api.PubNubException;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.List;
 
 @Controller
 @RequestMapping("wallet")
 @SessionAttributes({"wallet", "latesttransaction", "isloggedin", "pool", "username", "user", "blockchain"})
 
 public class WalletController {
-
     @Autowired private BlockchainRepository blockchainRepository;
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private BlockRepository blockRepository;
@@ -33,7 +29,7 @@ public class WalletController {
     @Autowired private WalletRepository walletRepository;
     @Autowired private TransactionService transactionService;
 
-    @Autowired TransactionPool pool;
+    @Autowired TransactionPoolMap pool;
 
     public WalletController() throws InterruptedException {}
 
@@ -154,7 +150,7 @@ public class WalletController {
     public String makeTransaction(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, InvalidKeyException {
         try {
             Transaction neu = new Transaction(w, address, amount);
-            pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
+            pool = TransactionPoolMap.fillTransactionPool(transactionRepository.getListOfTransactions());
             Transaction old = pool.findExistingTransactionByWallet(neu.getSenderAddress());
             if (old == null) {
                 model.addAttribute("latesttransaction", neu);
@@ -211,12 +207,7 @@ public class WalletController {
 //    }
 
     public void broadcastTransaction(Transaction t) throws InterruptedException {
-        try {
-            new PubNubApp().broadcastTransaction(t);
-        } catch (PubNubException e) {
-            System.err.println("Problem broadcasting the transaction.");
-            e.printStackTrace();
-        }
+        //            new PubNubApp().broadcastTransaction(t);
     }
 
 }

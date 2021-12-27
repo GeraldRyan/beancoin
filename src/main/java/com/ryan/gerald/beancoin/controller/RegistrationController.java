@@ -35,6 +35,11 @@ public class RegistrationController {
 
     @GetMapping("")
     public ModelAndView showRegisterPage(Model model) {
+        if ((boolean) model.getAttribute("isloggedin")) {
+            ModelAndView modelAndView =  new ModelAndView("redirect:/");
+//            modelAndView.addObject("modelAttribute" , new ModelAttribute());
+            return modelAndView;
+        }
         ModelAndView mv = new ModelAndView("registration/register");
         model.addAttribute("user", new User());
         return mv;
@@ -51,8 +56,11 @@ public class RegistrationController {
     @PostMapping("")
     public String registerUser(Model model, @ModelAttribute("user") @Valid User user) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
 
-        Optional<User> existingUser = userRepository.findById(user.getUsername());
+        if ((boolean) model.getAttribute("isloggedin")) {
+            return "redirect:/";
+        }
 
+        Optional<User> existingUser = userRepository.findById(user.getUsername());
         if (existingUser.isPresent()) {
             model.addAttribute("existsmsg", "User already exists. Choose another name or log in");
             return "registration/register";
@@ -64,6 +72,7 @@ public class RegistrationController {
         model.addAttribute("user", user);
         model.addAttribute("wallet", wallet);
         model.addAttribute("username", user.getUsername());
+        // TODO make URL show welcomepage not registration
         return "registration/welcomepage";
     }
 

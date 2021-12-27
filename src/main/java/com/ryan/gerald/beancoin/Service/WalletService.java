@@ -1,15 +1,23 @@
 package com.ryan.gerald.beancoin.Service;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-
-import com.ryan.gerald.beancoin.Dao.UserDao;
 import com.ryan.gerald.beancoin.Dao.WalletDao;
-import com.ryan.gerald.beancoin.entity.User;
 import com.ryan.gerald.beancoin.entity.Wallet;
+import com.ryan.gerald.beancoin.entity.WalletRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class WalletService {
+
+	@Autowired
+	WalletRepository walletRepository;
+
+	public Wallet getWalletByUsername(String username){
+		return walletRepository.findById(username).get();
+	}
+
+
+	@Deprecated
 	WalletDao dao = new WalletDao();
 
 	public Wallet addWalletService(Wallet w) {
