@@ -1,26 +1,13 @@
 package com.ryan.gerald.beancoin.entity;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import com.ryan.gerald.beancoin.Service.BlockService;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ryan.gerald.beancoin.utilities.CryptoHash;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
+
+import javax.persistence.*;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 /**
  * 
@@ -377,7 +364,7 @@ public class Block {
 		Block genesis = genesis_block();
 		System.out.println(genesis.toStringFormatted());
 		genesis.setTimestamp(new Date().getTime());
-		new BlockService().addBlockService(genesis);
+//		new BlockService().addBlockService(genesis);
 
 	}
 

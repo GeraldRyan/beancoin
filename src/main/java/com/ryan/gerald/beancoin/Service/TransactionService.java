@@ -50,58 +50,58 @@ public class TransactionService {
         return transactionRepository.save(t);
     }
 
-
-    /**
-     * Gets a transaction from the local database by transaction ID
-     *
-     * @param uuid
-     * @return
-     */
-    public Transaction getTransactionService(String uuid) {
-        return transactionD.getTransaction(uuid);
-    }
-
-    /**
-     * Adds a transaction to the database
-     *
-     * @param t
-     * @return
-     */
-    public Transaction addTransactionService(Transaction t) {
-        return transactionD.addTransaction(t);
-    }
-
-    /**
-     * Updates Transaction of given wallet so that you can append recipients and
-     * increase amounts to existing recipients
-     *
-     * @param neu
-     * @param alt
-     * @return
-     */
-    public Transaction updateTransactionService(Transaction neu, Transaction alt) {
-        return transactionD.updateTransaction(neu, alt);
-    }
-
-    public Transaction removeTransactionService(String UUID) {
-        return transactionD.removeTransaction(UUID);
-    }
-
-    /**
-     * Gets entire list of transactions as TransactionPool type from database
-     *
-     * @return
-     */
-    public TransactionPoolMap getAllTransactionsAsTransactionPoolService() {
-        return transactionD.getAllTransactionsAsTransactionPool();
-    }
-
-    /**
-     * Gets all transactions in list format for convenience.
-     *
-     * @return
-     */
-    public List<Transaction> getAllTransactionsAsTransactionList() {
-        return transactionD.getAllTransactionsAsTransactionList();
-    }
+//
+//    /**
+//     * Gets a transaction from the local database by transaction ID
+//     *
+//     * @param uuid
+//     * @return
+//     */
+//    public Transaction getTransactionService(String uuid) {
+//        return transactionD.getTransaction(uuid);
+//    }
+//
+//    /**
+//     * Adds a transaction to the database
+//     *
+//     * @param t
+//     * @return
+//     */
+//    public Transaction addTransactionService(Transaction t) {
+//        return transactionD.addTransaction(t);
+//    }
+//
+//    /**
+//     * Updates Transaction of given wallet so that you can append recipients and
+//     * increase amounts to existing recipients
+//     *
+//     * @param neu
+//     * @param alt
+//     * @return
+//     */
+//    public Transaction updateTransactionService(Transaction neu, Transaction alt) {
+//        return transactionD.updateTransaction(neu, alt);
+//    }
+//
+//    public Transaction removeTransactionService(String UUID) {
+//        return transactionD.removeTransaction(UUID);
+//    }
+//
+//    /**
+//     * Gets entire list of transactions as TransactionPool type from database
+//     *
+//     * @return
+//     */
+//    public TransactionPoolMap getAllTransactionsAsTransactionPoolService() {
+//        return transactionD.getAllTransactionsAsTransactionPool();
+//    }
+//
+//    /**
+//     * Gets all transactions in list format for convenience.
+//     *
+//     * @return
+//     */
+//    public List<Transaction> getAllTransactionsAsTransactionList() {
+//        return transactionD.getAllTransactionsAsTransactionList();
+//    }
 }

@@ -67,36 +67,6 @@ public class WalletController {
         return "wallet/wallet";
     }
 
-//	@PostMapping("")
-//	public String postWalletEmailSent(Model model) {
-//		Wallet w = (Wallet) model.getAttribute("wallet");
-//		if (w == null) {
-//			return "redirect:/";
-//		}
-//		w = ws.updateWalletBalanceService(w);
-//		model.addAttribute("wallet", w);
-//		emailPrivateKey(model);
-//		return "wallet/wallet";
-//	}
-
-//	public void emailPrivateKey(Model model) {
-//		HashMap<String, String> body = new HashMap();
-//		body.put("subject", "Your Private key");
-//		body.put("text", "Private Key");
-//		Object privateKey = ((Wallet) model.getAttribute("wallet")).getPrivatekey().getEncoded();
-//		String userEmail = ((User) model.getAttribute("user")).getEmail();
-//		String sender = System.getenv("email");
-//		String password = System.getenv("password");
-//		EmailSender.sendEmail(sender, password, userEmail, body);
-//	}
-//
-//    /**
-//     * WIP to make a better wallet console.
-//     */
-//    @GetMapping("/betterwallet")
-//    public String getBetterWallet(Model model) {
-//        return "wallet/betterwallet";
-//    }
 
     @GetMapping("/transact")
     public String getTransact(Model model) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
@@ -112,37 +82,6 @@ public class WalletController {
         walletService.saveWallet(w);
         return "wallet/transact";
     }
-
-//    @PostMapping("/transact")
-//    @ResponseBody
-//    public String postTransact(Model model, @RequestBody Map<String, Object> body)
-//            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
-//            InvalidAlgorithmParameterException, InterruptedException {
-//        Wallet randomWallet = Wallet.createWallet("anon"); // simulate anon wallet on the wire. This exact name is
-//        // important as it skips blockchain traversal for balance calculation, which is
-//        // still buggy with non stored wallets
-//
-//        Transaction neu = new Transaction(randomWallet, (String) body.get("address"),
-//                (double) ((Integer) body.get("amount")));
-//        pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
-//        model.addAttribute("pool", pool);
-//        Transaction alt = pool.findExistingTransactionByWallet(neu.getSenderAddress());
-//        if (alt == null) {
-//            model.addAttribute("latesttransaction", neu);
-//            new TransactionService().addTransactionService(neu);
-//            if (Config.BROADCASTING) {
-//                broadcastTransaction(neu);
-//            }
-//            return neu.toJSONtheTransaction();
-//        } else {
-//            Transaction updated = new TransactionService().updateTransactionService(neu, alt);
-//            model.addAttribute("latesttransaction", updated);
-//            if (Config.BROADCASTING) {
-//                broadcastTransaction(updated);
-//            }
-//            return updated.toJSONtheTransaction();
-//        }
-//    }
 
     @RequestMapping(value = "/transaction", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -175,6 +114,71 @@ public class WalletController {
 //            alert(Unkonwn Error occurred)
             return "index";
         }
+
+        //	@PostMapping("")
+//	public String postWalletEmailSent(Model model) {
+//		Wallet w = (Wallet) model.getAttribute("wallet");
+//		if (w == null) {
+//			return "redirect:/";
+//		}
+//		w = ws.updateWalletBalanceService(w);
+//		model.addAttribute("wallet", w);
+//		emailPrivateKey(model);
+//		return "wallet/wallet";
+//	}
+
+//	public void emailPrivateKey(Model model) {
+//		HashMap<String, String> body = new HashMap();
+//		body.put("subject", "Your Private key");
+//		body.put("text", "Private Key");
+//		Object privateKey = ((Wallet) model.getAttribute("wallet")).getPrivatekey().getEncoded();
+//		String userEmail = ((User) model.getAttribute("user")).getEmail();
+//		String sender = System.getenv("email");
+//		String password = System.getenv("password");
+//		EmailSender.sendEmail(sender, password, userEmail, body);
+//	}
+//
+//    /**
+//     * WIP to make a better wallet console.
+//     */
+//    @GetMapping("/betterwallet")
+//    public String getBetterWallet(Model model) {
+//        return "wallet/betterwallet";
+//    }
+
+
+//    @PostMapping("/transact")
+//    @ResponseBody
+//    public String postTransact(Model model, @RequestBody Map<String, Object> body)
+//            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
+//            InvalidAlgorithmParameterException, InterruptedException {
+//        Wallet randomWallet = Wallet.createWallet("anon"); // simulate anon wallet on the wire. This exact name is
+//        // important as it skips blockchain traversal for balance calculation, which is
+//        // still buggy with non stored wallets
+//
+//        Transaction neu = new Transaction(randomWallet, (String) body.get("address"),
+//                (double) ((Integer) body.get("amount")));
+//        pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
+//        model.addAttribute("pool", pool);
+//        Transaction alt = pool.findExistingTransactionByWallet(neu.getSenderAddress());
+//        if (alt == null) {
+//            model.addAttribute("latesttransaction", neu);
+//            new TransactionService().addTransactionService(neu);
+//            if (Config.BROADCASTING) {
+//                broadcastTransaction(neu);
+//            }
+//            return neu.toJSONtheTransaction();
+//        } else {
+//            Transaction updated = new TransactionService().updateTransactionService(neu, alt);
+//            model.addAttribute("latesttransaction", updated);
+//            if (Config.BROADCASTING) {
+//                broadcastTransaction(updated);
+//            }
+//            return updated.toJSONtheTransaction();
+//        }
+//    }
+
+
     }
 
 //    /**

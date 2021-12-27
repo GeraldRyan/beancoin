@@ -536,7 +536,7 @@ public class Transaction {
         System.out.println(t1.getAmount());
         System.out.println(t1.recipientAddress);
         System.out.println(t1.getUuid());
-        new TransactionService().addTransactionService(t1);
+//        new TransactionService().addTransactionService(t1);
     }
 
 }

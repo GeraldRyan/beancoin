@@ -73,7 +73,7 @@ public class RegistrationController {
     @GetMapping("welcome")
     public String getWelcome(Model model) {
         User u = ((User) model.getAttribute("user"));
-        Wallet w = (Wallet) new WalletService().getWalletService(u.getUsername()); // I find that extra protection
+        Wallet w = walletService.getWalletByUsername(u.getUsername()); // I find that extra protection
         // prevents unexpected crashes
         model.addAttribute("wallet", w);
         return "registration/welcomepage";
