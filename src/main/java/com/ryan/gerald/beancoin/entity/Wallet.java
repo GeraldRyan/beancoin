@@ -254,6 +254,7 @@ public class Wallet {
             i++;
             if (i < 7) {continue;} // dummy data blocks
             // would for (i=0; i<7; i++) {continue;} work?
+            System.out.println("BLOCK DESERIALIZED " + b.toStringConsole());
             List<TransactionRepr> trListMinedBlocks = b.deserializeTransactionData();
             for (TransactionRepr t : trListMinedBlocks) {
                 if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance

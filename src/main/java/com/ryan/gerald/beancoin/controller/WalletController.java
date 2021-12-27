@@ -1,5 +1,6 @@
 package com.ryan.gerald.beancoin.controller;
 
+import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
@@ -22,6 +23,7 @@ import java.util.List;
 @SessionAttributes({"wallet", "latesttransaction", "isloggedin", "pool", "username", "user", "blockchain"})
 
 public class WalletController {
+    @Autowired private BlockchainService blockchainService;
     @Autowired private BlockchainRepository blockchainRepository;
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private BlockRepository blockRepository;
@@ -37,8 +39,7 @@ public class WalletController {
     public Wallet initWalletIfNotPresent(Model m) throws UsernameNotLoaded {
         try {
             return walletRepository.findById(String.valueOf(m.getAttribute("username"))).get();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new UsernameNotLoaded("USER NAME IS NOT LOADED");
         }
     }
@@ -47,19 +48,20 @@ public class WalletController {
     public String getWallet(Model model) {
         Wallet w;
         try {
-            try{
+            try {
                 w = (Wallet) model.getAttribute("wallet");
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 w = walletRepository.findById(String.valueOf(model.getAttribute("username"))).get();
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/";
         }
         List<TransactionRepr> listTransactionsPending = transactionService.getTransactionReprList();
         Blockchain blockchain = (Blockchain) model.getAttribute("blockchain");
+        if (blockchain == null) {
+            blockchain = blockchainService.getBlockchainByName("beancoin");
+        }
         w.setBalance(Wallet.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress(),
                 listTransactionsPending)); // chain is the sourceOfTruth
         walletRepository.save(w);

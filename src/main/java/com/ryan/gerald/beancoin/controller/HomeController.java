@@ -14,25 +14,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
 @SessionAttributes({"blockchain", "wallet", "username", "isloggedin", "user", "msg", "transactionpool", "pubsubapp"})
 public class HomeController {
 
-    @Autowired private BlockchainRepository blockchainRepository;
+
     @Autowired private BlockchainService blockchainService;
     @Autowired private TransactionService transactionService;
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private BlockRepository blockRepository;
     @Autowired private UserService userService;
-    @Autowired private UserRepository userRepository;
     @Autowired private WalletService walletService;
-    @Autowired private WalletRepository walletRepository;
+
 
     @Autowired Initializer initializer;
     @Autowired private Environment env;
@@ -54,23 +49,6 @@ public class HomeController {
         return transactionService.getTransactionPool();
     }
 
-
-//    /**
-//     * PubNub pubsub provider. Can be instantiated as needed for broadcast, but as
-//     * it is also a listener, should be instantiated right away as session variable
-//     * in order to responsond to incoming messages (part of being part of a
-//     * community. Hoping this is the right method of doing so
-//
-//     */
-//	@ModelAttribute("pubsubapp")
-//	public PubNubApp startupApp() throws InterruptedException {
-//		if (Config.LISTENING) {
-////			return new PubNubApp();
-//		}
-//		return null;
-//	}
-
-    //	@PostMapping("") // why not?
     @GetMapping("")
     public String showIndex(Model model) {return "index";}
 
@@ -125,32 +103,13 @@ public class HomeController {
         return pool.getMinableTransactionDataString();
     }
 
-
     public String validateUserAndPassword(String username, String password) {
-        Optional<User> user = userRepository.findById(username);
-        if (user.isEmpty()) {
-            return "user not found";
-        }
-        if (user.get().getPassword().equalsIgnoreCase(password)) {
-//			user.get().getUsername()
-            return "true";
-        }
+        Optional<User> user = userService.getUserOptionalByName(username);
+        if (user.isEmpty()) {return "user not found";}
+        if (user.get().getPassword().equalsIgnoreCase(password)) {return "true";}
         return "false";
     }
 
-    @GetMapping("dashboard")
-    public String getDashboard(Model model) {
-        return "account/dashboard";
-    }
-
-    @GetMapping("navbar")
-    public String demoNavbar() {
-        return "common/navbar";
-    }
-
-    /**
-     * 404 pages redirect to home
-     */
     @ControllerAdvice
     public class ControllerAdvisor {
         @ExceptionHandler(NoHandlerFoundException.class)
@@ -158,4 +117,21 @@ public class HomeController {
             return "404";
         }
     }
+
+
+    //    /**
+//     * PubNub pubsub provider. Can be instantiated as needed for broadcast, but as
+//     * it is also a listener, should be instantiated right away as session variable
+//     * in order to responsond to incoming messages (part of being part of a
+//     * community. Hoping this is the right method of doing so
+//
+//     */
+//	@ModelAttribute("pubsubapp")
+//	public PubNubApp startupApp() throws InterruptedException {
+//		if (Config.LISTENING) {
+////			return new PubNubApp();
+//		}
+//		return null;
+//	}
 }
+

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -22,7 +23,9 @@ public class UserService {
 		return userRepository.findById(username).get();
 	}
 
-
+	public Optional<User> getUserOptionalByName(String username){
+		return userRepository.findById(username);
+	}
 
 
 

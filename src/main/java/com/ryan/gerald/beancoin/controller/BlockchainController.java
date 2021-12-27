@@ -2,10 +2,9 @@ package com.ryan.gerald.beancoin.controller;
 
 import com.google.gson.Gson;
 import com.pubnub.api.PubNubException;
+import com.ryan.gerald.beancoin.Service.BlockchainService;
+import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.entity.*;
-import com.ryan.gerald.beancoin.exceptions.BlocksInChainInvalidException;
-import com.ryan.gerald.beancoin.exceptions.ChainTooShortException;
-import com.ryan.gerald.beancoin.exceptions.GenesisBlockInvalidException;
 import com.ryan.gerald.beancoin.initializors.Config;
 import com.ryan.gerald.beancoin.initializors.Initializer;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
@@ -15,9 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -25,56 +21,15 @@ import java.util.List;
 @RequestMapping("blockchain")
 public class BlockchainController {
 
+    @Autowired private BlockchainService blockchainService;
     @Autowired private BlockchainRepository blockchainRepository;
     @Autowired private TransactionRepository transactionRepository;
+    @Autowired private TransactionService transactionService;
     @Autowired private BlockRepository blockRepository;
     @Autowired Initializer initializer;
-    @Autowired TransactionPoolMap pool; // REQUIRED for transactionRepo or else can inject dependency self
+    @Autowired TransactionPoolMap pool; // we need this as state?
 
-    //	TransactionService tService = new TransactionService(); // OLD STUFF - NEEDED FOR DAO CONNECTION
-//	TransactionPool pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD STUFF
-
-
-    TransactionPoolMap refreshTransactionPool() {
-        List<Transaction> transactionList = transactionRepository.getListOfTransactions();
-        System.out.println("SIZE: " + transactionList.size());
-//        TransactionPool pool = new TransactionPool();
-        for (Transaction t : transactionList) {
-            System.out.println(t.toString());
-            pool.putTransaction(t);
-        }
-        return pool;
-    }
-
-    /**
-     * This method order the chain properly according to timestamp if for some
-     * reason it pulled it from the database out of order (JPA error)
-     *
-     * @param model
-     */
-    public void refreshChain(Model model) throws NoSuchAlgorithmException, InterruptedException {
-//		Blockchain newer_blockchain_from_db = blockchainApp.getBlockchainService("beancoin");
-        Blockchain new_or_old_blockchain = makeBlockchainIfNull(model);
-        try {
-            ArrayList<Block> new_chain = new ArrayList<Block>(new_or_old_blockchain.getChain());
-            System.out.println("RE-SORTING ArrayList<Block>");
-            Collections.sort(new_chain, Comparator.comparingLong(Block::getTimestamp));
-            ((Blockchain) model.getAttribute("blockchain")).setChain(new_chain);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-//	List<Transaction> resultsList = em.createQuery("select t from Transaction t").getResultList();
-//	for (Transaction t : resultsList) {
-//		pool.putTransaction(t);
-//	}
-
-
-    public BlockchainController() throws InterruptedException {
-    }
-//	BlockService blockApp = new BlockService();
-//	BlockchainService blockchainApp = new BlockchainService();
+    public BlockchainController() throws InterruptedException {}
 
     /**
      * Pulls up beancoin blockchain on startup.
@@ -82,57 +37,49 @@ public class BlockchainController {
      */
     @ModelAttribute("blockchain")
     // This pulls from database before any request handler method goes (but only after a request is made)
-    public Blockchain makeBlockchainIfNull(Model model) throws NoSuchAlgorithmException, InterruptedException {
-//			Blockchain blockchain = blockchainApp.getBlockchainService("beancoin");
-        Blockchain blockchain = blockchainRepository.getBlockchainByName("beancoin");
-        if (blockchain != null) {
-            return blockchain;
-        } else {
-            blockchain = new Blockchain("beancoin");
-//            blockchainRepository.save(blockchain);
-//			Blockchain blockchain = blockchainApp.newBlockchainService("beancoin");
-            initializer.loadBC(blockchain);
-            blockchainRepository.save(blockchain);
-            Blockchain populated_blockchain = blockchainRepository.getBlockchainByName("beancoin");
-//			Blockchain populated_blockchain = blockchainApp.getBlockchainService("beancoin");
-            return populated_blockchain;
+    public Blockchain loadBlockchain(Model model) throws NoSuchAlgorithmException, InterruptedException {
+        Blockchain bc;
+        try {
+            bc = (Blockchain) model.getAttribute("blockchain");
+        } catch (Exception e) {
+            bc = blockchainService.CreateNewBlockchain("beancoin");
         }
+        return bc;
+    }
+
+    TransactionPoolMap refreshTransactionPool() {
+        return transactionService.getTransactionPool();
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String serveBlockchain(Model model) throws NoSuchAlgorithmException, InterruptedException,
-            ChainTooShortException, GenesisBlockInvalidException, BlocksInChainInvalidException {
-        refreshChain(model);
-        return ((Blockchain) model.getAttribute("blockchain")).toJSONtheChain();
+    public String serveBlockchain(Model model) {
+        Blockchain bc = (Blockchain) model.getAttribute("blockchain");
+        blockchainService.refreshChain(bc); // make sure ordered by timestamp (properly a persistence layer problem)
+        return bc.toJSONtheChain();
     }
 
-    // TODO LATER FACTOR and minify
     @RequestMapping(value = "mine", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public String getMine(Model model)
             throws NoSuchAlgorithmException, PubNubException, InterruptedException {
-//		pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD
         pool = refreshTransactionPool();
         String transactionData = pool.getMinableTransactionDataString();
-        if (transactionData == null){ return "No data to mine. Tell your friends to make transactions";}
-        List<Transaction> tlist = transactionRepository.getListOfTransactions();
-        Blockchain blockchain = blockchainRepository.getBlockchainByName("beancoin");
-
+        if (transactionData == null) {return "No data to mine. Tell your friends to make transactions";}
+        List<Transaction> tlist = transactionService.getTransactionList();
+        Blockchain blockchain = blockchainService.getBlockchainByName("beancoin");
         Block new_block = blockchain.add_block(transactionData);
+        model.addAttribute("blockchain", blockchain);
+        model.addAttribute("minedblock", new_block);
+        pool.refreshBlockchainTransactionPool(blockchain);
+        model.addAttribute("pool", pool);
+        blockchainService.saveBlockchain(blockchain);
         System.out.println("NEW BLOCK MINED: " + new_block.toStringConsole());
-        blockchainRepository.save(blockchain);
-        model.addAttribute("minedblock", new_block);//		Block new_block = blockchainApp.addBlockService("beancoin", transactionData);
+
         if (Config.BROADCASTING) { // TODO CHANGE TO KAFKA
 //            new PubNubApp().broadcastBlock(new_block);
         }
-        blockchain = blockchainRepository.getBlockchainByName("beancoin");
-//		blockchain = blockchainApp.getBlockchainService("beancoin");
-        model.addAttribute("blockchain", blockchain);
-        pool.refreshBlockchainTransactionPool(blockchain);
-//		pool = tService.getAllTransactionsAsTransactionPoolService(); // OLD
-//        pool = refreshTransactionPool(); // COPIED FROM OLD BUT WHY DO WE NEED TO KEEP DOING THIS??
-        model.addAttribute("pool", pool);
+
         return new_block.webworthyJson(tlist);
     }
 
