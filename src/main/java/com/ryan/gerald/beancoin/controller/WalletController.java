@@ -2,6 +2,7 @@ package com.ryan.gerald.beancoin.controller;
 
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
+import com.ryan.gerald.beancoin.Service.WalletService;
 import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
@@ -24,12 +25,8 @@ import java.util.List;
 
 public class WalletController {
     @Autowired private BlockchainService blockchainService;
-    @Autowired private BlockchainRepository blockchainRepository;
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private BlockRepository blockRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private WalletRepository walletRepository;
     @Autowired private TransactionService transactionService;
+    @Autowired private WalletService walletService;
 
     @Autowired TransactionPoolMap pool;
 
@@ -38,7 +35,7 @@ public class WalletController {
     @ModelAttribute("wallet")
     public Wallet initWalletIfNotPresent(Model m) throws UsernameNotLoaded {
         try {
-            return walletRepository.findById(String.valueOf(m.getAttribute("username"))).get();
+            return walletService.getWalletByUsername(String.valueOf(m.getAttribute("username")));
         } catch (Exception e) {
             throw new UsernameNotLoaded("USER NAME IS NOT LOADED");
         }
@@ -51,7 +48,7 @@ public class WalletController {
             try {
                 w = (Wallet) model.getAttribute("wallet");
             } catch (Exception e) {
-                w = walletRepository.findById(String.valueOf(model.getAttribute("username"))).get();
+                w = walletService.getWalletByUsername(String.valueOf(model.getAttribute("username")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,7 +61,7 @@ public class WalletController {
         }
         w.setBalance(Wallet.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress(),
                 listTransactionsPending)); // chain is the sourceOfTruth
-        walletRepository.save(w);
+        walletService.saveWallet(w);
         model.addAttribute("wallet", w);
 //			return "redirect:/";
         return "wallet/wallet";
@@ -107,12 +104,12 @@ public class WalletController {
         try {
             w = (Wallet) model.getAttribute("wallet");
         } catch (Exception e) {
-            w = walletRepository.findById((String) model.getAttribute("username")).get();
+            w = walletService.getWalletByUsername((String) model.getAttribute("username"));
         }
-        w.setBalance(Wallet.calculateWalletBalanceByTraversingChain(blockchainRepository.getBlockchainByName(
+        w.setBalance(Wallet.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress(), transactionService.getTransactionReprList()));
         model.addAttribute("wallet", w);
-        walletRepository.save(w);
+        walletService.saveWallet(w);
         return "wallet/transact";
     }
 
@@ -152,19 +149,19 @@ public class WalletController {
     public String makeTransaction(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, InvalidKeyException {
         try {
             Transaction neu = new Transaction(w, address, amount);
-            pool = TransactionPoolMap.fillTransactionPool(transactionRepository.getListOfTransactions());
+            pool = TransactionPoolMap.fillTransactionPool(transactionService.getTransactionList());
             Transaction old = pool.findExistingTransactionByWallet(neu.getSenderAddress());
             if (old == null) {
                 model.addAttribute("latesttransaction", neu);
-                transactionRepository.save(neu);
+                transactionService.saveTransaction(neu);
                 if (Config.BROADCASTING) {broadcastTransaction(neu);}
                 return neu.toJSONtheTransaction();
             } else {
                 System.out.println("Existing transaction found!");
-                Transaction merged = transactionRepository.findById(old.getUuid()).get();
+                Transaction merged = transactionService.getTransactionById(old.getUuid());
                 merged.update(neu.getSenderWallet(), neu.getRecipientAddress(), neu.getAmount());
                 merged.rebuildOutputInput();
-                transactionRepository.save(merged);
+                transactionService.saveTransaction(merged);
                 model.addAttribute("latesttransaction", merged);
                 if (Config.BROADCASTING) {broadcastTransaction(merged);}
                 return merged.toJSONtheTransaction();

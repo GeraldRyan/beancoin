@@ -46,7 +46,7 @@ public class HomeController {
 
     @ModelAttribute("transactionpool")
     public TransactionPoolMap initTransactionPool() {
-        return transactionService.getTransactionPool();
+        return transactionService.getUnminedTransactionsPoolMap();
     }
 
     @GetMapping("")

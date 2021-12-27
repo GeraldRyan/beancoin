@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
  * @author Gerald Ryan Natural constructor is zero arg
  *
  */
-// TODO Not really a proper service I believe. Used to be able to autowire the repository. Not stateless
+
 @Service
 public class TransactionPoolMap {
 
@@ -127,7 +127,7 @@ public class TransactionPoolMap {
      *
      * @param blockchain
      */
-    public void refreshBlockchainTransactionPool(Blockchain blockchain) {
+    public void clearProcessedTransactions(Blockchain blockchain) {
         List<TransactionRepr> trList;
         int i = 0;
         for (Block b : blockchain.getChain()) {

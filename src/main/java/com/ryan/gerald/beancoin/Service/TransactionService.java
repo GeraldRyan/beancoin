@@ -20,7 +20,7 @@ public class TransactionService {
     @Deprecated
     TransactionDao transactionD = new TransactionDao();
 
-    public TransactionPoolMap getTransactionPool() {
+    public TransactionPoolMap getUnminedTransactionsPoolMap() {
         List<Transaction> tl = new ArrayList<>(transactionRepository.getListOfTransactions());
         return TransactionPoolMap.fillTransactionPool(tl);
     }
@@ -40,6 +40,16 @@ public class TransactionService {
         lt.forEach(t -> t.rebuildOutputInput());
         return lt;
     }
+
+    public Transaction getTransactionById(String id ){
+        return transactionRepository.findById(id).get();
+
+    }
+
+    public Transaction saveTransaction(Transaction t){
+        return transactionRepository.save(t);
+    }
+
 
     /**
      * Gets a transaction from the local database by transaction ID

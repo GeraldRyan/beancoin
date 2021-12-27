@@ -17,6 +17,10 @@ public class WalletService {
 	}
 
 
+	public Wallet saveWallet(Wallet wallet){
+		return walletRepository.save(wallet);
+	}
+
 	@Deprecated
 	WalletDao dao = new WalletDao();
 

@@ -1,37 +1,31 @@
 package com.ryan.gerald.beancoin.controller;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.Optional;
-
-import javax.validation.Valid;
-
+import com.ryan.gerald.beancoin.Service.UserService;
+import com.ryan.gerald.beancoin.Service.WalletService;
+import com.ryan.gerald.beancoin.entity.User;
 import com.ryan.gerald.beancoin.entity.UserRepository;
+import com.ryan.gerald.beancoin.entity.Wallet;
 import com.ryan.gerald.beancoin.entity.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.ryan.gerald.beancoin.Service.UserService;
-import com.ryan.gerald.beancoin.Service.WalletService;
-import com.ryan.gerald.beancoin.entity.User;
-import com.ryan.gerald.beancoin.entity.Wallet;
+import javax.validation.Valid;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/register")
 @SessionAttributes({"isloggedin", "wallet", "username"})
 public class RegistrationController {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private WalletRepository walletRepository;
+    @Autowired private UserService userService;
+    @Autowired private WalletService walletService;
+
 
     @GetMapping("")
     public ModelAndView showRegisterPage(Model model) {
@@ -60,14 +54,14 @@ public class RegistrationController {
             return "redirect:/";
         }
 
-        Optional<User> existingUser = userRepository.findById(user.getUsername());
+        Optional<User> existingUser = userService.getUserOptionalByName(user.getUsername());
         if (existingUser.isPresent()) {
             model.addAttribute("existsmsg", "User already exists. Choose another name or log in");
             return "registration/register";
         }
         Wallet wallet = Wallet.createWallet(user.getUsername());
-        userRepository.save(user);
-        walletRepository.save(wallet);
+        userService.saveUser(user);
+        walletService.saveWallet(wallet);
         model.addAttribute("isloggedin", true);
         model.addAttribute("user", user);
         model.addAttribute("wallet", wallet);

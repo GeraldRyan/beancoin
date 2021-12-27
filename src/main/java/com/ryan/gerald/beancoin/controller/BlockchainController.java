@@ -4,7 +4,10 @@ import com.google.gson.Gson;
 import com.pubnub.api.PubNubException;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
-import com.ryan.gerald.beancoin.entity.*;
+import com.ryan.gerald.beancoin.entity.Block;
+import com.ryan.gerald.beancoin.entity.Blockchain;
+import com.ryan.gerald.beancoin.entity.Transaction;
+import com.ryan.gerald.beancoin.entity.TransactionPoolMap;
 import com.ryan.gerald.beancoin.initializors.Config;
 import com.ryan.gerald.beancoin.initializors.Initializer;
 import com.ryan.gerald.beancoin.utilities.TransactionRepr;
@@ -22,19 +25,12 @@ import java.util.List;
 public class BlockchainController {
 
     @Autowired private BlockchainService blockchainService;
-    @Autowired private BlockchainRepository blockchainRepository;
-    @Autowired private TransactionRepository transactionRepository;
     @Autowired private TransactionService transactionService;
-    @Autowired private BlockRepository blockRepository;
     @Autowired Initializer initializer;
-    @Autowired TransactionPoolMap pool; // we need this as state?
+    @Autowired TransactionPoolMap UnminedTransactionPoolMap; // Sort of a service/utiltity object
 
     public BlockchainController() throws InterruptedException {}
 
-    /**
-     * Pulls up beancoin blockchain on startup.
-     * If no beancoin exists, create one and populate it with initial values
-     */
     @ModelAttribute("blockchain")
     // This pulls from database before any request handler method goes (but only after a request is made)
     public Blockchain loadBlockchain(Model model) throws NoSuchAlgorithmException, InterruptedException {
@@ -47,10 +43,6 @@ public class BlockchainController {
         return bc;
     }
 
-    TransactionPoolMap refreshTransactionPool() {
-        return transactionService.getTransactionPool();
-    }
-
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public String serveBlockchain(Model model) {
@@ -61,33 +53,31 @@ public class BlockchainController {
 
     @RequestMapping(value = "mine", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String getMine(Model model)
+    public String doMineAsGET(Model model)
             throws NoSuchAlgorithmException, PubNubException, InterruptedException {
-        pool = refreshTransactionPool();
-        String transactionData = pool.getMinableTransactionDataString();
-        if (transactionData == null) {return "No data to mine. Tell your friends to make transactions";}
+        UnminedTransactionPoolMap = transactionService.getUnminedTransactionsPoolMap();
+        String transactionData = UnminedTransactionPoolMap.getMinableTransactionDataString();
+        if (transactionData == null) {return "No data to mine. Tell you" +
+                "r friends to make transactions";}
         List<Transaction> tlist = transactionService.getTransactionList();
         Blockchain blockchain = blockchainService.getBlockchainByName("beancoin");
         Block new_block = blockchain.add_block(transactionData);
         model.addAttribute("blockchain", blockchain);
         model.addAttribute("minedblock", new_block);
-        pool.refreshBlockchainTransactionPool(blockchain);
-        model.addAttribute("pool", pool);
+        UnminedTransactionPoolMap.clearProcessedTransactions(blockchain);  // deletes from Transaction Table
+        model.addAttribute("pool", UnminedTransactionPoolMap);
         blockchainService.saveBlockchain(blockchain);
         System.out.println("NEW BLOCK MINED: " + new_block.toStringConsole());
 
         if (Config.BROADCASTING) { // TODO CHANGE TO KAFKA
 //            new PubNubApp().broadcastBlock(new_block);
         }
-
         return new_block.webworthyJson(tlist);
     }
 
-
     @RequestMapping(value = "/{n}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String seeIf(@PathVariable String n, @ModelAttribute("blockchain") Blockchain blockchain, Model model)
-            throws NoSuchAlgorithmException, PubNubException, InterruptedException {
+    public String seeIf(@PathVariable String n, @ModelAttribute("blockchain") Blockchain blockchain, Model model) {
         try {
             Block b = ((Blockchain) model.getAttribute("blockchain")).getNthBlock(Integer.valueOf(n));
             if (Integer.valueOf(n) >= 0 && Integer.valueOf(n) <= 5) {
@@ -95,10 +85,9 @@ public class BlockchainController {
             }
             List<TransactionRepr> tr = b.deserializeTransactionData();
             return b.webworthyJson(tr, "plug");
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
+            e.printStackTrace();
             return "This index doesn't exist yet in our chain. Try a different number";
         }
-
     }
-
 }
