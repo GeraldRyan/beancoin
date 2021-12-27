@@ -23,8 +23,8 @@ import java.util.*;
 import javax.persistence.*;
 
 import com.ryan.gerald.beancoin.Service.BlockchainService;
-import com.ryan.gerald.beancoin.utilities.StringUtils;
-import com.ryan.gerald.beancoin.utilities.TransactionRepr;
+import com.ryan.gerald.beancoin.utils.StringUtils;
+import com.ryan.gerald.beancoin.utils.TransactionRepr;
 
 /**
  * An individual wallet for a miner. Keeps track of miner's balance. Allows

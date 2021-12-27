@@ -10,12 +10,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-//import jdk.nashorn.internal.runtime.regexp.joni.Config;
 
-/**
- * SOMETHING IS STILL DEPENDING ON THIS. WE NEED TO REMOVE THAT TIGHT CONNECTION. MAYBE NEXT CLEANUP STEP!!!
- */
-
+@Deprecated
 public abstract class DBConnection {
 	protected EntityManagerFactory emf = null;
 	protected EntityManager em = null;

@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.utilities;
+package com.ryan.gerald.beancoin.utils;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;

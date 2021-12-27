@@ -1,10 +1,7 @@
 package com.ryan.gerald.beancoin.initializors;
 
 /**
- * Not used at present but can make a general config class, both for dev and for
- * production
- * 
- * @author User
+ * Generic Blockchain Config
  *
  */
 public class Config {

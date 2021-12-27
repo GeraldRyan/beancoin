@@ -7,40 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class WalletService {
+public class WalletService implements WalletServiceInterface {
 
-	@Autowired
-	WalletRepository walletRepository;
+    @Autowired WalletRepository walletRepository;
 
-	public Wallet getWalletByUsername(String username){
-		return walletRepository.findById(username).get();
-	}
+    @Override
+    public Wallet getWalletByUsername(String username) {
+        return walletRepository.findById(username).get();
+    }
 
+    @Override
+    public Wallet saveWallet(Wallet wallet) {
+        return walletRepository.save(wallet);
+    }
 
-	public Wallet saveWallet(Wallet wallet){
-		return walletRepository.save(wallet);
-	}
-
-//	@Deprecated
-//	WalletDao dao = new WalletDao();
-//
-//	public Wallet addWalletService(Wallet w) {
-//		return dao.addWallet(w);
-//	}
-//
-//	public Wallet getWalletService(String walletId) {
-//		return dao.getWallet(walletId);
-//	}
-//
-//	/**
-//	 *
-//	 * Updates balance of wallet by blockchain traversal
-//	 *
-//	 * @param wallet
-//	 * @return
-//	 */
-//	public Wallet updateWalletBalanceService(Wallet wallet) {
-//		return dao.updateWallet(wallet);
-//	}
+    // .. whatever else considered necessary
 
 }

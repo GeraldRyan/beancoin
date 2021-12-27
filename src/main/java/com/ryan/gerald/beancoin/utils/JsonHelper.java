@@ -1,11 +1,4 @@
-package com.ryan.gerald.beancoin.utilities;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import com.ryan.gerald.beancoin.entity.Transaction;
-import com.google.gson.Gson;
+package com.ryan.gerald.beancoin.utils;
 
 public class JsonHelper {
 

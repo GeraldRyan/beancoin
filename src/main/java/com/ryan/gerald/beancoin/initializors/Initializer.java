@@ -1,29 +1,12 @@
 package com.ryan.gerald.beancoin.initializors;
 
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 
-import com.ryan.gerald.beancoin.Service.BlockchainService;
-import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.entity.*;
-import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
-import com.ryan.gerald.beancoin.utilities.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 @Service
 public class Initializer {
-
-    @Autowired BlockchainRepository blockchainRepository;
-    @Autowired BlockRepository blockRepository;
 
     public void loadBC(Blockchain blockchain) throws NoSuchAlgorithmException {
         blockchain.add_block("Dance The Waltz");

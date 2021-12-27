@@ -38,19 +38,11 @@ public class SyncToNetwork {
 	 * 
 	 * In future include set or dictionary of URLs.
 	 * 
-	 * Tight coupled method is slated for deprication and erasure once safe to do
+	 * Tight coupled method is slated for deprecation and erasure once safe to do
 	 * so.
 	 * 
 	 * purposes, but used in second server repo instance.
-	 * 
-	 * @return
-	 * @throws NoSuchAlgorithmException
-	 * @throws ChainTooShortException
-	 * @throws GenesisBlockInvalidException
-	 * @throws BlocksInChainInvalidException
-	 * @throws IllegalStateException
-	 * @throws ClientProtocolException
-	 * @throws IOException
+
 	 */
 	public static ArrayList<Block> getNetworkChain()
 			throws NoSuchAlgorithmException, ChainTooShortException, GenesisBlockInvalidException,

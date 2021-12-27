@@ -7,7 +7,7 @@ import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
 import com.ryan.gerald.beancoin.initializors.Config;
-import com.ryan.gerald.beancoin.utilities.TransactionRepr;
+import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

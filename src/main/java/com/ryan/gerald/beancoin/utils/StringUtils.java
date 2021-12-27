@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.utilities;
+package com.ryan.gerald.beancoin.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -7,7 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 public class StringUtils {

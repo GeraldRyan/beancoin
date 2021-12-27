@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.datamodelworkingexample;
+package com.ryan.gerald.beancoin.tutorials.datamodelworkingexample;
 
 import org.springframework.data.repository.CrudRepository;
 

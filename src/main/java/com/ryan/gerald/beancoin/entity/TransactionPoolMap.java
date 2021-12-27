@@ -13,7 +13,7 @@ import java.util.List;
 
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 
-import com.ryan.gerald.beancoin.utilities.TransactionRepr;
+import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

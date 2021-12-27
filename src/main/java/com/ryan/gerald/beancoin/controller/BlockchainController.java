@@ -10,7 +10,7 @@ import com.ryan.gerald.beancoin.entity.Transaction;
 import com.ryan.gerald.beancoin.entity.TransactionPoolMap;
 import com.ryan.gerald.beancoin.initializors.Config;
 import com.ryan.gerald.beancoin.initializors.Initializer;
-import com.ryan.gerald.beancoin.utilities.TransactionRepr;
+import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

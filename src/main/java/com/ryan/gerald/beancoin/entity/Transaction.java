@@ -21,10 +21,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.exceptions.InvalidTransactionException;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
-import com.ryan.gerald.beancoin.utilities.StringUtils;
+import com.ryan.gerald.beancoin.utils.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;

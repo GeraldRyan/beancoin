@@ -2,8 +2,8 @@ package com.ryan.gerald.beancoin.entity;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.ryan.gerald.beancoin.utilities.CryptoHash;
-import com.ryan.gerald.beancoin.utilities.TransactionRepr;
+import com.ryan.gerald.beancoin.utils.CryptoHash;
+import com.ryan.gerald.beancoin.utils.TransactionRepr;
 
 import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
