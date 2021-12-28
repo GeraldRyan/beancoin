@@ -13,25 +13,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
+
 @Controller
 @SessionAttributes({"blockchain", "wallet", "username", "isloggedin", "user", "msg", "transactionpool", "pubsubapp"})
 public class HomeController {
-
 
     @Autowired private BlockchainService blockchainService;
     @Autowired private TransactionService transactionService;
     @Autowired private UserService userService;
     @Autowired private WalletService walletService;
 
-
     @Autowired Initializer initializer;
-    @Autowired private Environment env;
+    @Autowired private Environment env; // Not using I believe but keep for example
 
     public HomeController() throws InterruptedException {}
 
@@ -50,7 +48,7 @@ public class HomeController {
         return transactionService.getUnminedTransactionsPoolMap();
     }
 
-    @GetMapping("")
+    @GetMapping("/")
     public String showIndex(Model model) {return "index";}
 
     @GetMapping("/login")
