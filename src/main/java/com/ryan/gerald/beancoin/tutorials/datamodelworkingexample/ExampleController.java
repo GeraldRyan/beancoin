@@ -1,10 +1,12 @@
 package com.ryan.gerald.beancoin.tutorials.datamodelworkingexample;
 
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+@Hidden
 @Controller
 @RequestMapping(path="/demo")
 public class ExampleController {
@@ -13,7 +15,6 @@ public class ExampleController {
     @GetMapping(path="/add") // Map ONLY POST Requests
     public @ResponseBody String addNewUser (@RequestParam String name
             , @RequestParam String email) {
-
         UserExample n = new UserExample();
         n.setName(name);
         n.setEmail(email);
