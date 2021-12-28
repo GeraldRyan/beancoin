@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping(path="/demo")
-public class MainController {
+public class ExampleController {
     @Autowired private UserExampleRepository userRepository;
 
     @GetMapping(path="/add") // Map ONLY POST Requests
