@@ -33,8 +33,9 @@ import com.google.gson.Gson;
  * 
  * @author Gerald Ryan Blockchain class of blockchain app. Blockchain class.
  *         Instantiate blockchain with a name as string
- * TODO Remove id and make name the id field
  *
+ * TODO Remove id and make name the id field
+ * Can I make this or other entities later wtih the builder pattern?
  */
 @Entity
 @Table(name = "blockchain")
