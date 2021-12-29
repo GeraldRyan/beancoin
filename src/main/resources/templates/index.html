@@ -23,16 +23,19 @@
 
         <div class="heading">
             <h1 class="salutations">
-                Welcome to the blockchain. Please <a href="./register">Register</a>
-                or <a class="" href="./login">Login</a>
+                Welcome to the blockchain.
             </h1>
         </div>
-        <h3>Or just look around</h3>
+        <h3 class="text-4xl">Please <a class="text-yellow-600 text-4xl" href="./register">Register</a>
+            or <a class="text-yellow-600" href="./login">Login</a> to use the services</h3><br>
+        <h3 class="text-4xl"><a th:href="@{/swagger-ui/index.html}">
+            Or view the API Spec</a></h3><br>
+        <h3 class="text-4xl">Or just look around</h3>
         <div class="menu-ctn">
 
 
-            <a href="./blockchain">Our live blockchain status</a> <a
-                href="./transactionpool">Live Transaction Pool (unmined
+            <a class="text-yellow-600" href="./blockchain">Our live blockchain status</a> <a
+                class="text-yellow-600" href="./transactionpool">Live Transaction Pool (unmined
             transactions)</a>
 
         </div>
@@ -69,7 +72,7 @@
 
 </th:block>
 <br><br><br><br><br><br>
-<div >
+<div>
     <h4 class="text-2xl text-green-700 ">This is but a humble front end</h4>
     <a class="text-m text-green-700 hover:text-xl hover:text-green-600 " th:href="@{/swagger-ui/index.html}">Click
         here to view the API spec</a>
