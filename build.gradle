@@ -24,8 +24,11 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.3'
 
 	// NOT SURE OF THE FOLLOWING TWO
-	//	implementation 'io.swagger.core.v3:swagger-annotations:2.1.12'
 	implementation 'io.swagger:swagger-annotations:1.6.4' // not sure if doing anything. certain endpoints not found
+	//	implementation 'io.swagger.core.v3:swagger-annotations:2.1.12'
+
+	// spring actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 
 	implementation group: 'com.pubnub', name: 'pubnub-gson', version: '5.3.0'  // will be switching to kafka later
@@ -33,6 +36,9 @@ dependencies {
 	compileClasspath 'org.springframework.boot:spring-boot-starter-validation:2.6.1'
 	compileClasspath 'org.apache.httpcomponents:httpcore:4.4.15'
 	compileClasspath 'org.apache.httpcomponents:httpclient:4.5.13'
+
+	// Spring Admin Dashboard (not a Spring project obviously
+	implementation 'de.codecentric:spring-boot-admin-starter-client:2.5.1'
 
 
 }

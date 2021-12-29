@@ -47,6 +47,17 @@ public class BlockchainController {
     @ResponseBody
     public String serveBlockchain(Model model) {
         Blockchain bc = (Blockchain) model.getAttribute("blockchain");
+        if (bc==null){
+            /*
+            TODO this was returning NULL on OpenAPI call. OPENAPI UI NEEDS TO WORK.
+            Need to instantiate Blockchain. Need to set up pattern of model, session-scope cache, general cache, no
+            cache patterns.
+            Start by removing all the sessions and then put them back as desirable (startover strategy)
+            Second, need to put the check session, if null then run dao/db query. Put this functionality in service
+            class if possible, or at least a function. Ideally abstract it away, make your methods take a string
+            argument or two- at least one to check if exists in model. Clean up controller class. 
+             */
+        }
         blockchainService.refreshChain(bc); // make sure ordered by timestamp (properly a persistence layer problem)
         return bc.toJSONtheChain();
     }
