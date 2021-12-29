@@ -12,6 +12,7 @@
 <div th:replace="fragments/navbar"></div>
 
 
+<!--<a th:href="/swagger-ui/index.html">Click here to view our API</a>-->
 <th:block th:if="${isloggedin == false }">
     <div class="m-auto text-center">
         <p class="text-2xl m-auto text-center text-red-700">You are not logged in.</p>
@@ -57,12 +58,22 @@
     <h2 class="h2">Some things you can do</h2>
 
     <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./wallet/">Open Your wallet</a> <br>
-    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./wallet/transact">Make a Transaction</a> <br>
-    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./blockchain">Explore our live blockchain</a> <br>
-    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./blockchain/mine">Mine a Block</a> <br>
-    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./transactionpool">View the live Transaction Pool</a> <br>
-
+    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./wallet/transact">Make a
+        Transaction</a> <br>
+    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./blockchain">Explore our live
+        blockchain</a> <br>
+    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./blockchain/mine">Mine a Block</a>
+    <br>
+    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./transactionpool">View the live
+        Transaction Pool</a> <br>
 
 </th:block>
+<br><br><br><br><br><br>
+<div >
+    <h4 class="text-2xl text-green-700 ">This is but a humble front end</h4>
+    <a class="text-m text-green-700 hover:text-xl hover:text-green-600 " th:href="@{/swagger-ui/index.html}">Click
+        here to view the API spec</a>
+</div>
+
 </body>
 </html>
