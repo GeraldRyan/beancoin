@@ -22,7 +22,7 @@ dependencies {
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	// NECESSARY (but not all endpoints display)
+	// NECESSARY
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.3'
 
 	// NOT SURE OF THE FOLLOWING TWO
