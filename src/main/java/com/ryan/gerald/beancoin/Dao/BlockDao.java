@@ -8,7 +8,6 @@ import com.ryan.gerald.beancoin.entity.Block;
 @Deprecated
 public class BlockDao extends DBConnection {
 
-	
 	public void addBlock(Block block) {
 		// Where will the mining happen? It should happen elsewhere. Trust.
 		this.connect();
