@@ -94,7 +94,7 @@ public class Wallet {
         KeyPair keyPair = keyGen.generateKeyPair();
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
-        if (ownerId == "admin"){return new Wallet(1000000, privateKey, publicKey, address, ownerId);}
+        if (ownerId == "admin") {return new Wallet(1000000, privateKey, publicKey, address, ownerId);}
         Wallet wallet = new Wallet(STARTING_BALANCE, privateKey, publicKey, address, ownerId);
         System.out.println("NEW WALLET CREATED");
         return wallet;
@@ -247,6 +247,7 @@ public class Wallet {
     // TODO wrap above function in this for cleaner code
     // TODO BE ABLE TO TRAVERSE FROM END OF BLOCK BACK UNTIL YOU HIT SOMETHING WTIH USERS ADDRESS. or something
     public static double calculateWalletBalanceByTraversingChainIncludePending(Blockchain bc, String adds, List<TransactionRepr> pendingTransactions) {
+        System.out.println("CALCULATING WALLET BALANCE FOR ADDRESS: " + adds);
         double bal = STARTING_BALANCE;
         int i = 0;
         for (Block b : bc.getChain()) {
@@ -260,11 +261,10 @@ public class Wallet {
                 if (t.getInput().get("address").equals(adds)) {  // input is moving per transaction and it should not.
                     System.out.println("INPUT BALANCE : " + t.getInput().get("amount"));
                     currentPmt = (double) t.getInput().get("amount") - (double) t.getOutput().get(adds);
-                    System.out.println("Input Balance to deduct " + currentPmt );
+                    System.out.println("Input Balance to deduct " + currentPmt);
                     bal -= currentPmt;
-                    break;
                 }
-                if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add receipts.
+                if (t.getOutput().containsKey(adds) && !t.getInput().get("address").equals(adds)) { // wallet is receiver. Add receipts.
                     System.out.println("ADD: " + t.getOutput().get(adds) + "    to " + adds);
                     bal += (double) t.getOutput().get(adds);
                 }
