@@ -20,7 +20,7 @@ public class UserService {
 
 
     public User getUserByUsername(String username) {
-        return userRepository.findById(username).get();
+        return nullChecker(userRepository.findById(username));
     }
 
     public Optional<User> getUserOptionalByName(String username) {
@@ -31,4 +31,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+
+    // TODO How can I extract/reuse this most elegantly?
+    public <T> T nullChecker(Optional<T> o){
+        if (o.isPresent()){return o.get(); }
+        else { return null; }
+    }
 }

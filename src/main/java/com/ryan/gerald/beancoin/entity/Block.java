@@ -58,13 +58,6 @@ public class Block {
 
 	/**
 	 * A block is a unit of storage for a blockchain that supports a cryptocurrency.
-	 * 
-	 * @param timestamp
-	 * @param lastHash
-	 * @param hash
-	 * @param data
-	 * @param difficulty
-	 * @param nonce
 	 */
 	public Block(long timestamp, String lastHash, String hash, String data, int difficulty, int nonce) {
 		super();
@@ -79,7 +72,6 @@ public class Block {
 	public Block() { }
 
 	/**
-	 * 
 	 * Prints a header-conforming console adapted output string in the form
 	 * 
 	 * @return
@@ -98,7 +90,6 @@ public class Block {
 
 	public String toStringFormatted() {
 		String datastring = "";
-
 		return String.format("%5s %10s %15s %15s %15s", timestamp, lastHash, hash, data, difficulty, nonce);
 	}
 
@@ -106,9 +97,6 @@ public class Block {
 	 * This utility serializer function helps deal with the complexities of Gson and
 	 * escape characters for different types of object and list serialization.
 	 * Understand its role by how it is used in this app.
-	 * 
-	 * @param tlist
-	 * @return
 	 */
 	public String webworthyJson(List<Transaction> tlist) {
 		HashMap<String, Object> serializeThisBundle = new HashMap<String, Object>();
@@ -138,8 +126,6 @@ public class Block {
 
 	/**
 	 * convert the block to a serialized JSON representation
-	 * 
-	 * @return
 	 */
 	public String toJSONtheBlock() {
 		return new Gson().toJson(this);
@@ -157,9 +143,6 @@ public class Block {
 	/**
 	 * Deserialize a valid JSON string with GSON and convert it back into valid
 	 * block
-	 * 
-	 * @param jsonel
-	 * @return
 	 */
 	public static Block fromJsonToBlock(String jsonel) {
 		Gson gson = new Gson();
@@ -170,11 +153,6 @@ public class Block {
 	/**
 	 * Mine a block based on given last block and data until a block hash is found
 	 * that meets the leading 0's Proof of Work requirement.
-	 * 
-	 * @param last_block
-	 * @param data
-	 * @return
-	 * @throws NoSuchAlgorithmException
 	 */
 	public static Block mine_block(Block last_block, String data) throws NoSuchAlgorithmException {
 		long timestamp = new Date().getTime();
@@ -225,9 +203,6 @@ public class Block {
 	 * Calculate the adjusted difficulty according to the MINE_RATE. Increase the
 	 * difficulty for quickly mined blocks. Decrease the difficulty for slowly mined
 	 * blocks.
-	 * 
-	 * @param last_block
-	 * @param new_timestamp
 	 */
 	public static int adjust_difficulty(Block last_block, long new_timestamp) {
 		long time_diff = new_timestamp - last_block.getTimestamp();
@@ -247,11 +222,6 @@ public class Block {
 	 * last_hash reference - Block must meet the proof of work requirements -
 	 * difficulty must only adjust by one - block hash must be a valid combination
 	 * of block fields
-	 * 
-	 * @param last_block
-	 * @param block
-	 * @return
-	 * @throws NoSuchAlgorithmException
 	 */
 	public static boolean is_valid_block(Block last_block, Block block) throws NoSuchAlgorithmException {
 		String binary_hash = CryptoHash.hex_to_binary(block.getHash());

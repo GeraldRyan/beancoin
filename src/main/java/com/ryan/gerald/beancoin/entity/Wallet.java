@@ -51,8 +51,9 @@ public class Wallet {
     byte[] publickeyByte; // for language agnosticism
     double balance;
     String address;
+    double balanceMined;
 
-    static double STARTING_BALANCE = 1000;
+    static double STARTING_BALANCE = 0; // New method. Will create an admin wallet and transfer funds from that
 
     public Wallet() {
     }
@@ -75,7 +76,7 @@ public class Wallet {
      * Refactor anyway
      */
     public Wallet(double balance, PublicKey publickey, String address) {
-        super();
+        super(); // huh
         balance = Wallet.calculateWalletBalanceByTraversingChain(new BlockchainService().getBlockchainByName("beancoin"), address);
         // can remove param 1 balance now or better yet add the blockchain as a
         // dependency injection as this is tight coupling
@@ -93,6 +94,7 @@ public class Wallet {
         KeyPair keyPair = keyGen.generateKeyPair();
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
+        if (ownerId == "admin"){return new Wallet(1000000, privateKey, publicKey, address, ownerId);}
         Wallet wallet = new Wallet(STARTING_BALANCE, privateKey, publicKey, address, ownerId);
         System.out.println("NEW WALLET CREATED");
         return wallet;
@@ -172,12 +174,6 @@ public class Wallet {
     /**
      * Restores a public key object in your chosen language from either a Base64
      * String or a byte[] as received over the wire (contains X.509 standard)
-     *
-     * @param publickey
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchProviderException
-     * @throws InvalidKeySpecException
      */
     public static PublicKey restorePublicKey(byte[] publickey)
             throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
@@ -198,13 +194,8 @@ public class Wallet {
 
     /**
      * Calculates balance of address based on blockchain history (only counts MINED BLOCKS)
-     * <p>
      * Two ways to find balance: calculate all transactions to and fro or trusting
      * output values
-     *
-     * @param bc
-     * @param adds
-     * @return
      */
     public static double calculateWalletBalanceByTraversingChain(Blockchain bc, String adds) {
         double balance = STARTING_BALANCE; // starting balance. static means not touching real wallet.
@@ -245,10 +236,18 @@ public class Wallet {
         return balance;
     }
 
+    public double getBalanceMined() {
+        return balanceMined;
+    }
+
+    public void setBalanceMined(double balanceMined) {
+        this.balanceMined = balanceMined;
+    }
+
     // TODO wrap above function in this for cleaner code
     // TODO BE ABLE TO TRAVERSE FROM END OF BLOCK BACK UNTIL YOU HIT SOMETHING WTIH USERS ADDRESS. or something
     public static double calculateWalletBalanceByTraversingChainIncludePending(Blockchain bc, String adds, List<TransactionRepr> pendingTransactions) {
-        double balance = STARTING_BALANCE;
+        double bal = STARTING_BALANCE;
         int i = 0;
         for (Block b : bc.getChain()) {
             i++;
@@ -256,25 +255,38 @@ public class Wallet {
             // would for (i=0; i<7; i++) {continue;} work?
             System.out.println("BLOCK DESERIALIZED " + b.toStringConsole());
             List<TransactionRepr> trListMinedBlocks = b.deserializeTransactionData();
+            double currentPmt = 0;
             for (TransactionRepr t : trListMinedBlocks) {
-                if (t.getInput().get("address").equals(adds)) { // wallet is sender. Set balance
-                    balance = (double) t.getOutput().get(adds);
-                    if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add receipts.
-                        balance += (double) t.getOutput().get(adds);
-                    }
+                if (t.getInput().get("address").equals(adds)) {  // input is moving per transaction and it should not.
+                    System.out.println("INPUT BALANCE : " + t.getInput().get("amount"));
+                    currentPmt = (double) t.getInput().get("amount") - (double) t.getOutput().get(adds);
+                    System.out.println("Input Balance to deduct " + currentPmt );
+                    bal -= currentPmt;
+                    break;
+                }
+                if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add receipts.
+                    System.out.println("ADD: " + t.getOutput().get(adds) + "    to " + adds);
+                    bal += (double) t.getOutput().get(adds);
                 }
             }
         }
+
         // Process Pending Transactions
+        double paying = 0;
+        double receiving = 0;
         for (TransactionRepr t : pendingTransactions) {
             if (t.getInput().get("address").equals(adds)) {
-                balance = (double) t.getOutput().get(adds);
-                if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
-                    balance += (double) t.getOutput().get(adds);
-                }
+                paying = (double) t.getInput().get("amount") - (double) t.getOutput().get(adds);
+                System.out.println("T INPUT " + t.getInput().get("amount") + " and output " + t.getOutput().get(adds));
+                System.out.println("Paying " + paying + " by " + adds);
+                break;
+            }
+            if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add bal to.
+                receiving += (double) t.getOutput().get(adds);
+                System.out.println("Receiving " + receiving + " by " + adds);
             }
         }
-        return balance;
+        return bal - paying + receiving;
     }
 
     public double getBalance() {

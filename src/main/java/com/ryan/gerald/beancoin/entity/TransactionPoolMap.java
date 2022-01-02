@@ -88,9 +88,7 @@ public class TransactionPoolMap {
      * @return
      */
     public String getMinableTransactionDataString() {
-        if (this.transactionMap.size() == 0) {
-            return null;
-        }
+        if (this.transactionMap.size() == 0) {return null;}
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         this.transactionMap.forEach((uuid, t) -> {

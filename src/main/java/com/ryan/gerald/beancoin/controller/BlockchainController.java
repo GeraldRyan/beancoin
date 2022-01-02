@@ -20,7 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Controller
-@SessionAttributes({"blockchain", "minedblock", "wallet"})
+@SessionAttributes({})
 @RequestMapping("blockchain")
 public class BlockchainController {
 
@@ -35,7 +35,7 @@ public class BlockchainController {
     public Blockchain loadBlockchain(Model model) throws NoSuchAlgorithmException, InterruptedException {
         Blockchain bc;
         try {
-            bc = (Blockchain) model.getAttribute("blockchain");
+            bc = blockchainService.getBlockchainByName("beancoin");
         } catch (Exception e) {
             bc = blockchainService.CreateNewBlockchain("beancoin");
         }
@@ -45,18 +45,8 @@ public class BlockchainController {
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public String serveBlockchain(Model model) {
-        Blockchain bc = (Blockchain) model.getAttribute("blockchain");
-        if (bc == null) {
-            /*
-            TODO this was returning NULL on OpenAPI call. OPENAPI UI NEEDS TO WORK.
-            Need to instantiate Blockchain. Need to set up pattern of model, session-scope cache, general cache, no
-            cache patterns.
-            Start by removing all the sessions and then put them back as desirable (startover strategy)
-            Second, need to put the check session, if null then run dao/db query. Put this functionality in service
-            class if possible, or at least a function. Ideally abstract it away, make your methods take a string
-            argument or two- at least one to check if exists in model. Clean up controller class. 
-             */
-        }
+        Blockchain bc = blockchainService.getBlockchainByName("beancoin");
+
         blockchainService.refreshChain(bc); // make sure ordered by timestamp (properly a persistence layer problem)
         return bc.toJSONtheChain();
     }
@@ -90,7 +80,8 @@ public class BlockchainController {
     @ResponseBody
     public String seeIf(@PathVariable String n, @ModelAttribute("blockchain") Blockchain blockchain, Model model) {
         try {
-            Block b = ((Blockchain) model.getAttribute("blockchain")).getNthBlock(Integer.valueOf(n));
+            Blockchain bc = blockchainService.getBlockchainByName("beancoin");
+            Block b = bc.getNthBlock(Integer.valueOf(n));
             if (Integer.valueOf(n) >= 0 && Integer.valueOf(n) <= 5) {
                 return new Gson().toJson(b);
             }

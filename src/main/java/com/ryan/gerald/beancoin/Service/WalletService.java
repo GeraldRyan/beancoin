@@ -6,6 +6,8 @@ import com.ryan.gerald.beancoin.entity.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class WalletService implements WalletServiceInterface {
 
@@ -13,7 +15,11 @@ public class WalletService implements WalletServiceInterface {
 
     @Override
     public Wallet getWalletByUsername(String username) {
-        return walletRepository.findById(username).get();
+        Optional<Wallet> o = walletRepository.findById(username);
+        if (o.isPresent()){
+            return o.get();
+        }
+        return null;
     }
 
     @Override

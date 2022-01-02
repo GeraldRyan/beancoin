@@ -30,8 +30,6 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * Document an exchange of currency from a sender to one or more recipients
- *
- * @author User
  */
 @Entity
 @Table(name = "transaction")
@@ -44,19 +42,13 @@ public class Transaction {
     String recipientAddress;
     String senderAddress;
     double amount;
-    /**
-     * Data structure about who the recipients are in the transaction and how much
-     * currency they are receiving and how much goes back to sender (change). Kind
-     * of like a simple receipt/ledger.
-     */
+
     @Transient
-    HashMap<String, Object> output; // like basic receipt
-    /**
-     * Meta info about transaction including timestamp, address, publickey of sender
-     * and signature, used to determine validity. Depends on output above
-     */
+    HashMap<String, Object> output; // recipients (including sender)
+
     @Transient
-    HashMap<String, Object> input; // like wire transfer document
+    HashMap<String, Object> input; // meta-info about transaction including sender starting balance
+
     @Column(columnDefinition = "varchar(2000) default 'Jon Snow'")
     String outputjson;
     @Column(columnDefinition = "varchar(2000) default 'Jon Snow'")
@@ -66,7 +58,7 @@ public class Transaction {
             throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, TransactionAmountExceedsBalance {
         super();
         if (senderWallet.getBalance() < amount) {
-            throw new TransactionAmountExceedsBalance("Transactionm Amount Exceeds Balance");
+            throw new TransactionAmountExceedsBalance("Transaction Amount Exceeds Balance");
         }
         this.uuid = StringUtils.getUUID8();
         this.output = Transaction.createOutputMap(senderWallet, recipientAddress, amount);
@@ -152,7 +144,8 @@ public class Transaction {
         byte[] bytesignature = senderWallet.sign(output);
         HashMap<String, Object> input = new HashMap<String, Object>();
         input.put("timestamp", new Date().getTime());
-        input.put("amount", senderWallet.getBalance());
+        input.put("amount", senderWallet.getBalanceMined());  // TODO FIX THIS- it is based on real balance but should be
+        // based on mined
         input.put("address", senderWallet.getAddress());
         input.put("publicKeyB64", publicKeyString);
         input.put("publicKeyFormat", senderWallet.getPublickey().getFormat());
@@ -162,16 +155,6 @@ public class Transaction {
 
     /**
      * Update transaction with existing or new recipient
-     *
-     * @param senderWallet
-     * @param recipientAddress
-     * @param amount
-     * @throws TransactionAmountExceedsBalance
-     * @throws IOException
-     * @throws SignatureException
-     * @throws NoSuchProviderException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
      */
     public void update(Wallet senderWallet, String recipientAddress, double amount)
             throws TransactionAmountExceedsBalance, InvalidKeyException, NoSuchAlgorithmException,
@@ -196,18 +179,6 @@ public class Transaction {
     /**
      * Validate a transaction. For invalid transactions, raises
      * InvalidTransactionException
-     *
-     * @param transaction
-     * @return
-     * @throws InvalidTransactionException
-     * @throws IOException
-     * @throws NoSuchProviderException
-     * @throws NoSuchAlgorithmException
-     * @throws SignatureException
-     * @throws InvalidKeyException
-     * @throws CertificateException
-     * @throws InvalidKeySpecException
-     * @throws InvalidAlgorithmParameterException
      */
     public static boolean is_valid_transaction(Transaction transaction) throws InvalidTransactionException,
             InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
@@ -390,10 +361,16 @@ public class Transaction {
         return new Gson().toJson(serializeThisBundle);
     }
 
+    public static String transactionStringSingleton(Transaction t) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        sb.append(t.__repr__());
+        sb.append("]");
+        return sb.toString().replace("\\\\", "");
+    }
+
     /**
      * Use this jsonifying method to get the final form for mining of transaction.
-     *
-     * @return
      */
     public String __repr__() {
         if (this.getInput() == null) {
@@ -412,13 +389,6 @@ public class Transaction {
     /**
      * Restore a Transaction instance (sans Wallet object) from JSON serialized Data
      * Data you get over the wire/REST API
-     *
-     * @param transactionJSON
-     * @return
-     * @throws IOExceptionlinked        tree map to hashmap
-     * @throws NoSuchProviderException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
      */
     static public Transaction fromJSONToTransaction(String transactionJSON)
             throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException {

@@ -40,7 +40,8 @@ public class BlockchainService {
     public void refreshChain(Blockchain bc){
         try {
             ArrayList<Block> new_chain = new ArrayList<Block>(bc.getChain());
-            Collections.sort(new_chain, Comparator.comparingLong(Block::getTimestamp));
+            Collections.sort(new_chain, Comparator.comparingLong(Block::getTimestamp)); // sort by timestamp, which
+            // should be already, but in case not, now it is.
             bc.setChain(new_chain);
         } catch (Exception e) {
             e.printStackTrace();

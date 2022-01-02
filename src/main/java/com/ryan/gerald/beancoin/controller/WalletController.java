@@ -21,7 +21,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("wallet")
-@SessionAttributes({"wallet", "latesttransaction", "isloggedin", "pool", "username", "user", "blockchain"})
+@SessionAttributes({"wallet", "latesttransaction", "isloggedin", "pool", "username", "user"})
 
 public class WalletController {
     @Autowired private BlockchainService blockchainService;
@@ -40,14 +40,10 @@ public class WalletController {
     }
 
     @GetMapping("")
-    public String getWallet(Model model) {
+    public String displayWallet(Model model) {
         Wallet w;
         try {
-            try {
-                w = (Wallet) model.getAttribute("wallet");
-            } catch (Exception e) {
                 w = walletService.getWalletByUsername(String.valueOf(model.getAttribute("username")));
-            }
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/";
@@ -59,6 +55,7 @@ public class WalletController {
                 listTransactionsPending); // chain is the sourceOfTruth, not DB
 
         w.setBalance(balance);
+        w.setBalanceMined(Wallet.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress()));
         walletService.saveWallet(w);
         model.addAttribute("wallet", w);
 //			return "redirect:/";
@@ -67,15 +64,12 @@ public class WalletController {
 
 
     @GetMapping("/transact")
-    public String getTransact(Model model) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
-        Wallet w;
-        try {
-            w = (Wallet) model.getAttribute("wallet");
-        } catch (Exception e) {
-            w = walletService.getWalletByUsername((String) model.getAttribute("username"));
-        }
+    public String getTransact(Model model)  {
+        Wallet w = walletService.getWalletByUsername((String) model.getAttribute("username"));
         w.setBalance(Wallet.calculateWalletBalanceByTraversingChainIncludePending(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress(), transactionService.getTransactionReprList()));
+        w.setBalanceMined(Wallet.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
+                "beancoin"), w.getAddress()));
         model.addAttribute("wallet", w);
         walletService.saveWallet(w);
         return "wallet/transact";
@@ -84,7 +78,7 @@ public class WalletController {
     @Hidden
     @RequestMapping(value = "/transaction", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String makeTransaction(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, InvalidKeyException {
+    public String makeTransaction(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount)  {
         try {
             Transaction neu = new Transaction(w, address, amount);
             TransactionPoolMap pool = new TransactionPoolMap(transactionService.getTransactionList()); // TOOD limit

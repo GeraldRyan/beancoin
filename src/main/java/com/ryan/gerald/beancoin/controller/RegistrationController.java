@@ -1,11 +1,10 @@
 package com.ryan.gerald.beancoin.controller;
 
+import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.UserService;
 import com.ryan.gerald.beancoin.Service.WalletService;
-import com.ryan.gerald.beancoin.entity.User;
-import com.ryan.gerald.beancoin.entity.UserRepository;
-import com.ryan.gerald.beancoin.entity.Wallet;
-import com.ryan.gerald.beancoin.entity.WalletRepository;
+import com.ryan.gerald.beancoin.entity.*;
+import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Optional;
@@ -25,12 +26,13 @@ public class RegistrationController {
 
     @Autowired private UserService userService;
     @Autowired private WalletService walletService;
+    @Autowired private BlockchainService blockchainService;
 
 
     @GetMapping("")
     public ModelAndView showRegisterPage(Model model) {
         if ((boolean) model.getAttribute("isloggedin")) {
-            ModelAndView modelAndView =  new ModelAndView("redirect:/");
+            ModelAndView modelAndView = new ModelAndView("redirect:/");
 //            modelAndView.addObject("modelAttribute" , new ModelAttribute());
             return modelAndView;
         }
@@ -48,7 +50,7 @@ public class RegistrationController {
 //	}
 
     @PostMapping("")
-    public String registerUser(Model model, @ModelAttribute("user") @Valid User user) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+    public String registerUser(Model model, @ModelAttribute("user") @Valid User user) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException, InvalidKeyException, TransactionAmountExceedsBalance {
 
         if ((boolean) model.getAttribute("isloggedin")) {
             return "redirect:/";
@@ -62,11 +64,19 @@ public class RegistrationController {
         Wallet wallet = Wallet.createWallet(user.getUsername());
         userService.saveUser(user);
         walletService.saveWallet(wallet);
+        Blockchain bc = blockchainService.getBlockchainByName("beancoin");
+        Wallet adminWallet;
+        adminWallet = walletService.getWalletByUsername("admin");
+        if (adminWallet == null) {
+            adminWallet = Wallet.createWallet("admin");
+        }
+        Transaction loadUserBalance = new Transaction(adminWallet, wallet.getAddress(), 1000);
+        bc.add_block(Transaction.transactionStringSingleton(loadUserBalance));
+        blockchainService.saveBlockchain(bc);
         model.addAttribute("isloggedin", true);
         model.addAttribute("user", user);
         model.addAttribute("wallet", wallet);
         model.addAttribute("username", user.getUsername());
-        // TODO make URL show welcomepage not registration
         return "registration/welcomepage";
     }
 
