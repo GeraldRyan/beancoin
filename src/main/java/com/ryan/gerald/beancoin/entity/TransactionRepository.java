@@ -11,6 +11,12 @@ public interface TransactionRepository extends CrudRepository<Transaction, Strin
     @Query("select t from Transaction t")
     List<Transaction> getListOfTransactions();
 
+    /**
+     * IMPLEMENT ME - check syntax and arrange by oldest so add timestamp
+     */
+    @Query(value = "select t from Transaction t LIMIT ?1", nativeQuery = true)
+    List<Transaction> getNOldestTransactions();
+
     @Modifying
     @Query("DELETE from Transaction t where t.uuid = :uuid")
     void delete(String uuid);

@@ -234,7 +234,6 @@ public class Wallet {
             }
         }
         List<TransactionRepr> trListUnmined = new ArrayList();
-        ;
         for (TransactionRepr t : trListUnmined) {
             if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance
                 // reset balance after each transaction
@@ -243,11 +242,12 @@ public class Wallet {
                 balance += (double) t.getOutput().get(adds);
             }
         }
-
         return balance;
     }
 
-    public static double calculateWalletBalanceByTraversingChain(Blockchain bc, String adds, List<TransactionRepr> pendingTransactions) {
+    // TODO wrap above function in this for cleaner code
+    // TODO BE ABLE TO TRAVERSE FROM END OF BLOCK BACK UNTIL YOU HIT SOMETHING WTIH USERS ADDRESS. or something
+    public static double calculateWalletBalanceByTraversingChainIncludePending(Blockchain bc, String adds, List<TransactionRepr> pendingTransactions) {
         double balance = STARTING_BALANCE;
         int i = 0;
         for (Block b : bc.getChain()) {
@@ -257,24 +257,23 @@ public class Wallet {
             System.out.println("BLOCK DESERIALIZED " + b.toStringConsole());
             List<TransactionRepr> trListMinedBlocks = b.deserializeTransactionData();
             for (TransactionRepr t : trListMinedBlocks) {
-                if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance
-                    // reset balance after each transaction
+                if (t.getInput().get("address").equals(adds)) { // wallet is sender. Set balance
                     balance = (double) t.getOutput().get(adds);
-                } else if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
+                    if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add receipts.
+                        balance += (double) t.getOutput().get(adds);
+                    }
+                }
+            }
+        }
+        // Process Pending Transactions
+        for (TransactionRepr t : pendingTransactions) {
+            if (t.getInput().get("address").equals(adds)) {
+                balance = (double) t.getOutput().get(adds);
+                if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
                     balance += (double) t.getOutput().get(adds);
                 }
             }
         }
-
-        for (TransactionRepr t : pendingTransactions) {
-            if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance
-                // reset balance after each transaction
-                balance = (double) t.getOutput().get(adds);
-            } else if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
-                balance += (double) t.getOutput().get(adds);
-            }
-        }
-
         return balance;
     }
 

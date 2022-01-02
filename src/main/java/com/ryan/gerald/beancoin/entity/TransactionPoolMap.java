@@ -3,34 +3,34 @@
  */
 package com.ryan.gerald.beancoin.entity;
 
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.HashMap;
-import java.util.List;
-
-import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
-
-import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import com.google.gson.Gson;
+import com.ryan.gerald.beancoin.Service.TransactionService;
+import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
- * @author Gerald Ryan Natural constructor is zero arg
+ *
+ *  Glorified map wrapper utility class for TransactionService
+ * @author Gerald Ryan
  *
  */
 
-@Service
 public class TransactionPoolMap {
-
-    @Autowired private TransactionRepository transactionRepository;
 
     HashMap<String, Object> transactionMap = new HashMap<String, Object>();
 
     public TransactionPoolMap() {}
+
+    public TransactionPoolMap(List<Transaction> transactionList) {
+        for (Transaction t : transactionList) {
+            this.putTransaction(t);
+        }
+    }
+
 
     public Transaction putTransaction(Transaction transaction) {
         transactionMap.put(transaction.getUuid(), transaction);
@@ -40,8 +40,6 @@ public class TransactionPoolMap {
     public void syncTransactionPool() {}
 
     public void broadcastTransactionPool() {}
-
-    public void TransactionPool() {}
 
     public static TransactionPoolMap fillTransactionPool(List<Transaction> transactionList) {
         TransactionPoolMap tp = new TransactionPoolMap();
@@ -101,7 +99,6 @@ public class TransactionPoolMap {
         });
         sb.deleteCharAt(sb.lastIndexOf(","));
         sb.append("]");
-        System.out.println(sb.toString());
         return sb.toString().replace("\\\\", "");
     }
 
@@ -122,12 +119,23 @@ public class TransactionPoolMap {
 //		}
 //	}
 
+
+    /***
+     * Telescoping wrapper class - for some reason TransactionService above was not autowiring
+     * @param blockchain
+     */
+//    public void clearProcessedTransactions(Blockchain blockchain){
+////        TransactionService ts = new TransactionService();
+//        clearProcessedTransactions(blockchain, this.transactionService);
+//    }
+
+
     /**
      * After successful day in the mines, delete what you have in your pool
      *
      * @param blockchain
      */
-    public void clearProcessedTransactions(Blockchain blockchain) {
+    public void clearProcessedTransactions(Blockchain blockchain, TransactionService transactionService) {
         List<TransactionRepr> trList;
         int i = 0;
         for (Block b : blockchain.getChain()) {
@@ -141,27 +149,11 @@ public class TransactionPoolMap {
                 if (this.getTransactionMap().containsKey(t.getId())) {
                     try {
                         System.out.println("Removing Transaction: " + t.getId());
-                        transactionRepository.deleteById(t.getId());
+                        System.out.println("TRANSACTION SERVICE: " + transactionService);
+//                        transactionService.deleteById(t.getId());
                     } catch (Exception e) {e.printStackTrace();}
                 }
             }
         }
-    }
-
-    public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException,
-            NoSuchProviderException, IOException, InvalidAlgorithmParameterException, TransactionAmountExceedsBalance {
-        TransactionPoolMap pool = new TransactionPoolMap();
-        Wallet w = Wallet.createWallet("sender");
-        Wallet unusedWallet = Wallet.createWallet("u");
-        pool.putTransaction(new Transaction(w, "foo", 15));
-        pool.putTransaction(new Transaction(Wallet.createWallet("1"), "foo", 15));
-        pool.putTransaction(new Transaction(Wallet.createWallet("2"), "foo", 15));
-        pool.putTransaction(new Transaction(Wallet.createWallet("3"), "foo", 15));
-        pool.putTransaction(new Transaction(Wallet.createWallet("4"), "foo", 15));
-        Transaction t = pool.findExistingTransactionByWallet(w.getAddress());
-        System.out.println(t); // expect a string representation of object (or address in memory). Indeed
-        Transaction tnull = pool.findExistingTransactionByWallet(unusedWallet.getAddress());
-        System.out.println(tnull); // expect null. Indeed
-
     }
 }

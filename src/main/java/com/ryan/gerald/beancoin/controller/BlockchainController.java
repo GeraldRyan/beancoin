@@ -20,14 +20,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Controller
-@SessionAttributes({"blockchain", "minedblock", "wallet", "pnapp"})
+@SessionAttributes({"blockchain", "minedblock", "wallet"})
 @RequestMapping("blockchain")
 public class BlockchainController {
 
     @Autowired private BlockchainService blockchainService;
     @Autowired private TransactionService transactionService;
     @Autowired Initializer initializer;
-    @Autowired TransactionPoolMap UnminedTransactionPoolMap; // Sort of a service/utiltity object
 
     public BlockchainController() throws InterruptedException {}
 
@@ -47,7 +46,7 @@ public class BlockchainController {
     @ResponseBody
     public String serveBlockchain(Model model) {
         Blockchain bc = (Blockchain) model.getAttribute("blockchain");
-        if (bc==null){
+        if (bc == null) {
             /*
             TODO this was returning NULL on OpenAPI call. OPENAPI UI NEEDS TO WORK.
             Need to instantiate Blockchain. Need to set up pattern of model, session-scope cache, general cache, no
@@ -65,25 +64,26 @@ public class BlockchainController {
     @RequestMapping(value = "mine", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public String doMineAsGET(Model model)
-            throws NoSuchAlgorithmException, PubNubException, InterruptedException {
-        UnminedTransactionPoolMap = transactionService.getUnminedTransactionsPoolMap();
-        String transactionData = UnminedTransactionPoolMap.getMinableTransactionDataString();
-        if (transactionData == null) {return "No data to mine. Tell you" +
-                "r friends to make transactions";}
-        List<Transaction> tlist = transactionService.getTransactionList();
-        Blockchain blockchain = blockchainService.getBlockchainByName("beancoin");
+            throws NoSuchAlgorithmException {
+        Blockchain blockchain = blockchainService.getBlockchainByName("beancoin"); // later will cache
+        List<Transaction> transList = transactionService.getTransactionList();
+        if (transList.isEmpty()) {return "No data to mine. Tell your friends to make transactions";}
+        TransactionPoolMap pool = new TransactionPoolMap(transList); // ok to construct. Ephemeral helper class
+        String transactionData = pool.getMinableTransactionDataString();  // payload of block
         Block new_block = blockchain.add_block(transactionData);
-        model.addAttribute("blockchain", blockchain);
+
+        model.addAttribute("blockchain", blockchain);  // why? DELETE, REFACTOR, RESTORE
         model.addAttribute("minedblock", new_block);
-        UnminedTransactionPoolMap.clearProcessedTransactions(blockchain);  // deletes from Transaction Table
-        model.addAttribute("pool", UnminedTransactionPoolMap);
-        blockchainService.saveBlockchain(blockchain);
+
+        // delete from transaction table.
+        transactionService.deletTransactionsInList(transList);
+        blockchainService.saveBlockchain(blockchain); // refresh blockchain by adding chain
         System.out.println("NEW BLOCK MINED: " + new_block.toStringConsole());
 
         if (Config.BROADCASTING) { // TODO CHANGE TO KAFKA
 //            new PubNubApp().broadcastBlock(new_block);
         }
-        return new_block.webworthyJson(tlist);
+        return new_block.webworthyJson(transList); // later manage max size of block
     }
 
     @RequestMapping(value = "/{n}", method = RequestMethod.GET, produces = "application/json")

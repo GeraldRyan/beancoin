@@ -6,7 +6,6 @@ import com.ryan.gerald.beancoin.Service.WalletService;
 import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
-import com.ryan.gerald.beancoin.initializors.Config;
 import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +27,6 @@ public class WalletController {
     @Autowired private BlockchainService blockchainService;
     @Autowired private TransactionService transactionService;
     @Autowired private WalletService walletService;
-
-    @Autowired TransactionPoolMap pool;
 
     public WalletController() throws InterruptedException {}
 
@@ -56,12 +53,12 @@ public class WalletController {
             return "redirect:/";
         }
         List<TransactionRepr> listTransactionsPending = transactionService.getTransactionReprList();
-        Blockchain blockchain = (Blockchain) model.getAttribute("blockchain");
-        if (blockchain == null) {
-            blockchain = blockchainService.getBlockchainByName("beancoin");
-        }
-        w.setBalance(Wallet.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress(),
-                listTransactionsPending)); // chain is the sourceOfTruth
+
+        Blockchain blockchain = blockchainService.getBlockchainByName("beancoin");
+        double balance = Wallet.calculateWalletBalanceByTraversingChainIncludePending(blockchain, w.getAddress(),
+                listTransactionsPending); // chain is the sourceOfTruth, not DB
+
+        w.setBalance(balance);
         walletService.saveWallet(w);
         model.addAttribute("wallet", w);
 //			return "redirect:/";
@@ -77,7 +74,7 @@ public class WalletController {
         } catch (Exception e) {
             w = walletService.getWalletByUsername((String) model.getAttribute("username"));
         }
-        w.setBalance(Wallet.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
+        w.setBalance(Wallet.calculateWalletBalanceByTraversingChainIncludePending(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress(), transactionService.getTransactionReprList()));
         model.addAttribute("wallet", w);
         walletService.saveWallet(w);
@@ -90,30 +87,28 @@ public class WalletController {
     public String makeTransaction(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, InvalidKeyException {
         try {
             Transaction neu = new Transaction(w, address, amount);
-            pool = TransactionPoolMap.fillTransactionPool(transactionService.getTransactionList());
-            Transaction old = pool.findExistingTransactionByWallet(neu.getSenderAddress());
-            if (old == null) {
+            TransactionPoolMap pool = new TransactionPoolMap(transactionService.getTransactionList()); // TOOD limit
+            Transaction existing = pool.findExistingTransactionByWallet(neu.getSenderAddress());
+            if (existing == null) {
                 model.addAttribute("latesttransaction", neu);
                 transactionService.saveTransaction(neu);
-                if (Config.BROADCASTING) {broadcastTransaction(neu);}
+//                if (Config.BROADCASTING) {broadcastTransaction(neu);} // TODO KAFKA
                 return neu.toJSONtheTransaction();
             } else {
-                System.out.println("Existing transaction found!");
-                Transaction merged = transactionService.getTransactionById(old.getUuid());
+                Transaction merged = transactionService.getTransactionById(existing.getUuid());
                 merged.update(neu.getSenderWallet(), neu.getRecipientAddress(), neu.getAmount());
                 merged.rebuildOutputInput();
                 transactionService.saveTransaction(merged);
                 model.addAttribute("latesttransaction", merged);
-                if (Config.BROADCASTING) {broadcastTransaction(merged);}
+//                if (Config.BROADCASTING) {broadcastTransaction(merged);} // TODO KAFKA
                 return merged.toJSONtheTransaction();
             }
         } catch (TransactionAmountExceedsBalance e) {
-            System.out.println("Transaction Amount Exceeds Balance");
+            System.err.println("Transaction Amount Exceeds Balance");
             model.addAttribute("exceedsBalance", "Transaction Amount Exceeds Balance. Please enter a lower amount");
             return "Transaction Amount Exceeds Balance. Please enter a lower amount";
         } catch (Exception e) {
             e.printStackTrace();
-//            alert(Unkonwn Error occurred)
             return "index";
         }
 
