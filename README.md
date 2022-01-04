@@ -1,15 +1,20 @@
 # BEANCOINAPP 
-A case study in blockchain 
+A case study in blockchain.
 
-A personal project, learning how to code in basic java. This app was made as part of my case study for a bootcamp 
-that ended up getting me my first job in tech as a developer. 
+A personal project, this app was made as part of my case study for a bootcamp
+that ended up getting me my first job in tech as a developer.
 
-The core blockchain model was based on David Katz's blockchain tutorial on Udemy. Thanks David. 
+Recently I have gotten back into it, building it out and deploying it. 
 
-I Transpiled from Python into Java. I added the MVC frontpage. TODO I will build an Angular Front End Client and 
-build out the REST API as necessary. 
+View the current version as hosted on [Heroku](https://beancoin.herokuapp.com/) 
 
-I will also do many many other things here, to learn, and grow and present, including many Spring modules, Swagger and 
-Kafka. 
+Note that their servers take about 30 seconds to boot up if nobody's been to the visit in a while. Hey- it's free, 
+but I will change hosts at some point! 
 
-It is about learning and having fun. 
+View some of my [plans](https://github.com/GeraldRyan/beancoin/issues) for building it out - all part of one giant 
+learning
+experience
+
+The core blockchain model was based on David Katz's blockchain tutorial on Udemy. Thanks David. Your courses are top 
+notch. 
+
