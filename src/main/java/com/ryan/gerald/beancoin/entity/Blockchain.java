@@ -1,88 +1,51 @@
 package com.ryan.gerald.beancoin.entity;
 
-//@GeneratedValue(strategy=GenerationType.AUTO)  Consider using this later under ID to auto increment
+import com.google.gson.Gson;
+import com.ryan.gerald.beancoin.exceptions.BlocksInChainInvalidException;
+import com.ryan.gerald.beancoin.exceptions.ChainTooShortException;
+import com.ryan.gerald.beancoin.exceptions.GenesisBlockInvalidException;
+
+import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import com.ryan.gerald.beancoin.Service.BlockchainService;
-import com.ryan.gerald.beancoin.exceptions.BlocksInChainInvalidException;
-import com.ryan.gerald.beancoin.exceptions.ChainTooShortException;
-import com.ryan.gerald.beancoin.exceptions.GenesisBlockInvalidException;
-import com.google.gson.Gson;
-
-/**
- * 
- * @author Gerald Ryan Blockchain class of blockchain app. Blockchain class.
- *         Instantiate blockchain with a name as string
- *
- * TODO Remove id and make name the id field
- * Can I make this or other entities later wtih the builder pattern?
- */
 @Entity
 @Table(name = "blockchain")
 public class Blockchain {
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(unique = true)
 	@Id
-	int id;
-	@Column(unique = true)
-	String instance_name;
+	String name;
 	long date_created;
 	long date_last_modified;
 	int length_of_chain;
 	@OneToMany(targetEntity = Block.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.EAGER)
-	@JoinTable(name="bc_blocks")
+	@JoinTable(name="blockchain_blocks")
 	List<Block> chain;
 
-	/**
-	 * To make a new blockchain all you need is a name.
-	 */
+	public Blockchain() {}
+
 	public Blockchain(String name) {
-		this.instance_name = name;
+		this.name = name;
 		this.date_created = new Date().getTime();
 		this.chain = new ArrayList<Block>();
 		this.chain.add(Block.genesis_block());
 		this.length_of_chain = 1;
 	}
 
-	public Blockchain() {
 
-	}
-
-	public static Blockchain createBlockchainInstance(String name) {
-		return new Blockchain(name);
-	}
+	public static Blockchain createBlockchainInstance(String name) {return new Blockchain(name);}
 
 	/**
 	 * Adds block to blockchain by calling block class's static mine_block method.
 	 * This ensures block is valid in itself, and is attached to end of local chain,
 	 * ensuring chain is valid.
-	 * 
-	 * @param
+	 * @param transactionData
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 */
-	public Block add_block(String dataScalar) throws NoSuchAlgorithmException {
-		Block new_block = Block.mine_block(this.chain.get(this.chain.size() - 1), dataScalar);
+	public Block add_block(String transactionData) throws NoSuchAlgorithmException {
+		Block new_block = Block.mine_block(this.chain.get(this.chain.size() - 1), transactionData);
 		this.chain.add(new_block);
 		this.length_of_chain++;
 		this.date_last_modified = new Date().getTime();
@@ -201,10 +164,10 @@ public class Blockchain {
 	}
 
 	/**
-	 * Validate the incoming chain. Enforce the following rules: - the chain must
-	 * start with the genesis block - blocks must be formatted correctly
-	 * 
-	 * @param blockchain
+	 * Validate the incoming chain. Enforce the following rules: -
+	 * 1. the chain must start with the genesis block
+	 * 2. blocks must be formatted correctly
+	 *
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 * @throws GenesisBlockInvalidException
@@ -213,14 +176,14 @@ public class Blockchain {
 	public static boolean is_valid_chain(Blockchain blockchain)
 			throws NoSuchAlgorithmException, GenesisBlockInvalidException, BlocksInChainInvalidException {
 		if (!blockchain.chain.get(0).equals(Block.genesis_block())) {
-			System.out.println("The genesis block must be valid");
-			throw new GenesisBlockInvalidException("Genesis Block is invalid");
+			System.out.println("THE GENESIS BLOCK MUST BE VALID");
+			throw new GenesisBlockInvalidException("GENESIS BLOCK IS INVALID");
 		}
 		for (int i = 1; i < blockchain.chain.size(); i++) {
 			Block current_block = blockchain.chain.get(i);
 			Block last_block = blockchain.chain.get(i - 1);
 			if (!Block.is_valid_block(last_block, current_block)) {
-//				System.out.println("At least one of the blocks in the chain is not valid");
+				System.out.println("AT lEAST ONE OF THE BLOCKS IN THE CHAIN IS NOT VALID!");
 				throw new BlocksInChainInvalidException("At least one of the blocks in the chain is not valid");
 			}
 		}
@@ -260,19 +223,14 @@ public class Blockchain {
 	 * @return
 	 */
 	public String toStringConsole() {
-		return String.format("%5s %15s %15s %15s %15s", id, instance_name, date_created, date_last_modified,
+		return String.format("%5s %15s %15s %15s", name, date_created, date_last_modified,
 				length_of_chain, "length", "content");
 	}
 
-	/**
-	 * Returns blockchain's metadata information as a string
-	 * 
-	 * @return
-	 */
 	public String toStringMeta() {
 		return String.format(
-				"Blockchain Metadata: id: %s instance: %s date_created: %s date_modified: %s length of chain: %s", id,
-				instance_name, date_created, date_last_modified, length_of_chain);
+				"Blockchain Metadata: Name: %s date_created: %s date_modified: %s length of chain: %s",
+				name, date_created, date_last_modified, length_of_chain);
 	}
 
 	public String toStringBroadcastChain() {
@@ -316,12 +274,8 @@ public class Blockchain {
 		}
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public String getInstance_name() {
-		return instance_name;
+	public String getName() {
+		return name;
 	}
 
 	public long getDate_created() {

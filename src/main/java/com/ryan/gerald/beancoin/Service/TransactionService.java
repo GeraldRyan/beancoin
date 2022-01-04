@@ -3,7 +3,6 @@ package com.ryan.gerald.beancoin.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ryan.gerald.beancoin.Dao.TransactionDao;
 import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionService {
 
-    @Deprecated TransactionDao transactionD = new TransactionDao();
     @Autowired private TransactionRepository transactionRepository;
 
     TransactionPoolMap pool;

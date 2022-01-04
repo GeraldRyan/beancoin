@@ -48,24 +48,20 @@ public class CryptoHash {
 	public static String getSHA256(long timestamp, String last_hash, String data, int difficulty, int nonce)
 			throws NoSuchAlgorithmException {
 		String s = "";
-
 		s += Long.toString(timestamp);
 		s += last_hash;
 		s += concat(data);
 		s += Integer.toString(difficulty);
 		s += Integer.toString(nonce);
-//		System.out.printf("Hashing \"%s\"\n", s);
 		MessageDigest md;
 		md = MessageDigest.getInstance("SHA-256");
 		byte[] b = md.digest(s.getBytes(StandardCharsets.UTF_8));
 		BigInteger number = new BigInteger(1, b);
 		StringBuilder hexString = new StringBuilder(number.toString(16));
-//		System.out.println(hexString);
 		while (hexString.length() < 64) {
 			hexString.insert(0, '0');
 		}
 		String messageDigestString = hexString.toString();
-//		System.out.printf("hash is:\n%s\n", messageDigestString);
 		return messageDigestString;
 	}
 
@@ -95,10 +91,7 @@ public class CryptoHash {
 
 	public static String concat(String... args) {
 		String s = "";
-		for (String $ : args) {
-			s += $;
-		}
-//		System.out.println(s);
+		for (String $ : args) {s += $;}
 		return s;
 	}
 

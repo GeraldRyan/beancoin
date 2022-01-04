@@ -7,22 +7,16 @@ import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
 import com.ryan.gerald.beancoin.utils.TransactionRepr;
-import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.List;
 
 @Controller
 @RequestMapping("wallet")
 @SessionAttributes({"wallet", "latesttransaction", "isloggedin", "pool", "username", "user"})
-
 public class WalletController {
     @Autowired private BlockchainService blockchainService;
     @Autowired private TransactionService transactionService;
@@ -62,9 +56,8 @@ public class WalletController {
         return "wallet/wallet";
     }
 
-
     @GetMapping("/transact")
-    public String getTransact(Model model)  {
+    public String transact(Model model)  {
         Wallet w = walletService.getWalletByUsername((String) model.getAttribute("username"));
         w.setBalance(Wallet.calculateWalletBalanceByTraversingChainIncludePending(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress(), transactionService.getTransactionReprList()));
@@ -75,12 +68,11 @@ public class WalletController {
         return "wallet/transact";
     }
 
-    @Hidden
     @RequestMapping(value = "/transaction", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String makeTransaction(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount)  {
+    public String doTransactionGET(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) {
         try {
-            Transaction neu = new Transaction(w, address, amount);
+            Transaction neu = Transaction.createTransactionWithWallet(w, address, amount);
             TransactionPoolMap pool = new TransactionPoolMap(transactionService.getTransactionList()); // TOOD limit
             Transaction existing = pool.findExistingTransactionByWallet(neu.getSenderAddress());
             if (existing == null) {
@@ -90,7 +82,7 @@ public class WalletController {
                 return neu.toJSONtheTransaction();
             } else {
                 Transaction merged = transactionService.getTransactionById(existing.getUuid());
-                merged.update(neu.getSenderWallet(), neu.getRecipientAddress(), neu.getAmount());
+                merged.updateTransactionWithWallet(w, neu.getRecipientAddress(), neu.getAmount());
                 merged.rebuildOutputInput();
                 transactionService.saveTransaction(merged);
                 model.addAttribute("latesttransaction", merged);
@@ -105,40 +97,22 @@ public class WalletController {
             e.printStackTrace();
             return "index";
         }
-
-        //	@PostMapping("")
-//	public String postWalletEmailSent(Model model) {
-//		Wallet w = (Wallet) model.getAttribute("wallet");
-//		if (w == null) {
-//			return "redirect:/";
-//		}
-//		w = ws.updateWalletBalanceService(w);
-//		model.addAttribute("wallet", w);
-//		emailPrivateKey(model);
-//		return "wallet/wallet";
-//	}
-
-//	public void emailPrivateKey(Model model) {
-//		HashMap<String, String> body = new HashMap();
-//		body.put("subject", "Your Private key");
-//		body.put("text", "Private Key");
-//		Object privateKey = ((Wallet) model.getAttribute("wallet")).getPrivatekey().getEncoded();
-//		String userEmail = ((User) model.getAttribute("user")).getEmail();
-//		String sender = System.getenv("email");
-//		String password = System.getenv("password");
-//		EmailSender.sendEmail(sender, password, userEmail, body);
-//	}
-//
-//    /**
-//     * WIP to make a better wallet console.
-//     */
-//    @GetMapping("/betterwallet")
-//    public String getBetterWallet(Model model) {
-//        return "wallet/betterwallet";
-//    }
+    }
 
 
-//    @PostMapping("/transact")
+//        @RequestMapping(value = "/transaction", method = RequestMethod.POST, produces = "application/json")
+//        @ResponseBody
+//        public String doTransactionPOST(@RequestBody TransactionDTO transactionDTO){
+//            Transaction t = new Transaction(transactionDTO.getToAddress(),transactionDTO.getToAmount())
+//            return "";
+//        }
+
+
+
+
+
+
+        //    @PostMapping("/transact")
 //    @ResponseBody
 //    public String postTransact(Model model, @RequestBody Map<String, Object> body)
 //            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
@@ -170,7 +144,40 @@ public class WalletController {
 //    }
 
 
-    }
+
+
+    //	@PostMapping("")
+//	public String postWalletEmailSent(Model model) {
+//		Wallet w = (Wallet) model.getAttribute("wallet");
+//		if (w == null) {
+//			return "redirect:/";
+//		}
+//		w = ws.updateWalletBalanceService(w);
+//		model.addAttribute("wallet", w);
+//		emailPrivateKey(model);
+//		return "wallet/wallet";
+//	}
+
+//	public void emailPrivateKey(Model model) {
+//		HashMap<String, String> body = new HashMap();
+//		body.put("subject", "Your Private key");
+//		body.put("text", "Private Key");
+//		Object privateKey = ((Wallet) model.getAttribute("wallet")).getPrivatekey().getEncoded();
+//		String userEmail = ((User) model.getAttribute("user")).getEmail();
+//		String sender = System.getenv("email");
+//		String password = System.getenv("password");
+//		EmailSender.sendEmail(sender, password, userEmail, body);
+//	}
+//
+//    /**
+//     * WIP to make a better wallet console.
+//     */
+//    @GetMapping("/betterwallet")
+//    public String getBetterWallet(Model model) {
+//        return "wallet/betterwallet";
+//    }
+
+
 
 //    /**
 //     * Dev method, not necessary. Able to post various combinations to make multiple

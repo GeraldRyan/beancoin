@@ -6,8 +6,6 @@ package com.ryan.gerald.beancoin.entity;
 import com.google.gson.Gson;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.utils.TransactionRepr;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;

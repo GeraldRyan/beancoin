@@ -86,22 +86,6 @@ public class HomeController {
         return "redirect:/";
     }
 
-    @GetMapping("/transactionpool")
-    public String getTransactionPool(Model model) {
-        model.addAttribute("transactionpoollist", transactionService.getTransactionList());
-        return "home/transactionpool";
-    }
-
-    @PostMapping("/transactionpool")
-    @ResponseBody
-    public String postTransactionPool(Model model) {
-        TransactionPoolMap pool = TransactionPoolMap.fillTransactionPool(transactionService.getTransactionList());
-        if (pool.getMinableTransactionDataString() == null) {
-            return "No transactions in the pool. Tell your friends to make transactions";
-        }
-        return pool.getMinableTransactionDataString();
-    }
-
     public String validateUserAndPassword(String username, String password) {
         Optional<User> user = userService.getUserOptionalByName(username);
         if (user.isEmpty()) {return "user not found";}

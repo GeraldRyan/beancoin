@@ -1,7 +1,6 @@
 package com.ryan.gerald.beancoin.controller;
 
 import com.google.gson.Gson;
-import com.pubnub.api.PubNubException;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.entity.Block;
@@ -63,7 +62,7 @@ public class BlockchainController {
         Block new_block = blockchain.add_block(transactionData);
 
         model.addAttribute("blockchain", blockchain);  // why? DELETE, REFACTOR, RESTORE
-        model.addAttribute("minedblock", new_block);
+            model.addAttribute("minedblock", new_block);
 
         // delete from transaction table.
         transactionService.deletTransactionsInList(transList);

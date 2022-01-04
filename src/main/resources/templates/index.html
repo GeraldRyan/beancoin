@@ -33,7 +33,7 @@
 
 
             <a class="text-yellow-600" href="./blockchain">Our live blockchain status</a> <a
-                class="text-yellow-600" href="./transactionpool">Live Transaction Pool (unmined
+                class="text-yellow-600" th:href="@{/transactions/unmined}">Live Transaction Pool (unmined
             transactions)</a>
             <br>
 
@@ -69,7 +69,7 @@
         blockchain</a> <br>
     <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./blockchain/mine">Mine a Block</a>
     <br>
-    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" href="./transactionpool">View the live
+    <a class="text-4xl text-green-700 hover:text-6xl hover:text-green-600" th:href="@{/transactions/unmined}">View the live
         Transaction Pool</a> <br>
 
 

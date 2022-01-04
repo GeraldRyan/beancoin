@@ -2,6 +2,11 @@ plugins {
 	id 'org.springframework.boot' version '2.6.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'application'
+}
+
+application {
+//	mainClass = 'com.ryan.gerald.beancoin.entity.Transaction'
 }
 
 group = 'com.ryan.gerald.beancoin'

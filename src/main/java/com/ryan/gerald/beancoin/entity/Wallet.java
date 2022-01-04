@@ -86,7 +86,11 @@ public class Wallet {
         this.address = address;
     }
 
-    public static Wallet createWallet(String ownerId)
+    public static Wallet createWallet(String ownerId) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+        return Wallet.createWallet(ownerId, STARTING_BALANCE);
+    }
+
+    public static Wallet createWallet(String ownerId, double startingBalance)
             throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         String address = String.valueOf(UUID.randomUUID()).substring(0, 8);
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC", "SunEC");
@@ -95,7 +99,7 @@ public class Wallet {
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
         if (ownerId == "admin") {return new Wallet(1000000, privateKey, publicKey, address, ownerId);}
-        Wallet wallet = new Wallet(STARTING_BALANCE, privateKey, publicKey, address, ownerId);
+        Wallet wallet = new Wallet(startingBalance, privateKey, publicKey, address, ownerId);
         System.out.println("NEW WALLET CREATED");
         return wallet;
     }
@@ -236,7 +240,7 @@ public class Wallet {
         return balance;
     }
 
-    public double getBalanceMined() {
+    public double getBalanceAsMined() {
         return balanceMined;
     }
 

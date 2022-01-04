@@ -46,10 +46,6 @@ public class StringUtils {
 
 	/**
 	 * Converts a object into a byte array directly through streaming objects.
-	 * 
-	 * @param strArray
-	 * @return
-	 * @throws IOException
 	 */
 	public static byte[] objectToByteArray(Object obj) throws IOException {
 
@@ -87,8 +83,6 @@ public class StringUtils {
 	 * Prints key and value to console of map for quick discovery. If line is
 	 * specified, you can tell your console where the map is coming from - e.g.
 	 * mapKeyValue(model.asMap(), "homecontroller line 134")
-	 * 
-	 * @param map
 	 */
 	public static void mapKeyValue(Map<?, ?> map) {
 		System.err.println("Mapping through dictionary");

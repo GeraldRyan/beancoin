@@ -13,10 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.*;
 import java.util.Optional;
 
 @Controller
@@ -41,14 +38,6 @@ public class RegistrationController {
         return mv;
     }
 
-    // THIS WORKS
-//	@GetMapping("")
-//	public String showRegisterPage() {
-////		ModelAndView mv = new ModelAndView("registration/register");
-////		model.addAttribute("user", new User());
-//		return "registration/register";
-//	}
-
     @PostMapping("")
     public String registerUser(Model model, @ModelAttribute("user") @Valid User user) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException, InvalidKeyException, TransactionAmountExceedsBalance {
 
@@ -70,8 +59,13 @@ public class RegistrationController {
         if (adminWallet == null) {
             adminWallet = Wallet.createWallet("admin");
         }
-        Transaction loadUserBalance = new Transaction(adminWallet, wallet.getAddress(), 1000);
-        bc.add_block(Transaction.transactionStringSingleton(loadUserBalance));
+        Transaction loadNewUserBalance = null;
+        try {
+            loadNewUserBalance = Transaction.createTransactionWithWallet(adminWallet, wallet.getAddress(), 1000);
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+        bc.add_block(Transaction.transactionStringSingleton(loadNewUserBalance));
         blockchainService.saveBlockchain(bc);
         model.addAttribute("isloggedin", true);
         model.addAttribute("user", user);
