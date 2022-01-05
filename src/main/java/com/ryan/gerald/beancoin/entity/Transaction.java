@@ -31,7 +31,7 @@ import com.google.gson.reflect.TypeToken;
  */
 @Entity
 @Table(name = "transaction")
-public class Transaction implements TransactionInterface {
+public class Transaction extends AbstractTransaction implements TransactionInterface {
     @Id
     String uuid;
     String recipientAddress;
