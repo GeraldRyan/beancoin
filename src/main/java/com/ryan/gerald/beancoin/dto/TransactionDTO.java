@@ -8,7 +8,7 @@ public class TransactionDTO {
     private String toAddress;
     private double toAmount;
     private String publickey;
-    private String signature;
+    private String privatekey;
     private String format;
 
     public String getToAddress() {
@@ -35,12 +35,12 @@ public class TransactionDTO {
         this.publickey = publickey;
     }
 
-    public String getSignature() {
-        return signature;
+    public String getPrivatekey() {
+        return privatekey;
     }
 
-    public void setSignature(String signature) {
-        this.signature = signature;
+    public void setPrivatekey(String privatekey) {
+        this.privatekey = privatekey;
     }
 
     public String getFromAddress() {

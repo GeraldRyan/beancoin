@@ -3,6 +3,7 @@ package com.ryan.gerald.beancoin.Dao;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.dbConnection.DBConnection;
 import com.ryan.gerald.beancoin.entity.Wallet;
+import com.ryan.gerald.beancoin.evaluation.BalanceCalculator;
 
 @Deprecated
 public class WalletDao extends DBConnection {
@@ -36,7 +37,7 @@ public class WalletDao extends DBConnection {
 		this.connect();
 		em.getTransaction().begin();
 		double newBalance =
-				Wallet.calculateWalletBalanceByTraversingChain(new BlockchainService().getBlockchainByName("beancoin"),
+				BalanceCalculator.calculateWalletBalanceByTraversingChain(new BlockchainService().getBlockchainByName("beancoin"),
 				wallet.getAddress());
 		wallet.setBalance(newBalance);
 		em.getTransaction().commit();

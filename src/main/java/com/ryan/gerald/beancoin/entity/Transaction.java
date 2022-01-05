@@ -32,7 +32,6 @@ import com.google.gson.reflect.TypeToken;
 @Entity
 @Table(name = "transaction")
 public class Transaction implements TransactionInterface {
-
     @Id
     String uuid;
     String recipientAddress;
@@ -59,6 +58,19 @@ public class Transaction implements TransactionInterface {
         rebuildOutputInput();
     }
 
+    /**
+     * Factory method for creating Transaction given a full fledged wallet
+     * @param senderWallet
+     * @param recipientAddress
+     * @param toAmount
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchProviderException
+     * @throws InvalidKeyException
+     * @throws IOException
+     * @throws TransactionAmountExceedsBalance
+     * @throws SignatureException
+     */
     public static Transaction createTransactionWithWallet(Wallet senderWallet, String recipientAddress, double toAmount)
             throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, TransactionAmountExceedsBalance, SignatureException {
         if (senderWallet.getBalance() < toAmount) {
@@ -73,24 +85,26 @@ public class Transaction implements TransactionInterface {
         return new Transaction(uuid, recipientAddress, senderWallet.getAddress(), toAmount, outputjson, inputjson);
     }
 
-
     /**
      * API METHOD for POSTing transactions. Input and output JSON strings must conform to spec (or should I persist these objects in separate tables -
      * transaction input hash transaction output hash
+     * TODO Test this works and set up API (BIG DAY THAT WILL BE)
      * @param t object in following form {}
      * @return
      * @throws TransactionAmountExceedsBalance
      */
-    public static Transaction postTransactionWithPresignedData(TransactionDTO t)
+    public static Transaction postTransactionWithPrivateKey(TransactionDTO t)
             throws TransactionAmountExceedsBalance {
+        // BAD PRACTICE TO SEND PRIVATE KEY OVER WIRE, BUT WHAT THE HECK. When angular client is up and going, then will have sign functionality
         String uuid = StringUtils.getUUID8();
         String recipientAddress = t.getToAddress();
         String senderAddress = t.getFromAddress();
+        String privateKey = t.getPrivatekey();
         double senderBalance = t.getFromBalance();
         double toAmount = t.getToAmount();
         double amount = t.getToAmount();
         HashMap<String, Object> outputMap = createOutputMap(senderAddress, recipientAddress, senderBalance, toAmount);
-        HashMap<String, Object> inputMap = createInputMap(senderAddress,senderBalance,t.getSignature(), t.getPublickey(), t.getFormat());
+        HashMap<String, Object> inputMap = createInputMap(senderAddress,senderBalance,t.getPrivatekey(), t.getPublickey(), t.getFormat());
         String outputjson = new Gson().toJson(outputMap);
         String inputjson = new Gson().toJson(inputMap);
         return new Transaction(uuid, recipientAddress, senderAddress, amount, outputjson, inputjson);
@@ -98,17 +112,10 @@ public class Transaction implements TransactionInterface {
 
     /**
      * API METHOD for POSTing transactions. Input and output JSON strings must conform to spec (or should I persist these objects in separate tables -
-     * transaction input hash transaction output hash
-     *
-     * @param uuid
-     * @param recipientAddress
-     * @param senderAddress
-     * @param amount
-     * @param outputjson
-     * @param inputjson
-     * @return
+     * transaction input hash transaction output hash.
+     * This is more like a user directly announces a new transaction. In reality this would go over the wire through a message broker or streaming service. Work for later.
      */
-    public static Transaction postTransactionWithPresignedData(String uuid, String recipientAddress, String senderAddress, double amount, String outputjson, String inputjson) {
+    public static Transaction postPresignedTransaction(String uuid, String recipientAddress, String senderAddress, double amount, String outputjson, String inputjson) {
         return new Transaction(uuid, recipientAddress, senderAddress, amount, outputjson, inputjson);
     }
 
@@ -128,6 +135,7 @@ public class Transaction implements TransactionInterface {
                 && !inputHash.containsKey("publicKeyFormat")
                 && !inputHash.containsKey("publicKeyB64")
                 && !inputHash.containsKey("timestamp")
+                && inputHash.keySet().size() == 6
                 && !((long) outputHash.values().stream().reduce(0, (sub, el) -> (long) sub + (long) el) == (long) inputHash.get("amount"))
         ) {
             return false;
@@ -138,10 +146,12 @@ public class Transaction implements TransactionInterface {
         return true;
     }
 
+    // TODO Implement me- oh wait already is in Wallet but moving to Specialty class
     public static boolean verifySignature() {
         return false;
     }
 
+    // TODO Implement me in BalanceCalculator class
     public static boolean senderHasBalanceOnChain() {
         return false;
     }
@@ -178,9 +188,10 @@ public class Transaction implements TransactionInterface {
     }
 
     /**
-     * Update transaction with existing or new recipient
+     * Update transaction with existing or new recipient. A true instance method.
+     * TODO create releated sub methods where wallet not provided (as in over wire). Need only match address and other key fields
      */
-    public void updateTransactionWithWallet(Wallet senderWallet, String recipientAddress, double amount)
+    public void updateTransaction(Wallet senderWallet, String recipientAddress, double amount)
             throws TransactionAmountExceedsBalance, InvalidKeyException, NoSuchAlgorithmException,
             NoSuchProviderException, SignatureException, IOException {
         if (amount > (double) this.output.get(senderWallet.getAddress())) {
@@ -200,42 +211,12 @@ public class Transaction implements TransactionInterface {
     }
 
     public static HashMap<String, Object> createInputMapWithWallet(Wallet senderWallet, HashMap<String, Object> output) throws NoSuchAlgorithmException, SignatureException, IOException, NoSuchProviderException, InvalidKeyException {
-        byte[] byteSignature = senderWallet.sign(output);
-        String signatureB64 = Base64.getEncoder().encodeToString(byteSignature);
+        String signatureB64 = senderWallet.sign(output); // consider signing outputJSON String not bytearray HashMap
         String publicKeyString = Base64.getEncoder().encodeToString(senderWallet.getPublickey().getEncoded());
         String pkFormat = senderWallet.getPublickey().getFormat();
         return Transaction.createInputMap(senderWallet.getAddress(), senderWallet.getBalance(), signatureB64, publicKeyString, pkFormat);
     }
 
-    /**
-     * Validate a transaction. For invalid transactions, raises
-     * InvalidTransactionException
-     */
-    public static boolean is_valid_transaction(Transaction transaction) throws InvalidTransactionException,
-            InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException {
-        String signatureString = (String) transaction.getInput().get("signatureB64");
-        String publicKeyString = (String) transaction.getInput().get("publicKeyB64");
-        byte[] signatureByte = Base64.getDecoder().decode(signatureString);
-        byte[] publicKeyByte = Base64.getDecoder().decode(publicKeyString);
-        PublicKey reconstructedPK = Wallet.restorePublicKey(publicKeyByte);
-//		PublicKey restoredPK = Wallet.restorePK((String) transaction.getInput().get("publicKeyB64"));
-//		PublicKey originalPK = (PublicKey) transaction.input.get("publicKey");
-        double sumOfTransactions = transaction.output.values().stream().mapToDouble(v -> (double) v).sum();
-        System.out.println("Sum of values " + sumOfTransactions);
-        if (sumOfTransactions != (double) transaction.input.get("amount")) {
-            throw new InvalidTransactionException("TRANSACTION OUTPUT DOESN'T MATCH INPUT");
-        }
-//		if (!Wallet.verifySignature((byte[]) transaction.input.get("signature"), transaction.output,
-//				originalPK)) {
-//			System.err.println("Signature not valid!");
-//			throw new InvalidTransactionException("Invalid Signature");
-//		}
-        if (!Wallet.verifySignature(signatureByte, transaction.getOutput(), reconstructedPK)) {
-            System.err.println("SIGNATURE NOT VALID!");
-            throw new InvalidTransactionException("INVALID SIGNATURE");
-        }
-        return true;
-    }
 
     /**
      * HashMap<> Input, Output are not persisted to DB but JSON strings inputJson
@@ -262,140 +243,67 @@ public class Transaction implements TransactionInterface {
         }
     }
 
-    /**
-     * jsonify only input output for blockchain itself. Calls a helper class that
-     * strips off extraneous data (easiest cleanest way to implement and maintain
-     * existing code
-     *
-     * @return
-     */
-
-    public static boolean is_valid_transactionReconstructPK(Transaction transaction)
-            throws InvalidTransactionException, InvalidKeyException, SignatureException, NoSuchAlgorithmException,
-            NoSuchProviderException, IOException, InvalidKeySpecException {
-        StringUtils.mapKeyValue(transaction.getOutput(), "Line 289");
-
-        double sumOfTransactions = transaction.getOutput().values().stream().mapToDouble(t -> (double) t).sum();
-        System.out.println("Sum of values " + sumOfTransactions);
-        String signatureString = (String) transaction.getInput().get("signatureString");
-        String publicKeyString = (String) transaction.getInput().get("publicKeyB64");
-        byte[] signatureByte = Base64.getDecoder().decode(signatureString);
-        byte[] publicKeyByte = Base64.getDecoder().decode(publicKeyString);
-        PublicKey reconstructedPK = Wallet.restorePublicKey(publicKeyByte);
-
-        System.out.println("signature string: " + signatureString);
-        System.out.println("PKSTring string: " + publicKeyString);
-        System.out.println("signature byte: " + signatureByte);
-        System.out.println("PK Byte: " + publicKeyByte);
-        if (sumOfTransactions != (double) transaction.getInput().get("amount")) {
-            throw new InvalidTransactionException("Value mismatch of propsed transactions");
-        }
-        System.out.println(transaction.getInput().get("signature"));
-        if (!Wallet.verifySignature(signatureByte, transaction.getOutput(), reconstructedPK)) {
-            System.err.println("Signature not valid!");
-            throw new InvalidTransactionException("Invalid Signature");
-        }
-        return true;
-    }
-
     @Override
     public String toString() {
         return "Transaction [uuid=" + uuid + ", recipientAddress=" + recipientAddress
                 + ", amount=" + amount + ", output=" + output + ", input=" + input + "]";
     }
-
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
-
     public void setRecipientAddress(String recipientAddress) {
         this.recipientAddress = recipientAddress;
     }
-
     public void setAmount(double amount) {
         this.amount = amount;
     }
-
     public void setOutput(HashMap<String, Object> output) {
         this.output = output;
     }
-
     public void setInput(HashMap<String, Object> input) {
         this.input = input;
     }
-
     public String getUuid() {
         return uuid;
     }
-
     public String getRecipientAddress() {
         return recipientAddress;
     }
-
     public double getAmount() {
         return amount;
     }
-
     public HashMap<String, Object> getOutput() {
         return output;
     }
-
     public HashMap<String, Object> getInput() {
         return input;
     }
-
     public String getSenderAddress() {
         return senderAddress;
     }
-
     public void setSenderAddress(String senderAddress) {
         this.senderAddress = senderAddress;
     }
-
     public String getOutputjson() {
         return outputjson;
     }
-
     public void setOutputjson(String outputjson) {
         this.outputjson = outputjson;
     }
-
     public String getInputjson() {
         return inputjson;
     }
-
     public void setInputjson(String inputjson) {
         this.inputjson = inputjson;
     }
 
-    // DID NOT WORK AND FOUND OTHER METHOD (didn't try super hard but found other
-    // method)
-//	public static PublicKey restorePublicKeyObj(byte[] pk) throws CertificateException {
-//		CertificateFactory f = CertificateFactory.getInstance("X.509");
-//		X509Certificate certificate = (X509Certificate) f.generateCertificate(new ByteArrayInputStream(pk));
-//		PublicKey publicKey = certificate.getPublicKey();
-//
-//		return publicKey;
-//	}
-    // DID NOT WORK AND FOUND OTHER METHOD (didn't try super hard but found other
-    // method)
-//	public static PublicKey restorePublicKeyObj(String pk) throws CertificateException {
-//		CertificateFactory f = CertificateFactory.getInstance("X.509");
-//		X509Certificate certificate = (X509Certificate) f
-//				.generateCertificate(new ByteArrayInputStream(pk.getBytes(StandardCharsets.UTF_8)));
-//		PublicKey publicKey = certificate.getPublicKey();
-//		return publicKey;
-//	}
-
     /**
      * Uses GSON library to serialize blockchain chain as json string.
+     * TODO Extract to other class
      */
     public String toJSONtheTransaction() {
-
         HashMap<String, Object> serializeThisBundle = new HashMap<String, Object>();
         HashMap<String, Object> inputClone = (HashMap<String, Object>) input.clone();
-        HashMap<String, Object> outputClone = (HashMap<String, Object>) output.clone();
-        inputClone.remove("wallet");
         serializeThisBundle.put("input", inputClone);
         serializeThisBundle.put("output", output);
         serializeThisBundle.put("UUID", uuid);
@@ -422,7 +330,6 @@ public class Transaction implements TransactionInterface {
         }
         HashMap<String, Object> serializeThisBundle = new HashMap<String, Object>();
         HashMap<String, Object> inputClone = (HashMap<String, Object>) input.clone();
-        HashMap<String, Object> outputClone = (HashMap<String, Object>) output.clone();
         inputClone.remove("wallet");
         serializeThisBundle.put("input", inputClone);
         serializeThisBundle.put("output", output);
@@ -430,10 +337,10 @@ public class Transaction implements TransactionInterface {
         return new Gson().toJson(serializeThisBundle);
     }
 
+    // TODO THESE guys are being used but do they need to be? At least rename or review.
     public Transaction fromJSONTheTransaction(String json) {
         return new Gson().fromJson(json, Transaction.class);
     }
-
     public static Transaction fromJSONTheTransactionStatic(String json) {
         return new Gson().fromJson(json, Transaction.class);
     }

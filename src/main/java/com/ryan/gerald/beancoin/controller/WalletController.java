@@ -4,6 +4,7 @@ import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.WalletService;
 import com.ryan.gerald.beancoin.entity.*;
+import com.ryan.gerald.beancoin.evaluation.BalanceCalculator;
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
 import com.ryan.gerald.beancoin.utils.TransactionRepr;
@@ -45,11 +46,11 @@ public class WalletController {
         List<TransactionRepr> listTransactionsPending = transactionService.getTransactionReprList();
 
         Blockchain blockchain = blockchainService.getBlockchainByName("beancoin");
-        double balance = Wallet.calculateWalletBalanceByTraversingChainIncludePending(blockchain, w.getAddress(),
+        double balance = BalanceCalculator.calculateWalletBalanceByTraversingChainIncludePending(blockchain, w.getAddress(),
                 listTransactionsPending); // chain is the sourceOfTruth, not DB
 
         w.setBalance(balance);
-        w.setBalanceMined(Wallet.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress()));
+        w.setBalanceAsMined(BalanceCalculator.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress()));
         walletService.saveWallet(w);
         model.addAttribute("wallet", w);
 //			return "redirect:/";
@@ -59,9 +60,9 @@ public class WalletController {
     @GetMapping("/transact")
     public String transact(Model model)  {
         Wallet w = walletService.getWalletByUsername((String) model.getAttribute("username"));
-        w.setBalance(Wallet.calculateWalletBalanceByTraversingChainIncludePending(blockchainService.getBlockchainByName(
+        w.setBalance(BalanceCalculator.calculateWalletBalanceByTraversingChainIncludePending(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress(), transactionService.getTransactionReprList()));
-        w.setBalanceMined(Wallet.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
+        w.setBalanceAsMined(BalanceCalculator.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress()));
         model.addAttribute("wallet", w);
         walletService.saveWallet(w);
@@ -82,7 +83,7 @@ public class WalletController {
                 return neu.toJSONtheTransaction();
             } else {
                 Transaction merged = transactionService.getTransactionById(existing.getUuid());
-                merged.updateTransactionWithWallet(w, neu.getRecipientAddress(), neu.getAmount());
+                merged.updateTransaction(w, neu.getRecipientAddress(), neu.getAmount());
                 merged.rebuildOutputInput();
                 transactionService.saveTransaction(merged);
                 model.addAttribute("latesttransaction", merged);

@@ -7,6 +7,7 @@ import javax.persistence.Embeddable;
 /**
  * If deprciated, consider deleting!!!
  */
+@Deprecated
 @Embeddable
 public class WalletForDB {
 
@@ -16,7 +17,6 @@ public class WalletForDB {
 	String address;
 
 	public WalletForDB(Wallet wallet) {
-		super();
 		this.publickey = wallet.getPublickey().getEncoded();
 		this.privatekey = wallet.getPrivatekey().getEncoded();
 		this.address = wallet.getAddress();

@@ -21,20 +21,8 @@ public class User {
     String hint;
     String answer;
     String email;
-    @OneToOne
-    @JoinColumn(name = "ownerID")
-    Wallet wallet;
 
     public User() {}
-
-    public User(String username, String password, String hint, String answer, String email, Wallet wallet) {
-        super();
-        this.username = username;
-        this.password = password;
-        this.hint = hint;
-        this.answer = answer;
-        this.email = email;
-    }
 
     public User(String username, String password, String hint, String answer, String email) {
         super();

@@ -6,7 +6,7 @@ plugins {
 }
 
 application {
-//	mainClass = 'com.ryan.gerald.beancoin.entity.Transaction'
+//	mainClass = 'com.ryan.gerald.beancoin.entity.Wallet'
 }
 
 group = 'com.ryan.gerald.beancoin'
