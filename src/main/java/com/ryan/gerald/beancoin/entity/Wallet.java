@@ -56,6 +56,19 @@ public class Wallet {
         this.ownerId = ownerId;
     }
 
+    public Transaction createTransaction(String toAddress, double toAmount) throws NoSuchAlgorithmException, SignatureException, IOException, NoSuchProviderException, InvalidKeyException {
+        if (this.getBalance() < toAmount){
+            System.err.println("Transaction Amount exceeds balance");
+            return null;
+        }
+        // get output (receipt or agreement) to sign
+        HashMap<String, Object> outputMap = Transaction.createOutputMap(this.getAddress(), toAddress, this.getBalance(), toAmount);
+        String signatureB64 = this.sign(outputMap);
+        String publicKeyString = Base64.getEncoder().encodeToString(this.getPublickey().getEncoded());
+        String publicKeyFormat = this.getPublickey().getFormat();
+        return Transaction.createTransaction(toAddress, toAmount, this.getAddress(), this.getBalance(), outputMap, signatureB64, publicKeyString, publicKeyFormat);
+    }
+
     public static Wallet createWallet(String ownerId) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         return Wallet.createWallet(ownerId, STARTING_BALANCE);
     }
@@ -72,6 +85,8 @@ public class Wallet {
         System.out.println("NEW WALLET CREATED");
         return new Wallet(startingBalance, privateKey, publicKey, address, ownerId);
     }
+
+
 
     /**
      * Generate a signature based on data using local private key

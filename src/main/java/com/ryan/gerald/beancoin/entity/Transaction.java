@@ -2,11 +2,7 @@ package com.ryan.gerald.beancoin.entity;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.SignatureException;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.Date;
@@ -41,48 +37,36 @@ public class Transaction extends AbstractTransaction implements TransactionInter
     String outputjson;
     @Column(columnDefinition = "varchar(2000) default 'Jon Snow'")
     String inputjson;
-    @Transient  // WHAT'S THE POINT OF HAVING THESE MAPS? DECIDE ON STRING FMT OR OTHER TABLE (OR OTHER DB MODEL)
+    @Transient  // Needed?????
     HashMap<String, Object> output; // recipients (including sender)
     @Transient
     HashMap<String, Object> input; // meta-inputHash about transaction including sender starting balance
 
     public Transaction() {}
 
-    public Transaction(String uuid, String recipientAddress, String senderAddress, double amount, String outputjson, String inputjson) {
-        this.uuid = uuid;
-        this.recipientAddress = recipientAddress;
-        this.senderAddress = senderAddress;
-        this.amount = amount;
+    private Transaction(String toAddress, double toAmount, String fromAddress, String outputjson, String inputjson) {
+        this.uuid = StringUtils.getUUID8();;
+        this.recipientAddress = toAddress;
+        this.amount = toAmount;
+        this.senderAddress = fromAddress;
         this.outputjson = outputjson;
         this.inputjson = inputjson;
         rebuildOutputInput();
     }
 
-    /**
-     * Factory method for creating Transaction given a full fledged wallet
-     * @param senderWallet
-     * @param recipientAddress
-     * @param toAmount
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchProviderException
-     * @throws InvalidKeyException
-     * @throws IOException
-     * @throws TransactionAmountExceedsBalance
-     * @throws SignatureException
-     */
-    public static Transaction createTransactionWithWallet(Wallet senderWallet, String recipientAddress, double toAmount)
-            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, TransactionAmountExceedsBalance, SignatureException {
-        if (senderWallet.getBalance() < toAmount) {
-            throw new TransactionAmountExceedsBalance("Transaction Amount Exceeds Balance");
+
+
+    public static Transaction createTransaction(String toAddress, double toAmount, String fromAddress, double fromBalance, HashMap<String, Object> outputMap, String signatureB64, String publicKeyB64, String format) {
+        if (toAmount > fromBalance){
+            System.err.println("Amount exceeds balance");
+            return null;
         }
-        String uuid = StringUtils.getUUID8();
-        HashMap<String, Object> output = Transaction.createOutputMap(senderWallet.getAddress(), recipientAddress, senderWallet.getBalance(), toAmount);
-        HashMap<String, Object> input = Transaction.createInputMapWithWallet(senderWallet, output);
-        String outputjson = new Gson().toJson(output);
-        String inputjson = new Gson().toJson(input);
+        HashMap<String, Object> inputMap = Transaction.createInputMap(fromAddress, fromBalance, signatureB64, publicKeyB64, format);
+        String outputJson = new Gson().toJson(outputMap);
+        String inputJson = new Gson().toJson(inputMap);
+
         System.out.println("New transaction made!");
-        return new Transaction(uuid, recipientAddress, senderWallet.getAddress(), toAmount, outputjson, inputjson);
+        return new Transaction(toAddress, toAmount, fromAddress, outputJson, inputJson);
     }
 
     /**
@@ -93,31 +77,30 @@ public class Transaction extends AbstractTransaction implements TransactionInter
      * @return
      * @throws TransactionAmountExceedsBalance
      */
-    public static Transaction postTransactionWithPrivateKey(TransactionDTO t)
-            throws TransactionAmountExceedsBalance {
-        // BAD PRACTICE TO SEND PRIVATE KEY OVER WIRE, BUT WHAT THE HECK. When angular client is up and going, then will have sign functionality
-        String uuid = StringUtils.getUUID8();
-        String recipientAddress = t.getToAddress();
-        String senderAddress = t.getFromAddress();
-        String privateKey = t.getPrivatekey();
-        double senderBalance = t.getFromBalance();
-        double toAmount = t.getToAmount();
-        double amount = t.getToAmount();
-        HashMap<String, Object> outputMap = createOutputMap(senderAddress, recipientAddress, senderBalance, toAmount);
-        HashMap<String, Object> inputMap = createInputMap(senderAddress,senderBalance,t.getPrivatekey(), t.getPublickey(), t.getFormat());
-        String outputjson = new Gson().toJson(outputMap);
-        String inputjson = new Gson().toJson(inputMap);
-        return new Transaction(uuid, recipientAddress, senderAddress, amount, outputjson, inputjson);
-    }
+//    public static Transaction postTransactionWithPrivateKey(TransactionDTO t)
+//            throws TransactionAmountExceedsBalance {
+//        // BAD PRACTICE TO SEND PRIVATE KEY OVER WIRE, BUT WHAT THE HECK. When angular client is up and going, then will have sign functionality
+//        String recipientAddress = t.getToAddress();
+//        String senderAddress = t.getFromAddress();
+//        String privateKey = t.getPrivatekey();
+//        double senderBalance = t.getFromBalance();
+//        double toAmount = t.getToAmount();
+//        double amount = t.getToAmount();
+//        HashMap<String, Object> outputMap = this.createOutputMap(senderAddress, recipientAddress, senderBalance, toAmount);
+//        HashMap<String, Object> inputMap = this.createInputMap(senderAddress,senderBalance,t.getPrivatekey(), t.getPublickey(), t.getFormat());
+//        String outputjson = new Gson().toJson(outputMap);
+//        String inputjson = new Gson().toJson(inputMap);
+//        return new Transaction(recipientAddress, senderAddress, amount, outputjson, inputjson);
+//    }
 
     /**
      * API METHOD for POSTing transactions. Input and output JSON strings must conform to spec (or should I persist these objects in separate tables -
      * transaction input hash transaction output hash.
      * This is more like a user directly announces a new transaction. In reality this would go over the wire through a message broker or streaming service. Work for later.
      */
-    public static Transaction postPresignedTransaction(String uuid, String recipientAddress, String senderAddress, double amount, String outputjson, String inputjson) {
-        return new Transaction(uuid, recipientAddress, senderAddress, amount, outputjson, inputjson);
-    }
+//    public static Transaction postPresignedTransaction(String uuid, String recipientAddress, String senderAddress, double amount, String outputjson, String inputjson) {
+//        return new Transaction(recipientAddress, senderAddress, amount, outputjson, inputjson);
+//    }
 
     public static boolean verifyInputOutputStrings(String in, String out) {
         Type type = new TypeToken<HashMap<String, Object>>() {
@@ -156,66 +139,31 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         return false;
     }
 
-    /**
-     * Structures output data of wallet - a hashmap of two items, currency going to
-     * recipient at address and change going back to sender
-     */
-    public static HashMap<String, Object> createOutputMap(String senderAddress, String recipientAddress, double fromBalance, double toAmount)
-            throws TransactionAmountExceedsBalance {
-        HashMap<String, Object> output = new HashMap<String, Object>();
-        output.put(senderAddress, (fromBalance - toAmount));
-        output.put(recipientAddress, toAmount);
-        return output;
-    }
 
-    /**
-     * Structured meta data about transaction, including digitial binding signature
-     * of transaction from sender Includes senders public key for verification
-     */
-    public static HashMap<String, Object> createInputMap(String senderAddress,
-                                                         double senderBalance,
-                                                         String signatureB64,
-                                                         String publicKeyB64,
-                                                         String pkFormat) {
-        HashMap<String, Object> input = new HashMap<String, Object>();
-        input.put("timestamp", new Date().getTime());
-        input.put("amount", senderBalance);
-        input.put("address", senderAddress);
-        input.put("publicKeyB64", publicKeyB64);
-        input.put("publicKeyFormat", pkFormat);
-        input.put("signatureB64", signatureB64);
-        return input;
-    }
+
+
 
     /**
      * Update transaction with existing or new recipient. A true instance method.
-     * TODO create releated sub methods where wallet not provided (as in over wire). Need only match address and other key fields
-     */
-    public void updateTransaction(Wallet senderWallet, String recipientAddress, double amount)
-            throws TransactionAmountExceedsBalance, InvalidKeyException, NoSuchAlgorithmException,
-            NoSuchProviderException, SignatureException, IOException {
-        if (amount > (double) this.output.get(senderWallet.getAddress())) {
-            throw new TransactionAmountExceedsBalance(
-                    "Transaction amount exceeds existing balance after prior transactions");
-        }
-        if (this.output.containsKey(recipientAddress)) {
-            this.output.put(recipientAddress, (double) this.output.get(recipientAddress) + amount);
-        } else {
-            this.output.put(recipientAddress, amount);
-            this.recipientAddress = "multiple";
-        }
-        this.output.put(senderWallet.getAddress(), (double) this.output.get(senderWallet.getAddress()) - amount);
-        this.amount += amount;
-        this.input = this.createInputMapWithWallet(senderWallet, output);
-        this.updateOutputInputJson();
-    }
+//     */
+//    public void updateTransaction(String toAddress, double toAmount, String fromAddress, double fromBalance, HashMap<String, Object> outputMap, String signatureB64, String publicKeyB64, String format)
+//            throws TransactionAmountExceedsBalance {
+//        if (amount > (double) this.output.get(fromAddress)) {
+//            throw new TransactionAmountExceedsBalance(
+//                    "Transaction amount exceeds existing balance after prior transactions");
+//        }
+//        if (this.output.containsKey(recipientAddress)) {
+//            this.output.put(recipientAddress, (double) this.output.get(recipientAddress) + amount);
+//        } else {
+//            this.output.put(recipientAddress, amount);
+//            this.recipientAddress = "multiple";
+//        }
+//        this.output.put(fromAddress, (double) this.output.get(fromAddress) - amount);
+//        this.amount += amount;
+//        this.input = this.createInputMap(fromAddress, fromBalance, output);
+//        this.updateOutputInputJson();
+//    }
 
-    public static HashMap<String, Object> createInputMapWithWallet(Wallet senderWallet, HashMap<String, Object> output) throws NoSuchAlgorithmException, SignatureException, IOException, NoSuchProviderException, InvalidKeyException {
-        String signatureB64 = senderWallet.sign(output); // consider signing outputJSON String not bytearray HashMap
-        String publicKeyString = Base64.getEncoder().encodeToString(senderWallet.getPublickey().getEncoded());
-        String pkFormat = senderWallet.getPublickey().getFormat();
-        return Transaction.createInputMap(senderWallet.getAddress(), senderWallet.getBalance(), signatureB64, publicKeyString, pkFormat);
-    }
 
 
     /**
@@ -248,6 +196,7 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         return "Transaction [uuid=" + uuid + ", recipientAddress=" + recipientAddress
                 + ", amount=" + amount + ", output=" + output + ", input=" + input + "]";
     }
+
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }

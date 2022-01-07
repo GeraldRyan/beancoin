@@ -7,12 +7,51 @@ import java.io.IOException;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
 
 public class AbstractTransaction {
 
     /**
-     * Validate a transaction. For invalid transactions, raises
-     * InvalidTransactionException
+     * Structures output data of wallet - a hashmap of two items, currency going to
+     * recipient at address and change going back to sender
+     */
+    public static HashMap<String, Object> createOutputMap(String senderAddress, String recipientAddress, double fromBalance, double toAmount) {
+        HashMap<String, Object> output = new HashMap<String, Object>();
+        output.put(senderAddress, (fromBalance - toAmount));
+        output.put(recipientAddress, toAmount);
+        return output;
+    }
+    /**
+     * Structured meta data about transaction, including digitial binding signature
+     * of transaction from sender Includes senders public key for verification
+     */
+    protected static HashMap<String, Object> createInputMap(String senderAddress,
+                                                         double senderBalance,
+                                                         String signatureB64,
+                                                         String publicKeyB64,
+                                                         String pkFormat) {
+        HashMap<String, Object> input = new HashMap<String, Object>();
+        input.put("timestamp", new Date().getTime());
+        input.put("amount", senderBalance);
+        input.put("address", senderAddress);
+        input.put("publicKeyB64", publicKeyB64);
+        input.put("publicKeyFormat", pkFormat);
+        input.put("signatureB64", signatureB64);
+        return input;
+    }
+
+    /**
+     * Base class for Transactionm implementation. Containst static method to verify transaction.
+     * @param transaction
+     * @return
+     * @throws InvalidTransactionException
+     * @throws InvalidKeyException
+     * @throws SignatureException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchProviderException
+     * @throws IOException
+     * @throws InvalidKeySpecException
      */
     public static boolean is_valid_transaction(Transaction transaction) throws InvalidTransactionException,
             InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException {

@@ -12,14 +12,20 @@ import java.util.Base64;
 
 /**
  * TODO Completely fix and clean up and nuke these. MOST LIKELY GARBAGE.
+ * To verify incoming Transactionm from the blockchain
  */
 public class TransactionValidator {
+    double STARTING_BALANCE = 0;
+    String PROVIDER = "SunEC";
+    String SIGNATURE_ALGORITHM = "SHA256withECDSA";
+    String KEYPAIR_GEN_ALGORITHM = "EC";
+    String PARAMETER_SPEC = "secp256k1";
 
     /**
      * Validate a transaction. For invalid transactions, raises
      * InvalidTransactionException
      */
-    public static boolean is_valid_transaction(Transaction transaction) throws InvalidTransactionException,
+    public boolean is_valid_transaction(Transaction transaction) throws InvalidTransactionException,
             InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException {
         String signatureString = (String) transaction.getInput().get("signatureB64");
         String publicKeyString = (String) transaction.getInput().get("publicKeyB64");
@@ -47,7 +53,7 @@ public class TransactionValidator {
     }
 
 
-    public static boolean is_valid_transactionReconstructPK(Transaction transaction)
+    public boolean is_valid_transactionReconstructPK(Transaction transaction)
             throws InvalidTransactionException, InvalidKeyException, SignatureException, NoSuchAlgorithmException,
             NoSuchProviderException, IOException, InvalidKeySpecException {
         StringUtils.mapKeyValue(transaction.getOutput(), "Line 289");

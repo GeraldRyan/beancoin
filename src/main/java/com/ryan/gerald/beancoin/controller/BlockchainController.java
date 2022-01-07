@@ -30,7 +30,6 @@ public class BlockchainController {
     public BlockchainController() throws InterruptedException {}
 
     @ModelAttribute("blockchain")
-    // This pulls from database before any request handler method goes (but only after a request is made)
     public Blockchain loadBlockchain(Model model) throws NoSuchAlgorithmException, InterruptedException {
         Blockchain bc;
         try {

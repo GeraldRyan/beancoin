@@ -73,27 +73,35 @@ public class WalletController {
     @ResponseBody
     public String doTransactionGET(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) {
         try {
-            Transaction neu = Transaction.createTransactionWithWallet(w, address, amount);
-            TransactionPoolMap pool = new TransactionPoolMap(transactionService.getTransactionList()); // TOOD limit
-            Transaction existing = pool.findExistingTransactionByWallet(neu.getSenderAddress());
-            if (existing == null) {
-                model.addAttribute("latesttransaction", neu);
-                transactionService.saveTransaction(neu);
-//                if (Config.BROADCASTING) {broadcastTransaction(neu);} // TODO KAFKA
-                return neu.toJSONtheTransaction();
-            } else {
-                Transaction merged = transactionService.getTransactionById(existing.getUuid());
-                merged.updateTransaction(w, neu.getRecipientAddress(), neu.getAmount());
-                merged.rebuildOutputInput();
-                transactionService.saveTransaction(merged);
-                model.addAttribute("latesttransaction", merged);
-//                if (Config.BROADCASTING) {broadcastTransaction(merged);} // TODO KAFKA
-                return merged.toJSONtheTransaction();
-            }
-        } catch (TransactionAmountExceedsBalance e) {
-            System.err.println("Transaction Amount Exceeds Balance");
-            model.addAttribute("exceedsBalance", "Transaction Amount Exceeds Balance. Please enter a lower amount");
-            return "Transaction Amount Exceeds Balance. Please enter a lower amount";
+            Transaction neu = w.createTransaction(address, amount);
+            model.addAttribute("latesttransaction", neu);
+            transactionService.saveTransaction(neu);
+            return neu.toJSONtheTransaction();
+
+            // REMOVE ME?? REMOVE UPDATE TRANSACTION FUNCTION TO MAKE EACH ONE SINGULAR??
+//            TransactionPoolMap pool = new TransactionPoolMap(transactionService.getTransactionList());
+//            Transaction existing = pool.findExistingTransactionByWallet(neu.getSenderAddress());
+//            if (existing == null) {
+//                model.addAttribute("latesttransaction", neu);
+//                transactionService.saveTransaction(neu);
+////                if (Config.BROADCASTING) {broadcastTransaction(neu);} // TODO KAFKA
+//                return neu.toJSONtheTransaction();
+//            } else {
+//                Transaction merged = transactionService.getTransactionById(existing.getUuid());
+//                merged.updateTransaction(w, neu.getRecipientAddress(), neu.getAmount());
+//                merged.rebuildOutputInput();
+//                transactionService.saveTransaction(merged);
+//                model.addAttribute("latesttransaction", merged);
+////                if (Config.BROADCASTING) {broadcastTransaction(merged);} // TODO KAFKA
+//                return merged.toJSONtheTransaction();
+//            }
+//        } catch (TransactionAmountExceedsBalance | Exception e) {
+//            System.err.println("Transaction Amount Exceeds Balance");
+//            model.addAttribute("exceedsBalance", "Transaction Amount Exceeds Balance. Please enter a lower amount");
+//            return "Transaction Amount Exceeds Balance. Please enter a lower amount";
+
+            // REMOVE ABOVE AND MAKE TRANSACTIONS GRANULAR?
+
         } catch (Exception e) {
             e.printStackTrace();
             return "index";

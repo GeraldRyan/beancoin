@@ -61,7 +61,7 @@ public class RegistrationController {
         }
         Transaction loadNewUserBalance = null;
         try {
-            loadNewUserBalance = Transaction.createTransactionWithWallet(adminWallet, wallet.getAddress(), 1000);
+            loadNewUserBalance = adminWallet.createTransaction(wallet.getAddress(), 1000);
         } catch (SignatureException e) {
             e.printStackTrace();
         }
