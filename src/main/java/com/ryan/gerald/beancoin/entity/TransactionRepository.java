@@ -9,7 +9,7 @@ import java.util.List;
 public interface TransactionRepository extends CrudRepository<Transaction, String> {
 
     @Query("select t from Transaction t")
-    List<Transaction> getListOfTransactions();
+    List<Transaction> getUnminedTransactionList();
 
     /**
      * IMPLEMENT ME - check syntax and arrange by oldest so add timestamp

@@ -19,7 +19,6 @@ import com.google.gson.reflect.TypeToken;
  * Document an exchange of currency from a sender to one or more recipients
  */
 @Entity
-@Table(name = "transaction")
 public class Transaction extends AbstractTransaction implements TransactionInterface {
     @Id String uuid;
     String recipientAddress;
@@ -156,11 +155,11 @@ public class Transaction extends AbstractTransaction implements TransactionInter
      */
     public String serialize() {
         if (this.getInputMap() == null) {this.reinflateInputOutputMaps();}
-        HashMap<String, Object> serializeThisMap = new HashMap<String, Object>();
-        serializeThisMap.put("input", this.inputMap);
-        serializeThisMap.put("output", this.outputMap);
-        serializeThisMap.put("id", this.uuid);
-        return new Gson().toJson(serializeThisMap);
+        HashMap<String, Object> serializableMap = new HashMap<String, Object>();
+        serializableMap.put("input", this.inputMap);
+        serializableMap.put("output", this.outputMap);
+        serializableMap.put("id", this.uuid);
+        return new Gson().toJson(serializableMap);
     }
 
     public Transaction deserialize(String s) {

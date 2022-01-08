@@ -38,7 +38,7 @@ public class Blockchain {
 	 * @param name
 	 * @return
 	 */
-	public static Blockchain createBlockchain(String name) {return Blockchain.createBlockchain(name);}
+	public static Blockchain createBlockchain(String name) {return new Blockchain(name);}
 
 	/**
 	 * Adds block to blockchain by calling block class's static mine_block method.

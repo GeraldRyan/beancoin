@@ -53,12 +53,13 @@ public class BlockchainController {
     public String doMineAsGET(Model model)
             throws NoSuchAlgorithmException {
         Blockchain blockchain = blockchainService.getBlockchainByName("beancoin"); // later will cache
-        List<Transaction> txList = transactionService.getTransactionList();
+        List<Transaction> txList = transactionService.getUnminedTransactionList();
         if (txList.isEmpty()) {return "No data to mine. Tell your friends to make transactions";}
         TransactionPoolMap pool = new TransactionPoolMap(txList); // What's use of this TransactionMap
-        String txDataJsonArray = pool.getMinableTransactionDataString();  // payload of block TODO THIS IS BROKEN, ESCAPES STRING
+        String txListString = pool.getMinableTransactionDataString();  // payload of block TODO THIS IS BROKEN, ESCAPES STRING
 //        String txJsonArray = new Gson().toJson(txList);
-        Block new_block = blockchain.add_block(txDataJsonArray);
+        String txListJson = new Gson().toJson(txList);
+        Block new_block = blockchain.add_block(txListJson);
 
         model.addAttribute("blockchain", blockchain);  // why? DELETE, REFACTOR, RESTORE
             model.addAttribute("minedblock", new_block);
@@ -83,7 +84,7 @@ public class BlockchainController {
             if (Integer.valueOf(n) >= 0 && Integer.valueOf(n) <= 5) {
                 return new Gson().toJson(b);
             }
-            List<Transaction> txList = b.deserializeTransactionData();
+            List<Transaction> txList = b.deserializeTx();
             return b.webworthyJson(txList);
         } catch (NullPointerException e) {
             e.printStackTrace();

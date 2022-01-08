@@ -1,5 +1,6 @@
 package com.ryan.gerald.beancoin.controller;
 
+import com.google.gson.Gson;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.UserService;
 import com.ryan.gerald.beancoin.Service.WalletService;
@@ -14,6 +15,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -45,6 +48,7 @@ public class RegistrationController {
             return "redirect:/";
         }
 
+        // TODO BELONGS IN NEW USER SERVICE!! TOO MUCH LOGIC HERE!!!
         Optional<User> existingUser = userService.getUserOptionalByName(user.getUsername());
         if (existingUser.isPresent()) {
             model.addAttribute("existsmsg", "User already exists. Choose another name or log in");
@@ -56,17 +60,16 @@ public class RegistrationController {
         Blockchain bc = blockchainService.getBlockchainByName("beancoin");
         Wallet adminWallet;
         adminWallet = walletService.getWalletByUsername("admin");
-        if (adminWallet == null) {
-            adminWallet = Wallet.createWallet("admin");
-        }
-        Transaction loadNewUserBalance = null;
-        try {
-            loadNewUserBalance = adminWallet.createTransaction(wallet.getAddress(), 1000);
-        } catch (SignatureException e) {
+        if (adminWallet == null) {adminWallet = Wallet.createWallet("admin");}
+        Transaction newUserTransfer = null;
+        try {newUserTransfer = adminWallet.createTransaction(wallet.getAddress(), 1000);} catch (SignatureException e) {
             e.printStackTrace();
         }
-        bc.add_block(Transaction.transactionStringSingleton(loadNewUserBalance));
-        blockchainService.saveBlockchain(bc);
+        List<Transaction> singleList = new ArrayList<Transaction>();
+        singleList.add(newUserTransfer);
+        String singleListJson = new Gson().toJson(singleList);
+        bc.add_block(singleListJson); // does need to serialize as list not as individual?
+        blockchainService.saveBlockchain(bc);  // go straight to blockchain, no need to mine this type
         model.addAttribute("isloggedin", true);
         model.addAttribute("user", user);
         model.addAttribute("wallet", wallet);

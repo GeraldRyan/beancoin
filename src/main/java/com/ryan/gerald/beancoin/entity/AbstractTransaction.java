@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class AbstractTransaction {
-    String uuid;
 
     /**
      * Structures output data of wallet - a hashmap of two items, currency going to

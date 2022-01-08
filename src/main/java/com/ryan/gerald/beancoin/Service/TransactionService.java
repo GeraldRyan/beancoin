@@ -17,8 +17,8 @@ public class TransactionService {
 //        return TransactionPoolMap.fillTransactionPool(txList);
 //    }
 
-    public List<Transaction> getTransactionList() {
-        List<Transaction> lt = transactionRepository.getListOfTransactions();
+    public List<Transaction> getUnminedTransactionList() {
+        List<Transaction> lt = transactionRepository.getUnminedTransactionList();
 //        lt.forEach(t -> t.reinflateInputOutputMaps()); // is this needed, here or ever?
         return lt;
     }
@@ -64,14 +64,14 @@ public class TransactionService {
         for (Block b : blockchain.getChain()) {
             i++;
             if (i < 7) {continue;}
-            List<Transaction> txList = b.deserializeTransactionData();
+            List<Transaction> txList = b.deserializeTx();
             if (transactionFoundInBlock(b, txId)) {return b.getTimestamp();}
         }
         return 0;
     }
 
     public boolean transactionFoundInBlock(Block b, String txId) {
-        List<Transaction> txList = b.deserializeTransactionData();
+        List<Transaction> txList = b.deserializeTx();
         for (Transaction t : txList) {if (t.getUuid().equals(txId)) {return true;}}
         return false;
     }

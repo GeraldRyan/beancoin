@@ -17,11 +17,12 @@ import java.util.List;
 
 @Controller
 @RequestMapping("wallet")
-@SessionAttributes({"wallet", "latesttransaction", "isloggedin", "pool", "username", "user"})
+@SessionAttributes({"wallet", "isloggedin", "username", "user"})
 public class WalletController {
     @Autowired private BlockchainService blockchainService;
     @Autowired private TransactionService transactionService;
     @Autowired private WalletService walletService;
+    @Autowired private BalanceCalculator balanceCalculator;
 
     public WalletController() throws InterruptedException {}
 
@@ -38,19 +39,18 @@ public class WalletController {
     public String displayWallet(Model model) {
         Wallet w;
         try {
-                w = walletService.getWalletByUsername(String.valueOf(model.getAttribute("username")));
+            w = walletService.getWalletByUsername(String.valueOf(model.getAttribute("username")));
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/";
         }
-        List<Transaction> listTransactionsPending = transactionService.getTransactionList();
-
+        List<Transaction> listTransactionsPending = transactionService.getUnminedTransactionList();
         Blockchain blockchain = blockchainService.getBlockchainByName("beancoin");
-        double balance = BalanceCalculator.calculateWalletBalanceByTraversingChainIncludePending(blockchain, w.getAddress(),
-                listTransactionsPending); // chain is the sourceOfTruth, not DB
+        double balance = balanceCalculator.calculateBalanceFromChainAndLocalUnminedTxPool(blockchain, w.getAddress(),
+                listTransactionsPending);
 
-        w.setBalance(balance);
-        w.setBalanceAsMined(BalanceCalculator.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress()));
+        w.setBalance(balance);  // TODO probably wrong place for this logic
+        w.setBalanceAsMined(balanceCalculator.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress()));
         walletService.saveWallet(w);
         model.addAttribute("wallet", w);
 //			return "redirect:/";
@@ -58,11 +58,11 @@ public class WalletController {
     }
 
     @GetMapping("/transact")
-    public String transact(Model model)  {
+    public String transact(Model model) {
         Wallet w = walletService.getWalletByUsername((String) model.getAttribute("username"));
-        w.setBalance(BalanceCalculator.calculateWalletBalanceByTraversingChainIncludePending(blockchainService.getBlockchainByName(
-                "beancoin"), w.getAddress(), transactionService.getTransactionList()));
-        w.setBalanceAsMined(BalanceCalculator.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
+        w.setBalance(balanceCalculator.calculateBalanceFromChainAndLocalUnminedTxPool(blockchainService.getBlockchainByName(
+                "beancoin"), w.getAddress(), transactionService.getUnminedTransactionList()));
+        w.setBalanceAsMined(balanceCalculator.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress()));
         model.addAttribute("wallet", w);
         walletService.saveWallet(w);
@@ -117,11 +117,7 @@ public class WalletController {
 //        }
 
 
-
-
-
-
-        //    @PostMapping("/transact")
+    //    @PostMapping("/transact")
 //    @ResponseBody
 //    public String postTransact(Model model, @RequestBody Map<String, Object> body)
 //            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
@@ -151,8 +147,6 @@ public class WalletController {
 //            return updated.toJSONtheTransaction();
 //        }
 //    }
-
-
 
 
     //	@PostMapping("")
@@ -185,7 +179,6 @@ public class WalletController {
 //    public String getBetterWallet(Model model) {
 //        return "wallet/betterwallet";
 //    }
-
 
 
 //    /**

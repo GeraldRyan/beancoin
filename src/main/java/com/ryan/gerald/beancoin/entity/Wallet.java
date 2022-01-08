@@ -1,28 +1,16 @@
 package com.ryan.gerald.beancoin.entity;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.SignatureException;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.*;
-
-import javax.persistence.*;
-
 import com.ryan.gerald.beancoin.utils.StringUtils;
-import com.ryan.gerald.beancoin.utils.TransactionRepr;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import java.io.IOException;
+import java.security.*;
+import java.security.spec.ECGenParameterSpec;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * An individual wallet for a miner. Keeps track of miner's balance. Allows

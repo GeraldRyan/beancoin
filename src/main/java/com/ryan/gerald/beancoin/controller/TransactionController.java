@@ -21,14 +21,14 @@ public class TransactionController {
 
     @GetMapping("/unmined")
     public String getTransactionPool(Model model) {
-        model.addAttribute("pool", transactionService.getTransactionList());
+        model.addAttribute("pool", transactionService.getUnminedTransactionList());
         return "home/transactionpool";
     }
 
     @PostMapping("/unmined")
     @ResponseBody
     public String unminedTransactionsPOST(Model model) {
-        TransactionPoolMap pool = TransactionPoolMap.fillTransactionPool(transactionService.getTransactionList());
+        TransactionPoolMap pool = TransactionPoolMap.fillTransactionPool(transactionService.getUnminedTransactionList());
         if (pool.getMinableTransactionDataString() == null) {
             return "No transactions in the pool. Tell your friends to make transactions";
         }

@@ -7,7 +7,7 @@ import com.ryan.gerald.beancoin.evaluation.BalanceCalculator;
 
 @Deprecated
 public class WalletDao extends DBConnection {
-
+private BalanceCalculator balanceCalculator;
 	
 	public Wallet addWallet(Wallet w) {
 		this.connect();
@@ -37,7 +37,7 @@ public class WalletDao extends DBConnection {
 		this.connect();
 		em.getTransaction().begin();
 		double newBalance =
-				BalanceCalculator.calculateWalletBalanceByTraversingChain(new BlockchainService().getBlockchainByName("beancoin"),
+				balanceCalculator.calculateWalletBalanceByTraversingChain(new BlockchainService().getBlockchainByName("beancoin"),
 				wallet.getAddress());
 		wallet.setBalance(newBalance);
 		em.getTransaction().commit();
