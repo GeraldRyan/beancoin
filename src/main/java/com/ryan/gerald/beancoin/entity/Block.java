@@ -19,7 +19,7 @@ public class Block {
 	private String lastHash;
 	@Lob
 	@Column(columnDefinition = "LONGTEXT")
-	String data;
+	String tx;
 	int difficulty;
 	int nonce;
 	static final long MILLISECONDS = 1;
@@ -32,7 +32,7 @@ public class Block {
 		GENESIS_DATA.put("timestamp", (long) 1);
 		GENESIS_DATA.put("last_hash", "genesis_last_hash");
 		GENESIS_DATA.put("hash", "genesis_hash");
-		GENESIS_DATA.put("data", "GENESIS GENESIS GENESIS");
+		GENESIS_DATA.put("tx", "GENESIS GENESIS GENESIS");
 		GENESIS_DATA.put("difficulty", 7);
 		GENESIS_DATA.put("nonce", 1);
 	}
@@ -42,36 +42,36 @@ public class Block {
 	/**
 	 * A block is a unit of storage for a blockchain that supports a cryptocurrency.
 	 */
-	public Block(long timestamp, String lastHash, String hash, String data, int difficulty, int nonce) {
+	public Block(long timestamp, String lastHash, String hash, String tx, int difficulty, int nonce) {
 		super();
 		this.timestamp = timestamp;
 		this.lastHash = lastHash;
 		this.hash = hash;
-		this.data = data;
+		this.tx = tx;
 		this.difficulty = difficulty;
 		this.nonce = nonce;
 	}
 
 	/**
-	 * Generates Genesis block with hard coded data that will be identical for all
+	 * Generates Genesis block with hard coded transaction data (tx) that will be identical for all
 	 * instances of blockchain
 	 */
 	public static Block genesis_block() {
 		return new Block((Long) GENESIS_DATA.get("timestamp"), (String) GENESIS_DATA.get("last_hash"),
-				(String) GENESIS_DATA.get("hash"), (String) GENESIS_DATA.get("data"),
+				(String) GENESIS_DATA.get("hash"), (String) GENESIS_DATA.get("tx"),
 				(Integer) GENESIS_DATA.get("difficulty"), (Integer) GENESIS_DATA.get("nonce"));
 	}
 
 	/**
-	 * Mine a block based on given last block and data until a block hash is found
+	 * Mine a block based on given last block and tx until a block hash is found
 	 * that meets the leading 0's Proof of Work requirement.
 	 */
-	public static Block mine_block(Block last_block, String dataPayload) throws NoSuchAlgorithmException {
+	public static Block mine_block(Block last_block, String txPayload) throws NoSuchAlgorithmException {
 		long timestamp = new Date().getTime();
 		String last_hash = last_block.getHash();
 		int difficulty = Block.adjust_difficulty(last_block, timestamp);
 		int nonce = 0;
-		String hash = CryptoHash.getSHA256(timestamp, last_block.getHash(), dataPayload, difficulty, nonce);
+		String hash = CryptoHash.getSHA256(timestamp, last_block.getHash(), txPayload, difficulty, nonce);
 		String proof_of_work = CryptoHash.n_len_string('0', difficulty);
 		String binary_hash = CryptoHash.hex_to_binary(hash);
 		String binary_hash_work_end = binary_hash.substring(0, difficulty);
@@ -81,7 +81,7 @@ public class Block {
 			nonce += 1;
 			timestamp = new Date().getTime();
 			difficulty = Block.adjust_difficulty(last_block, timestamp);
-			hash = CryptoHash.getSHA256(timestamp, last_block.getHash(), dataPayload, difficulty, nonce);
+			hash = CryptoHash.getSHA256(timestamp, last_block.getHash(), txPayload, difficulty, nonce);
 			proof_of_work = CryptoHash.n_len_string('0', difficulty);
 			binary_hash = CryptoHash.hex_to_binary(hash);
 			binary_hash_work_end = binary_hash.substring(0, difficulty);
@@ -91,7 +91,7 @@ public class Block {
 		System.out.println("binary_Hash_work_end " + binary_hash_work_end);
 		System.out.println("binary hash " + binary_hash);
 		System.out.println("BLOCK MINED!");
-		return new Block(timestamp, last_hash, hash, dataPayload, difficulty, nonce);
+		return new Block(timestamp, last_hash, hash, txPayload, difficulty, nonce);
 	}
 
 	/**
@@ -154,18 +154,18 @@ public class Block {
 	 */
 	public String toStringConsole() {
 		return "\n-----------BLOCK--------\ntimestamp: " + this.timestamp + "\nlastHash: " + this.lastHash + "\nhash: "
-				+ this.hash + "\ndifficulty: " + this.getDifficulty() + "\nData: " + this.data + "\nNonce: "
+				+ this.hash + "\ndifficulty: " + this.getDifficulty() + "\nData: " + this.tx + "\nNonce: "
 				+ this.nonce + "\n-----------------------\n";
 	}
 
 	public String toStringWebAPI() {
-		return String.format("timestamp: %s, lastHash:%s, hash:%s, data:[%s], difficulty:%s", timestamp, lastHash, hash,
-				data, difficulty, nonce);
+		return String.format("timestamp: %s, lastHash:%s, hash:%s, tx:[%s], difficulty:%s", timestamp, lastHash, hash,
+				tx, difficulty, nonce);
 	}
 
 	public String toStringFormatted() {
-		String datastring = "";
-		return String.format("%5s %10s %15s %15s %15s", timestamp, lastHash, hash, data, difficulty, nonce);
+		String txstring = "";
+		return String.format("%5s %10s %15s %15s %15s", timestamp, lastHash, hash, tx, difficulty, nonce);
 	}
 
 	/**
@@ -184,7 +184,7 @@ public class Block {
 		serializeThisBundle.put("lasthash", lastHash);
 		serializeThisBundle.put("difficulty", difficulty);
 		serializeThisBundle.put("nonce", nonce);
-		serializeThisBundle.put("data", treprlist);
+		serializeThisBundle.put("tx", treprlist);
 		return new Gson().toJson(serializeThisBundle);
 	}
 
@@ -195,7 +195,7 @@ public class Block {
 		serializeThisBundle.put("lasthash", lastHash);
 		serializeThisBundle.put("difficulty", difficulty);
 		serializeThisBundle.put("nonce", nonce);
-		serializeThisBundle.put("data", tlist);
+		serializeThisBundle.put("tx", tlist);
 		return new Gson().toJson(serializeThisBundle);
 	}
 
@@ -251,7 +251,7 @@ public class Block {
 	}
 
 	public String getData() {
-		return data;
+		return tx;
 	}
 
 	public int getNonce() {
@@ -262,7 +262,7 @@ public class Block {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((data == null) ? 0 : data.hashCode());
+		result = prime * result + ((tx == null) ? 0 : tx.hashCode());
 		result = prime * result + difficulty;
 		result = prime * result + ((hash == null) ? 0 : hash.hashCode());
 		result = prime * result + ((lastHash == null) ? 0 : lastHash.hashCode());
@@ -280,10 +280,10 @@ public class Block {
 		if (getClass() != obj.getClass())
 			return false;
 		Block other = (Block) obj;
-		if (data == null) {
-			if (other.data != null)
+		if (tx == null) {
+			if (other.tx != null)
 				return false;
-		} else if (!data.equals(other.data))
+		} else if (!tx.equals(other.tx))
 			return false;
 		if (difficulty != other.difficulty)
 			return false;
