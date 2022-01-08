@@ -2,10 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="ISO-8859-1">
-    <title>Insert title here</title>
+    <title>Unmined Transaction Pool</title>
+<!--    <link th:href="@{/styles/tailwind.css}" rel="stylesheet"/>-->
+<!--    <link th:href="@{/styles/main.css}" rel="stylesheet"/>-->
 </head>
-<!-- CSS style to set alternate table
-            row using color -->
 <style>
 table {
 	border-collapse: collapse;
@@ -29,10 +29,7 @@ tr:nth-child(odd) {
 <body>
 <div th:replace="fragments/navbar"></div>
 <h1>Transaction Pool</h1>
-<h2>Note this displays transactions broken down by individual, for
-    uniform display in table format. It is not displayed in it's natural form. For that, use the REST API.</h2>
-<h2>You can get the original JSON format by submitting a POST
-    request to this same endpoint with any given payload ||| {} |||</h2>
+<h2>See transactions in JSON by submitting POST request to this endpoint with empty object: {}</h2>
 
 
 <table border="2">
@@ -47,38 +44,21 @@ tr:nth-child(odd) {
     </tr>
 
 
-    <th:block th:each="t : ${transactionpoollist}">
-        <th:block th:each="recipientAdds : ${t.output.keySet()}">
-            <th:block th:if="${recipientAdds} != ${t.input.address}">
+    <th:block th:each="t : ${pool}">
+        <th:block th:each="adds : ${t.outputMap.keySet()}">
+            <th:block th:if="${adds} != ${t.inputMap.address}">
                 <tr>
-                    <td th:text="${t.input.address}"></td>
-                    <td th:text="${t.input.amount}"></td>
-                    <td th:text="${recipientAdds}"></td>
-                    <td th:text="${t.output.get(recipientAdds)}"></td>
-                    <td th:text="${t.input.amount - t.output.get(recipientAdds)}"></td>
-                    <td th:text="${t.input.timestamp}"></td>
+                    <td th:text="${t.inputMap.address}"></td>
+                    <td th:text="${t.inputMap.amount}"></td>
+                    <td th:text="${adds}"></td>
+                    <td th:text="${t.outputMap.get(adds)}"></td>
+                    <td th:text="${t.inputMap.amount - t.outputMap.get(adds)}"></td>
+                    <td th:text="${t.inputMap.timestamp}"></td>
                     <td th:text="${t.uuid}"></td>
                 </tr>
             </th:block>
         </th:block>
     </th:block>
-    <!--    <c:forEach items="${transactionpoollist}" var="t">-->
-    <!--        <c:forEach items="${t.getOutput().keySet()}" var="recipientAdds">-->
-    <!--            <c:if test="${ !recipientAdds.equals(t.getInput().get(\" address\-->
-    <!--            "))}">-->
-    <!--            <tr>-->
-    <!--                <td>${t.getInput().get("address")}</td>-->
-    <!--                <td>${t.getInput().get("amount")}</td>-->
-    <!--                <td>${recipientAdds}</td>-->
-    <!--                <td>${t.getOutput().get(recipientAdds)}</td>-->
-    <!--                <td>${t.getInput().get("amount") - t.getOutput().get(recipientAdds)}</td>-->
-    <!--                <td>${t.getInput().get("timestamp")}</td>-->
-    <!--                <td>${t.getUuid()}</td>-->
-    <!--            </tr>-->
-    <!--            </c:if>-->
-    <!--        </c:forEach>-->
-    <!--    </c:forEach>-->
-
 </table>
 <br>
 

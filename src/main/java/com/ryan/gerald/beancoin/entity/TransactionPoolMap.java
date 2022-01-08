@@ -42,7 +42,7 @@ public class TransactionPoolMap {
     public static TransactionPoolMap fillTransactionPool(List<Transaction> transactionList) {
         TransactionPoolMap tp = new TransactionPoolMap();
         for (Transaction t : transactionList) {
-            t.rebuildOutputInput();
+            t.reinflateInputOutputMaps();
             tp.putTransaction(t);
         }
         return tp;
@@ -65,10 +65,10 @@ public class TransactionPoolMap {
             System.err.println("UUID OF TRANSACTION IS " + uuid);
             Transaction t = (Transaction) this.getTransactionMap().get(uuid);
             System.err.println("INPUT JSON");
-            System.err.println(t.getInputjson());
+            System.err.println(t.getInputJson());
             System.err.println("OUTPUT JSON");
-            System.err.println(t.getOutputjson());
-            tmpinput = new Gson().fromJson(t.getInputjson(), HashMap.class);
+            System.err.println(t.getOutputJson());
+            tmpinput = new Gson().fromJson(t.getInputJson(), HashMap.class);
             if (tmpinput == null) {
                 return null; // TODO : empty transaction with only an ID happened. I don't know how.
             }
@@ -90,7 +90,7 @@ public class TransactionPoolMap {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         this.transactionMap.forEach((uuid, t) -> {
-            sb.append(((Transaction) t).__repr__());
+            sb.append(((Transaction) t).serialize());
             sb.append(",");
         });
         sb.deleteCharAt(sb.lastIndexOf(","));

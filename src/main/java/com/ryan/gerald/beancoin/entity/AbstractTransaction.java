@@ -1,5 +1,6 @@
 package com.ryan.gerald.beancoin.entity;
 
+import com.google.gson.Gson;
 import com.ryan.gerald.beancoin.exceptions.InvalidTransactionException;
 import com.ryan.gerald.beancoin.utils.StringUtils;
 
@@ -11,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class AbstractTransaction {
+    String uuid;
 
     /**
      * Structures output data of wallet - a hashmap of two items, currency going to
@@ -41,8 +43,22 @@ public class AbstractTransaction {
         return input;
     }
 
+    protected HashMap<String, Object> deserializeOutputJson(String outputJson){
+        return new Gson().fromJson(outputJson, HashMap.class);
+    }
+    protected HashMap<String, Object> deserializeInputJson(String inputJson){
+        return new Gson().fromJson(inputJson, HashMap.class);
+    }
+
+    protected String serializeOutpuMap(HashMap<String, Object> outputMap){
+        return new Gson().toJson(outputMap);
+    }
+    protected String serializeInputMap(HashMap<String, Object> inputMap){
+        return new Gson().toJson(inputMap);
+    }
+
     /**
-     * Base class for Transactionm implementation. Containst static method to verify transaction.
+     * Base class for Transactionm implementation. Contains static method to verify transaction.
      * @param transaction
      * @return
      * @throws InvalidTransactionException
@@ -55,16 +71,16 @@ public class AbstractTransaction {
      */
     public static boolean is_valid_transaction(Transaction transaction) throws InvalidTransactionException,
             InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException {
-        String signatureString = (String) transaction.getInput().get("signatureB64");
-        String publicKeyString = (String) transaction.getInput().get("publicKeyB64");
+        String signatureString = (String) transaction.getInputMap().get("signatureB64");
+        String publicKeyString = (String) transaction.getInputMap().get("publicKeyB64");
         byte[] signatureByte = Base64.getDecoder().decode(signatureString);
         byte[] publicKeyByte = Base64.getDecoder().decode(publicKeyString);
         PublicKey reconstructedPK = Wallet.restorePublicKey(publicKeyByte);
 //		PublicKey restoredPK = Wallet.restorePK((String) transaction.getInput().get("publicKeyB64"));
 //		PublicKey originalPK = (PublicKey) transaction.input.get("publicKey");
-        double sumOfTransactions = transaction.getOutput().values().stream().mapToDouble(v -> (double) v).sum();
+        double sumOfTransactions = transaction.getOutputMap().values().stream().mapToDouble(v -> (double) v).sum();
         System.out.println("Sum of values " + sumOfTransactions);
-        if (sumOfTransactions != (double) transaction.getInput().get("amount")) {
+        if (sumOfTransactions != (double) transaction.getInputMap().get("amount")) {
             throw new InvalidTransactionException("TRANSACTION OUTPUT DOESN'T MATCH INPUT");
         }
 //		if (!Wallet.verifySignature((byte[]) transaction.input.get("signature"), transaction.output,
@@ -72,7 +88,7 @@ public class AbstractTransaction {
 //			System.err.println("Signature not valid!");
 //			throw new InvalidTransactionException("Invalid Signature");
 //		}
-        byte[] data = StringUtils.objectToByteArray(transaction.getOutput());
+        byte[] data = StringUtils.objectToByteArray(transaction.getOutputMap());
         if (!Wallet.verifySignature(signatureString, data, reconstructedPK)) {
             System.err.println("SIGNATURE NOT VALID!");
             throw new InvalidTransactionException("INVALID SIGNATURE");
@@ -84,12 +100,12 @@ public class AbstractTransaction {
     public static boolean is_valid_transactionReconstructPK(Transaction transaction)
             throws InvalidTransactionException, InvalidKeyException, SignatureException, NoSuchAlgorithmException,
             NoSuchProviderException, IOException, InvalidKeySpecException {
-        StringUtils.mapKeyValue(transaction.getOutput(), "Line 289");
+        StringUtils.mapKeyValue(transaction.getOutputMap(), "Line 289");
 
-        double sumOfTransactions = transaction.getOutput().values().stream().mapToDouble(t -> (double) t).sum();
+        double sumOfTransactions = transaction.getOutputMap().values().stream().mapToDouble(t -> (double) t).sum();
         System.out.println("Sum of values " + sumOfTransactions);
-        String signatureString = (String) transaction.getInput().get("signatureString");
-        String publicKeyString = (String) transaction.getInput().get("publicKeyB64");
+        String signatureString = (String) transaction.getInputMap().get("signatureString");
+        String publicKeyString = (String) transaction.getInputMap().get("publicKeyB64");
         byte[] signatureByte = Base64.getDecoder().decode(signatureString);
         byte[] publicKeyByte = Base64.getDecoder().decode(publicKeyString);
         PublicKey reconstructedPK = Wallet.restorePublicKey(publicKeyByte);
@@ -98,11 +114,11 @@ public class AbstractTransaction {
         System.out.println("PKSTring string: " + publicKeyString);
         System.out.println("signature byte: " + signatureByte);
         System.out.println("PK Byte: " + publicKeyByte);
-        if (sumOfTransactions != (double) transaction.getInput().get("amount")) {
+        if (sumOfTransactions != (double) transaction.getInputMap().get("amount")) {
             throw new InvalidTransactionException("Value mismatch of propsed transactions");
         }
-        System.out.println(transaction.getInput().get("signature"));
-        byte[] data = StringUtils.objectToByteArray(transaction.getOutput());
+        System.out.println(transaction.getInputMap().get("signature"));
+        byte[] data = StringUtils.objectToByteArray(transaction.getOutputMap());
         if (!Wallet.verifySignature(signatureString, data, reconstructedPK)) {
             System.err.println("Signature not valid!");
             throw new InvalidTransactionException("Invalid Signature");

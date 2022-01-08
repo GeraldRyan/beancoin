@@ -12,8 +12,8 @@ public class TransactionRepr {
 
     public TransactionRepr(Transaction t) {
         this.id = t.getUuid();
-        this.input = t.getInput();
-        this.output = t.getOutput();
+        this.input = t.getInputMap();
+        this.output = t.getOutputMap();
     }
 
     public String getId() {

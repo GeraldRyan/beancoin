@@ -5,7 +5,6 @@ import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.WalletService;
 import com.ryan.gerald.beancoin.entity.*;
 import com.ryan.gerald.beancoin.evaluation.BalanceCalculator;
-import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
 import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +75,7 @@ public class WalletController {
             Transaction neu = w.createTransaction(address, amount);
             model.addAttribute("latesttransaction", neu);
             transactionService.saveTransaction(neu);
-            return neu.toJSONtheTransaction();
+            return neu.serialize();
 
             // REMOVE ME?? REMOVE UPDATE TRANSACTION FUNCTION TO MAKE EACH ONE SINGULAR??
 //            TransactionPoolMap pool = new TransactionPoolMap(transactionService.getTransactionList());

@@ -25,16 +25,15 @@ public class TransactionService {
     public List<TransactionRepr> getTransactionReprList() {
         List<TransactionRepr> trList = new ArrayList<>();
         this.getTransactionList().forEach(t -> {
-            t.rebuildOutputInput();
+            t.reinflateInputOutputMaps();
             trList.add(new TransactionRepr(t));
         });
         return trList;
     }
 
     public List<Transaction> getTransactionList() {
-        // note need to get Tx from databse and then rebuild (unpack) input output attributes
         List<Transaction> lt = transactionRepository.getListOfTransactions();
-        lt.forEach(t -> t.rebuildOutputInput());
+        lt.forEach(t -> t.reinflateInputOutputMaps());
         return lt;
     }
 
@@ -44,7 +43,7 @@ public class TransactionService {
     public List<Transaction> getNOldestTransactions(Integer n) {
         // note need to get Tx from databse and then rebuild (unpack) input output attributes
         List<Transaction> lt = transactionRepository.getNOldestTransactions();
-        lt.forEach(t -> t.rebuildOutputInput());
+        lt.forEach(t -> t.reinflateInputOutputMaps());
         return lt;
     }
 

@@ -21,7 +21,7 @@ public class TransactionController {
 
     @GetMapping("/unmined")
     public String getTransactionPool(Model model) {
-        model.addAttribute("transactionpoollist", transactionService.getTransactionList());
+        model.addAttribute("pool", transactionService.getTransactionList());
         return "home/transactionpool";
     }
 
