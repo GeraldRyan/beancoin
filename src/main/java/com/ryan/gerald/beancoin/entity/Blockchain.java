@@ -25,7 +25,7 @@ public class Blockchain {
 
 	public Blockchain() {}
 
-	public Blockchain(String name) {
+	private Blockchain(String name) {
 		this.name = name;
 		this.date_created = new Date().getTime();
 		this.chain = new ArrayList<Block>();
@@ -33,19 +33,23 @@ public class Blockchain {
 		this.length_of_chain = 1;
 	}
 
-
-	public static Blockchain createBlockchainInstance(String name) {return new Blockchain(name);}
+	/**
+	 * Factory method public API to create a new named blockchain
+	 * @param name
+	 * @return
+	 */
+	public static Blockchain createBlockchain(String name) {return Blockchain.createBlockchain(name);}
 
 	/**
 	 * Adds block to blockchain by calling block class's static mine_block method.
 	 * This ensures block is valid in itself, and is attached to end of local chain,
 	 * ensuring chain is valid.
-	 * @param transactionData
+	 * @param txData
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 */
-	public Block add_block(String transactionData) throws NoSuchAlgorithmException {
-		Block new_block = Block.mine_block(this.chain.get(this.chain.size() - 1), transactionData);
+	public Block add_block(String txData) throws NoSuchAlgorithmException {
+		Block new_block = Block.mine_block(this.chain.get(this.chain.size() - 1), txData);
 		this.chain.add(new_block);
 		this.length_of_chain++;
 		this.date_last_modified = new Date().getTime();
@@ -244,7 +248,7 @@ public class Blockchain {
 	/**
 	 * Uses GSON library to serialize blockchain chain as json string.
 	 */
-	public String toJSONtheChain() {
+	public String serialize() {
 		return new Gson().toJson(chain);
 	}
 

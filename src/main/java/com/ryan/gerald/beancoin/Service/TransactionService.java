@@ -1,46 +1,30 @@
 package com.ryan.gerald.beancoin.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ryan.gerald.beancoin.entity.*;
-import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
-
+// TODO Separate out into two classes or subclasses - UnMinedTransactionService (For transactions to mine into block) and MinedTransactionServices (to scan blockchain/block to verify and query blockchain for transaction deets
 @Service
 public class TransactionService {
 
     @Autowired private TransactionRepository transactionRepository;
 
-    TransactionPoolMap pool;
-
-
-    public TransactionPoolMap getUnminedTransactionsPoolMap() {
-        List<Transaction> tl = new ArrayList<>(transactionRepository.getListOfTransactions());
-        return TransactionPoolMap.fillTransactionPool(tl);
-    }
-
-    public List<TransactionRepr> getTransactionReprList() {
-        List<TransactionRepr> trList = new ArrayList<>();
-        this.getTransactionList().forEach(t -> {
-            t.reinflateInputOutputMaps();
-            trList.add(new TransactionRepr(t));
-        });
-        return trList;
-    }
+//    public TransactionPoolMap getUnminedTransactionsAsMap() {
+//        List<Transaction> txList = new ArrayList<>(transactionRepository.getListOfTransactions());
+//        txList.forEach(t->t.reinflateInputOutputMaps());
+//        return TransactionPoolMap.fillTransactionPool(txList);
+//    }
 
     public List<Transaction> getTransactionList() {
         List<Transaction> lt = transactionRepository.getListOfTransactions();
-        lt.forEach(t -> t.reinflateInputOutputMaps());
+//        lt.forEach(t -> t.reinflateInputOutputMaps()); // is this needed, here or ever?
         return lt;
     }
 
-    /**
-     * Implement me
-     */
-    public List<Transaction> getNOldestTransactions(Integer n) {
+    // TODO make use of in future
+    public List<Transaction> get_n_oldest_unmined_transactions(Integer n) {
         // note need to get Tx from databse and then rebuild (unpack) input output attributes
         List<Transaction> lt = transactionRepository.getNOldestTransactions();
         lt.forEach(t -> t.reinflateInputOutputMaps());
@@ -52,7 +36,7 @@ public class TransactionService {
 
     }
 
-    public void deleteTransactionById(String id){
+    public void deleteTransactionById(String id) {
         System.out.println("TRANSACTIONREPOSITORY: " + transactionRepository);
         transactionRepository.deleteById(id);
     }
@@ -69,34 +53,26 @@ public class TransactionService {
      * just been processed- maybe only a subset of all
      *
      */
-    public void deletTransactionsInList(List<Transaction> list){
-        for (Transaction t: list){
-            transactionRepository.deleteById(t.getUuid());
-        }
+    public void deletTransactionsInList(List<Transaction> txList) {
+        txList.forEach(t-> transactionRepository.deleteById(t.getUuid()));
     }
 
-    public void clearProcessedTransactions(Blockchain blockchain, List<Transaction> listTransaction) {
-        TransactionPoolMap pool = new TransactionPoolMap(listTransaction);
-        List<TransactionRepr> trList;
+    // Naive solution- will use Merkle Technology later.
+    public long FindTransactionInChain(Blockchain blockchain, String txId) {
         int i = 0;
+        // traverse all blocks in our chain version, skipping genesis blocks (throws Gson error but TODO handle better)
         for (Block b : blockchain.getChain()) {
             i++;
-            if (i < 7) {
-                continue;
-            }
-            // skip first six blocks as they have dummy data. will cause gson type crash.
-            trList = b.deserializeTransactionData();
-            for (TransactionRepr t : trList) {
-                if (pool.getTransactionMap().containsKey(t.getId())) {
-                    try {
-                        System.out.println("Removing Transaction: " + t.getId());
-                        System.out.println("TRANSACTION SERVICE: ");
-                        transactionRepository.deleteById(t.getId());
-                    } catch (Exception e) {e.printStackTrace();}
-                }
-            }
+            if (i < 7) {continue;}
+            List<Transaction> txList = b.deserializeTransactionData();
+            if (transactionFoundInBlock(b, txId)) {return b.getTimestamp();}
         }
+        return 0;
     }
 
-
+    public boolean transactionFoundInBlock(Block b, String txId) {
+        List<Transaction> txList = b.deserializeTransactionData();
+        for (Transaction t : txList) {if (t.getUuid().equals(txId)) {return true;}}
+        return false;
+    }
 }

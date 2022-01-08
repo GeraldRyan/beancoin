@@ -2,19 +2,22 @@ package com.ryan.gerald.beancoin.entity;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.ryan.gerald.beancoin.exceptions.InvalidLastHashException;
 import com.ryan.gerald.beancoin.utils.CryptoHash;
-import com.ryan.gerald.beancoin.utils.TransactionRepr;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 @Entity
 public class Block {
 
-	@Id
-	Long timestamp;
+	@Id Long timestamp;
 	private String hash;
 	private String lastHash;
 	@Lob
@@ -42,7 +45,7 @@ public class Block {
 	/**
 	 * A block is a unit of storage for a blockchain that supports a cryptocurrency.
 	 */
-	public Block(long timestamp, String lastHash, String hash, String tx, int difficulty, int nonce) {
+	private Block(long timestamp, String lastHash, String hash, String tx, int difficulty, int nonce) {
 		super();
 		this.timestamp = timestamp;
 		this.lastHash = lastHash;
@@ -66,12 +69,12 @@ public class Block {
 	 * Mine a block based on given last block and tx until a block hash is found
 	 * that meets the leading 0's Proof of Work requirement.
 	 */
-	public static Block mine_block(Block last_block, String txPayload) throws NoSuchAlgorithmException {
+	public static Block mine_block(Block last_block, String txArrJson) throws NoSuchAlgorithmException {
 		long timestamp = new Date().getTime();
 		String last_hash = last_block.getHash();
 		int difficulty = Block.adjust_difficulty(last_block, timestamp);
 		int nonce = 0;
-		String hash = CryptoHash.getSHA256(timestamp, last_block.getHash(), txPayload, difficulty, nonce);
+		String hash = CryptoHash.getSHA256(timestamp, last_block.getHash(), txArrJson, difficulty, nonce);
 		String proof_of_work = CryptoHash.n_len_string('0', difficulty);
 		String binary_hash = CryptoHash.hex_to_binary(hash);
 		String binary_hash_work_end = binary_hash.substring(0, difficulty);
@@ -81,7 +84,7 @@ public class Block {
 			nonce += 1;
 			timestamp = new Date().getTime();
 			difficulty = Block.adjust_difficulty(last_block, timestamp);
-			hash = CryptoHash.getSHA256(timestamp, last_block.getHash(), txPayload, difficulty, nonce);
+			hash = CryptoHash.getSHA256(timestamp, last_block.getHash(), txArrJson, difficulty, nonce);
 			proof_of_work = CryptoHash.n_len_string('0', difficulty);
 			binary_hash = CryptoHash.hex_to_binary(hash);
 			binary_hash_work_end = binary_hash.substring(0, difficulty);
@@ -91,7 +94,7 @@ public class Block {
 		System.out.println("binary_Hash_work_end " + binary_hash_work_end);
 		System.out.println("binary hash " + binary_hash);
 		System.out.println("BLOCK MINED!");
-		return new Block(timestamp, last_hash, hash, txPayload, difficulty, nonce);
+		return new Block(timestamp, last_hash, hash, txArrJson, difficulty, nonce);
 	}
 
 	/**
@@ -173,29 +176,14 @@ public class Block {
 	 * escape characters for different types of object and list serialization.
 	 * Understand its role by how it is used in this app.
 	 */
-	public String webworthyJson(List<Transaction> tlist) {
+	public String webworthyJson(List<Transaction> txList) {
 		HashMap<String, Object> serializeThisBundle = new HashMap<String, Object>();
-		List<TransactionRepr> treprlist = new ArrayList();
-		for (Transaction t : tlist) {
-			treprlist.add(new TransactionRepr(t));
-		}
-		serializeThisBundle.put("timestamp", timestamp);
-		serializeThisBundle.put("hash", hash);
-		serializeThisBundle.put("lasthash", lastHash);
-		serializeThisBundle.put("difficulty", difficulty);
-		serializeThisBundle.put("nonce", nonce);
-		serializeThisBundle.put("tx", treprlist);
-		return new Gson().toJson(serializeThisBundle);
-	}
-
-	public String webworthyJson(List<TransactionRepr> tlist, String foo) {
-		HashMap<String, Object> serializeThisBundle = new HashMap<String, Object>();
-		serializeThisBundle.put("timestamp", timestamp);
-		serializeThisBundle.put("hash", hash);
-		serializeThisBundle.put("lasthash", lastHash);
-		serializeThisBundle.put("difficulty", difficulty);
-		serializeThisBundle.put("nonce", nonce);
-		serializeThisBundle.put("tx", tlist);
+		serializeThisBundle.put("timestamp", this.timestamp);
+		serializeThisBundle.put("hash", this.hash);
+		serializeThisBundle.put("lasthash", this.lastHash);
+		serializeThisBundle.put("difficulty", this.difficulty);
+		serializeThisBundle.put("nonce", this.nonce);
+		serializeThisBundle.put("tx", txList);
 		return new Gson().toJson(serializeThisBundle);
 	}
 
@@ -206,8 +194,8 @@ public class Block {
 		return new Gson().toJson(this);
 	}
 
-	public List<TransactionRepr> deserializeTransactionData() {
-		java.lang.reflect.Type t = new TypeToken<List<TransactionRepr>>() {
+	public List<Transaction> deserializeTransactionData() {
+		java.lang.reflect.Type t = new TypeToken<List<Transaction>>() {
 		}.getType();
 		return new Gson().fromJson(this.getData(), t);
 //		List<TransactionRepr> listTR = null;

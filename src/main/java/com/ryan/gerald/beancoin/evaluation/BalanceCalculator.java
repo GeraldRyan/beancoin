@@ -2,10 +2,11 @@ package com.ryan.gerald.beancoin.evaluation;
 
 import com.ryan.gerald.beancoin.entity.Block;
 import com.ryan.gerald.beancoin.entity.Blockchain;
-import com.ryan.gerald.beancoin.utils.TransactionRepr;
+import com.ryan.gerald.beancoin.entity.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BalanceCalculator {
     final static double STARTING_BALANCE = 0;
@@ -14,67 +15,58 @@ public class BalanceCalculator {
      * Will be best form solution according to this strategy (which may be naive and non-performative).
      * TODO implement and clean up helper methods
      */
-    public static double calculateWalletBalance(Blockchain bc, String adds, List<TransactionRepr> pendingTransactions){
+    public static double calculateWalletBalanceIncludeLocalPending(Blockchain bc, String adds, List<Transaction> pendingTransactions) {
         return calculateWalletBalanceByTraversingChain(bc, adds) + calculateNetBalanceInUnminedPool(adds, pendingTransactions);
     }
 
-
     /**
-     *
-     * TODO Naive solution and incorrect actually, and repetitive.
-     * Fix this.
-     * Dependency Injection is good- but the entire blockchain??? LOL
-     * Calculates balance of address based on blockchain history (only counts MINED BLOCKS)
-     * Two ways to find balance: calculate all transactions to and fro or trusting
-     * output values
+     * TODO Naive solution. Later use Merkel Technology.
+     * Dependency Injection is good- but pass entire blockchain???
      */
     public static double calculateWalletBalanceByTraversingChain(Blockchain bc, String adds) {
-        double balance = STARTING_BALANCE; // starting balance. static means not touching real wallet.
-        // loop through transactions - yes, every transaction of every block of the
-        // entire chain (minus the dummy data chains)
-        System.out.println("String address" + adds);
+        AtomicReference<Double> balance = new AtomicReference<>(STARTING_BALANCE);
+        System.out.println("Looking up balance for " + adds);
         if (bc == null) {
-            System.err.println("BLOCKCHAIN IS NULL");
-            System.err.println("String address" + adds);
-            return -1; // if -1 in caller function, leave balance same. Should this have been non
-            // static perhaps?
+            System.err.println("Error: Blockchain is null");
+            return -1;
         }
-
         int i = 0;
         for (Block b : bc.getChain()) {
             i++;
-            if (i < 7) {continue;} // dummy data blocks
-            // would for (i=0; i<7; i++) {continue;} work?
-            List<TransactionRepr> trListMinedBlocks = b.deserializeTransactionData();
-            for (TransactionRepr t : trListMinedBlocks) {
-                if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance
-                    // reset balance after each transaction
-                    balance = (double) t.getOutput().get(adds);
-                } else if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
-                    balance += (double) t.getOutput().get(adds);
+            if (i < 7) {continue;} // dummy data blocks, breaks deserialization otherwise
+            List<Transaction> txListOfBlock = b.deserializeTransactionData();
+            for (Transaction t : txListOfBlock) {
+                t.reinflateInputOutputMaps();
+                if (t.getInputMap().get("address").equals(adds)) { // wallet is sender -- deduct amt sent
+                    t.getOutputMap().keySet().forEach(k-> {
+                        if (!k.equals(adds)){
+                            balance.updateAndGet(v -> (double) (v - (double) t.getOutputMap().get(k)));}
+                    });
+                } else if (t.getOutputMap().containsKey(adds)) { // wallet is receiver. Add balance to.
+                    balance.updateAndGet(v -> (double) (v + (double) t.getOutputMap().get(adds)));
                 }
             }
         }
-        List<TransactionRepr> trListUnmined = new ArrayList();
-        for (TransactionRepr t : trListUnmined) {
-            if (t.getInput().get("address").equals(adds)) { // wallet is sender -- deduct balance
+        List<Transaction> txListUnmined = new ArrayList();
+        for (Transaction t : txListUnmined) {
+            if (t.getInputMap().get("address").equals(adds)) { // wallet is sender -- deduct balance
                 // reset balance after each transaction
-                balance = (double) t.getOutput().get(adds);
-            } else if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add balance to.
-                balance += (double) t.getOutput().get(adds);
+                balance.set((double) t.getOutputMap().get(adds));
+            } else if (t.getOutputMap().containsKey(adds)) { // wallet is receiver. Add balance to.
+                balance.updateAndGet(v -> (double) (v + (double) t.getOutputMap().get(adds)));
             }
         }
-        return balance;
+        return balance.get();
     }
 
     // TODO implement me!
-    public static double calculateNetBalanceInUnminedPool(String adds, List<TransactionRepr> pendingTransactions){
+    public static double calculateNetBalanceInUnminedPool(String adds, List<Transaction> pendingTransactions) {
         return 0;
     }
 
     // TODO wrap above function in this for cleaner code
     // TODO BE ABLE TO TRAVERSE FROM END OF BLOCK BACK UNTIL YOU HIT SOMETHING WTIH USERS ADDRESS. or something
-    public static double calculateWalletBalanceByTraversingChainIncludePending(Blockchain bc, String adds, List<TransactionRepr> pendingTransactions) {
+    public static double calculateWalletBalanceByTraversingChainIncludePending(Blockchain bc, String adds, List<Transaction> pendingTransactions) {
         System.out.println("CALCULATING WALLET BALANCE FOR ADDRESS: " + adds);
         double bal = STARTING_BALANCE;
         int i = 0;
@@ -83,18 +75,19 @@ public class BalanceCalculator {
             if (i < 7) {continue;} // dummy data blocks
             // would for (i=0; i<7; i++) {continue;} work?
             System.out.println("BLOCK DESERIALIZED " + b.toStringConsole());
-            List<TransactionRepr> trListMinedBlocks = b.deserializeTransactionData();
+            List<Transaction> txListMinedBlock = b.deserializeTransactionData();
             double currentPmt = 0;
-            for (TransactionRepr t : trListMinedBlocks) {
-                if (t.getInput().get("address").equals(adds)) {  // input is moving per transaction and it should not.
-                    System.out.println("INPUT BALANCE : " + t.getInput().get("amount"));
-                    currentPmt = (double) t.getInput().get("amount") - (double) t.getOutput().get(adds);
+            for (Transaction t : txListMinedBlock) {
+                t.reinflateInputOutputMaps();
+                if (t.getInputMap().get("address").equals(adds)) {  // input is moving per transaction and it should not.
+                    System.out.println("INPUT BALANCE : " + t.getInputMap().get("amount"));
+                    currentPmt = (double) t.getInputMap().get("amount") - (double) t.getOutputMap().get(adds);
                     System.out.println("Input Balance to deduct " + currentPmt);
                     bal -= currentPmt;
                 }
-                if (t.getOutput().containsKey(adds) && !t.getInput().get("address").equals(adds)) { // wallet is receiver. Add receipts.
-                    System.out.println("ADD: " + t.getOutput().get(adds) + "    to " + adds);
-                    bal += (double) t.getOutput().get(adds);
+                if (t.getOutputMap().containsKey(adds) && !t.getInputMap().get("address").equals(adds)) { // wallet is receiver. Add receipts.
+                    System.out.println("ADD: " + t.getOutputMap().get(adds) + "    to " + adds);
+                    bal += (double) t.getOutputMap().get(adds);
                 }
             }
         }
@@ -102,15 +95,16 @@ public class BalanceCalculator {
         // Process Pending Transactions
         double paying = 0;
         double receiving = 0;
-        for (TransactionRepr t : pendingTransactions) {
-            if (t.getInput().get("address").equals(adds)) {
-                paying = (double) t.getInput().get("amount") - (double) t.getOutput().get(adds);
-                System.out.println("T INPUT " + t.getInput().get("amount") + " and output " + t.getOutput().get(adds));
+        for (Transaction t : pendingTransactions) {
+            t.reinflateInputOutputMaps();
+            if (t.getInputMap().get("address").equals(adds)) {
+                paying = (double) t.getInputMap().get("amount") - (double) t.getOutputMap().get(adds);
+                System.out.println("T INPUT " + t.getInputMap().get("amount") + " and output " + t.getOutputMap().get(adds));
                 System.out.println("Paying " + paying + " by " + adds);
                 break;
             }
-            if (t.getOutput().containsKey(adds)) { // wallet is receiver. Add bal to.
-                receiving += (double) t.getOutput().get(adds);
+            if (t.getOutputMap().containsKey(adds)) { // wallet is receiver. Add bal to.
+                receiving += (double) t.getOutputMap().get(adds);
                 System.out.println("Receiving " + receiving + " by " + adds);
             }
         }

@@ -21,7 +21,7 @@ public class BlockchainDao extends DBConnection {
     public Blockchain newBlockchain(String name) {
         this.connect();
         try {
-            Blockchain new_blockchain = new Blockchain(name);
+            Blockchain new_blockchain = Blockchain.createBlockchain(name);
             em.getTransaction().begin();
             em.persist(new_blockchain);
             em.getTransaction().commit();

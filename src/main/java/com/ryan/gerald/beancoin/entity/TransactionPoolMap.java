@@ -4,19 +4,11 @@
 package com.ryan.gerald.beancoin.entity;
 
 import com.google.gson.Gson;
-import com.ryan.gerald.beancoin.Service.TransactionService;
-import com.ryan.gerald.beancoin.utils.TransactionRepr;
 
 import java.util.HashMap;
 import java.util.List;
 
-/**
- *
- *  Glorified map wrapper utility class for TransactionService
- * @author Gerald Ryan
- *
- */
-
+// TODO is this class necessary? Isn't List<Transaction> enough, that we don't need to make HashMap<String, Object> where String = t.getUuid()?
 public class TransactionPoolMap {
 
     HashMap<String, Object> transactionMap = new HashMap<String, Object>();
@@ -98,58 +90,8 @@ public class TransactionPoolMap {
         return sb.toString().replace("\\\\", "");
     }
 
-    /**
-     * Main data payload of this class- the transaction map contains a HashMap of
-     * all the transactions in this pool
-     *
-     * @return
-     */
     public HashMap<String, Object> getTransactionMap() {
         return transactionMap;
     }
 
-//	public void consoleLogAll() {
-//		System.err.println("Transactions in Transaction Pool");
-//		for (String id : this.getTransactionMap().keySet()) {
-//			System.out.println("key: " + id + " value: " + this.getTransactionMap().get(id));
-//		}
-//	}
-
-
-    /***
-     * Telescoping wrapper class - for some reason TransactionService above was not autowiring
-     * @param blockchain
-     */
-//    public void clearProcessedTransactions(Blockchain blockchain){
-////        TransactionService ts = new TransactionService();
-//        clearProcessedTransactions(blockchain, this.transactionService);
-//    }
-
-
-    /**
-     * After successful day in the mines, delete what you have in your pool
-     *
-     * @param blockchain
-     */
-    public void clearProcessedTransactions(Blockchain blockchain, TransactionService transactionService) {
-        List<TransactionRepr> trList;
-        int i = 0;
-        for (Block b : blockchain.getChain()) {
-            i++;
-            if (i < 7) {
-                continue;
-            }
-            // skip first six blocks as they have dummy data. will cause gson type crash.
-            trList = b.deserializeTransactionData();
-            for (TransactionRepr t : trList) {
-                if (this.getTransactionMap().containsKey(t.getId())) {
-                    try {
-                        System.out.println("Removing Transaction: " + t.getId());
-                        System.out.println("TRANSACTION SERVICE: " + transactionService);
-//                        transactionService.deleteById(t.getId());
-                    } catch (Exception e) {e.printStackTrace();}
-                }
-            }
-        }
-    }
 }

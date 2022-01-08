@@ -3,10 +3,11 @@ package com.ryan.gerald.beancoin.controller;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.WalletService;
-import com.ryan.gerald.beancoin.entity.*;
+import com.ryan.gerald.beancoin.entity.Blockchain;
+import com.ryan.gerald.beancoin.entity.Transaction;
+import com.ryan.gerald.beancoin.entity.Wallet;
 import com.ryan.gerald.beancoin.evaluation.BalanceCalculator;
 import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
-import com.ryan.gerald.beancoin.utils.TransactionRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,7 +43,7 @@ public class WalletController {
             e.printStackTrace();
             return "redirect:/";
         }
-        List<TransactionRepr> listTransactionsPending = transactionService.getTransactionReprList();
+        List<Transaction> listTransactionsPending = transactionService.getTransactionList();
 
         Blockchain blockchain = blockchainService.getBlockchainByName("beancoin");
         double balance = BalanceCalculator.calculateWalletBalanceByTraversingChainIncludePending(blockchain, w.getAddress(),
@@ -60,7 +61,7 @@ public class WalletController {
     public String transact(Model model)  {
         Wallet w = walletService.getWalletByUsername((String) model.getAttribute("username"));
         w.setBalance(BalanceCalculator.calculateWalletBalanceByTraversingChainIncludePending(blockchainService.getBlockchainByName(
-                "beancoin"), w.getAddress(), transactionService.getTransactionReprList()));
+                "beancoin"), w.getAddress(), transactionService.getTransactionList()));
         w.setBalanceAsMined(BalanceCalculator.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress()));
         model.addAttribute("wallet", w);

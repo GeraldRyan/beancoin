@@ -31,7 +31,7 @@ public class BlockchainService {
     }
 
     public Blockchain CreateNewBlockchain (String name) throws NoSuchAlgorithmException {
-        Blockchain bc = new Blockchain(name);
+        Blockchain bc = Blockchain.createBlockchain(name);
         initializer.loadBC(bc);
         blockchainRepository.save(bc);
         return bc;

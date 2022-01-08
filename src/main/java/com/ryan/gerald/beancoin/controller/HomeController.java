@@ -20,14 +20,13 @@ import java.util.Optional;
 
 
 @Controller
-@SessionAttributes({"blockchain", "wallet", "username", "isloggedin", "user", "msg", "transactionpool", "pubsubapp"})
+@SessionAttributes({"username", "isloggedin", "user", "wallet"})
 public class HomeController {
 
     @Autowired private BlockchainService blockchainService;
     @Autowired private TransactionService transactionService;
     @Autowired private UserService userService;
     @Autowired private WalletService walletService;
-
     @Autowired Initializer initializer;
     @Autowired private Environment env; // Not using I believe but keep for example
 
@@ -43,13 +42,8 @@ public class HomeController {
         return blockchainService.loadOrCreateBlockchain("beancoin");
     }
 
-    @ModelAttribute("transactionpool")
-    public TransactionPoolMap initTransactionPool() {
-        return transactionService.getUnminedTransactionsPoolMap();
-    }
-
     @GetMapping("/")
-    public String showIndex(Model model) {return "index";}
+    public String showHomePage(Model model) {return "index";}
 
     @GetMapping("/login")
     public String showLoginPage(Model model, @ModelAttribute("login") Login login) {
@@ -82,7 +76,7 @@ public class HomeController {
         model.addAttribute("wallet", null);
         model.addAttribute("username", null);
         model.addAttribute("user", null);
-        HttpSession httpSession = request.getSession();
+        HttpSession httpSession = request.getSession();  // what does this line do?
         return "redirect:/";
     }
 
