@@ -12,26 +12,21 @@ import java.util.Base64;
 
 /**
  * TODO Completely fix and clean up and nuke these. MOST LIKELY GARBAGE.
- * To verify incoming Transactionm from the blockchain
+ * Verify Incoming Blocks and Transactions from the blockchain
  */
-public class TransactionValidator {
-    double STARTING_BALANCE = 0;
-    String PROVIDER = "SunEC";
-    String SIGNATURE_ALGORITHM = "SHA256withECDSA";
-    String KEYPAIR_GEN_ALGORITHM = "EC";
-    String PARAMETER_SPEC = "secp256k1";
+public class TransactionVerifier {
 
     /**
      * Validate a transaction. For invalid transactions, raises
      * InvalidTransactionException
      */
-    public boolean is_valid_transaction(Transaction transaction) throws InvalidTransactionException,
+    public boolean isTransactionValid(Transaction transaction) throws InvalidTransactionException,
             InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException {
         String signatureString = (String) transaction.getInputMap().get("signatureB64");
         String publicKeyString = (String) transaction.getInputMap().get("publicKeyB64");
         byte[] signatureByte = Base64.getDecoder().decode(signatureString);
         byte[] publicKeyByte = Base64.getDecoder().decode(publicKeyString);
-        PublicKey reconstructedPK = Wallet.restorePublicKey(publicKeyByte);
+        PublicKey reconstructedPK = new KeyUtils().getPublicKeyObj(publicKeyByte);
 //		PublicKey restoredPK = Wallet.restorePK((String) transaction.getInput().get("publicKeyB64"));
 //		PublicKey originalPK = (PublicKey) transaction.input.get("publicKey");
         double sumOfTransactions = transaction.getOutputMap().values().stream().mapToDouble(v -> (double) v).sum();
@@ -64,7 +59,7 @@ public class TransactionValidator {
         String publicKeyString = (String) transaction.getInputMap().get("publicKeyB64");
         byte[] signatureByte = Base64.getDecoder().decode(signatureString);
         byte[] publicKeyByte = Base64.getDecoder().decode(publicKeyString);
-        PublicKey reconstructedPK = Wallet.restorePublicKey(publicKeyByte);
+        PublicKey reconstructedPK = new KeyUtils().getPublicKeyObj(publicKeyByte);
 
         System.out.println("signature string: " + signatureString);
         System.out.println("PKSTring string: " + publicKeyString);

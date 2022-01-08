@@ -19,7 +19,7 @@ public class Block {
 	private String lastHash;
 	@Lob
 	@Column(columnDefinition = "LONGTEXT")
-	String data;  // could be a List<Transactions> @OneToMany. Something to think about
+	String data;
 	int difficulty;
 	int nonce;
 	static final long MILLISECONDS = 1;

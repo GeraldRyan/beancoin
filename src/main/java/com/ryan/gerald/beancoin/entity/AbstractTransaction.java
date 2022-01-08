@@ -1,6 +1,7 @@
 package com.ryan.gerald.beancoin.entity;
 
 import com.google.gson.Gson;
+import com.ryan.gerald.beancoin.evaluation.KeyUtils;
 import com.ryan.gerald.beancoin.exceptions.InvalidTransactionException;
 import com.ryan.gerald.beancoin.utils.StringUtils;
 
@@ -69,13 +70,13 @@ public class AbstractTransaction {
      * @throws IOException
      * @throws InvalidKeySpecException
      */
-    public static boolean is_valid_transaction(Transaction transaction) throws InvalidTransactionException,
+    public static boolean validateTransaction(Transaction transaction) throws InvalidTransactionException,
             InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException {
         String signatureString = (String) transaction.getInputMap().get("signatureB64");
         String publicKeyString = (String) transaction.getInputMap().get("publicKeyB64");
         byte[] signatureByte = Base64.getDecoder().decode(signatureString);
         byte[] publicKeyByte = Base64.getDecoder().decode(publicKeyString);
-        PublicKey reconstructedPK = Wallet.restorePublicKey(publicKeyByte);
+        PublicKey reconstructedPK = new KeyUtils().getPublicKeyObj(publicKeyByte);
 //		PublicKey restoredPK = Wallet.restorePK((String) transaction.getInput().get("publicKeyB64"));
 //		PublicKey originalPK = (PublicKey) transaction.input.get("publicKey");
         double sumOfTransactions = transaction.getOutputMap().values().stream().mapToDouble(v -> (double) v).sum();
@@ -108,7 +109,7 @@ public class AbstractTransaction {
         String publicKeyString = (String) transaction.getInputMap().get("publicKeyB64");
         byte[] signatureByte = Base64.getDecoder().decode(signatureString);
         byte[] publicKeyByte = Base64.getDecoder().decode(publicKeyString);
-        PublicKey reconstructedPK = Wallet.restorePublicKey(publicKeyByte);
+        PublicKey reconstructedPK = new KeyUtils().getPublicKeyObj(publicKeyByte);
 
         System.out.println("signature string: " + signatureString);
         System.out.println("PKSTring string: " + publicKeyString);

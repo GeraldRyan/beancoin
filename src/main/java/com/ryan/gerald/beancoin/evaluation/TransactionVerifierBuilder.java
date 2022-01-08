@@ -1,4 +1,4 @@
 package com.ryan.gerald.beancoin.evaluation;
 
-public class TransactionValidatorBuilder {
+public class TransactionVerifierBuilder {
 }

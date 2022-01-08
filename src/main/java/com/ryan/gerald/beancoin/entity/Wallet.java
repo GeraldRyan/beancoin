@@ -107,7 +107,6 @@ public class Wallet {
         return Base64.getEncoder().encodeToString(signatureBytes);
     }
 
-
     /**
      * Verifies signature of given data given publicKey and algorithm/provider info
      */
@@ -118,26 +117,6 @@ public class Wallet {
         signature.update(data);
         byte[] sigbytes = Base64.getDecoder().decode(signatureToCheck);
         return signature.verify(sigbytes);
-    }
-
-    /**
-     * Restores a public key object in your chosen language from either a Base64
-     * String or a byte[] as received over the wire (contains X.509 standard)
-     * TODO consider new class for this
-     */
-    public static PublicKey restorePublicKey(byte[] key)
-            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        KeyFactory keyFactory = KeyFactory.getInstance(KEYPAIR_GEN_ALGORITHM, PROVIDER);
-//		KeySpec ks = new X509EncodedKeySpec(pk, "EC");
-        KeySpec ks = new X509EncodedKeySpec(key);
-        PublicKey pkRestored = keyFactory.generatePublic(ks);
-        return pkRestored;
-    }
-
-    // I think I'll use later when I get strings over the wire
-    public static PublicKey restorePublicKey(String key)
-            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        return restorePublicKey(key.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
