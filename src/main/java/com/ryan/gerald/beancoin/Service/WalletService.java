@@ -33,8 +33,8 @@ public class WalletService {
         return this.updateBalance(w);
     }
 
-    public Wallet saveWallet(Wallet wallet) {
-        return walletRepository.save(wallet);
+    public Wallet saveWallet(Wallet w) {
+        return walletRepository.save(w);
     }
 
     public Wallet newWallet(String username) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {

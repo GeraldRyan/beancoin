@@ -21,12 +21,12 @@ import java.util.UUID;
 @Entity
 public class Wallet {
 
-    private @Id String ownerId; // ==> User.username
-    private @Lob PrivateKey privatekey;  // keep for now- but maybe even immediately can just store as string base 64
-    private @Lob PublicKey publickey;
-    private double balance;
-    private String address;
-    private double balanceAsMined;
+    public @Id String ownerId; // ==> User.username
+    public @Lob PrivateKey privatekey;  // keep for now- but maybe even immediately can just store as string base 64
+    public @Lob PublicKey publickey;
+    public double balance;
+    public String address;
+    public double balanceAsMined;
     final static double STARTING_BALANCE = 0;
     final static String PROVIDER = "SunEC";
     final static String SIGNATURE_ALGORITHM = "SHA256withECDSA";
