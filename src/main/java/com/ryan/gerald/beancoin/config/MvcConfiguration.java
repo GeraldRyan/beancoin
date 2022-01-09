@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.mvcconfig;
+package com.ryan.gerald.beancoin.config;
 
 /**
  * I BELEIVE THIS IS NOT BEING USED!

@@ -14,9 +14,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import com.ryan.gerald.beancoin.entity.Block;
-import com.ryan.gerald.beancoin.exceptions.BlocksInChainInvalidException;
-import com.ryan.gerald.beancoin.exceptions.ChainTooShortException;
-import com.ryan.gerald.beancoin.exceptions.GenesisBlockInvalidException;
+import com.ryan.gerald.beancoin.exception.BlocksInChainInvalidException;
+import com.ryan.gerald.beancoin.exception.ChainTooShortException;
+import com.ryan.gerald.beancoin.exception.GenesisBlockInvalidException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

@@ -1,5 +1,6 @@
-package com.ryan.gerald.beancoin.entity;
+package com.ryan.gerald.beancoin.repository;
 
+import com.ryan.gerald.beancoin.entity.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

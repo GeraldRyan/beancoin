@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.exceptions;
+package com.ryan.gerald.beancoin.exception;
 
 public class BlocksInChainInvalidException extends Exception {
 	public BlocksInChainInvalidException(String errorMessage) {

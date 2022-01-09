@@ -1,6 +1,7 @@
 package com.ryan.gerald.beancoin.Service;
 
 import com.ryan.gerald.beancoin.entity.*;
+import com.ryan.gerald.beancoin.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -19,7 +20,7 @@ public class TransactionService {
 
     public List<Transaction> getUnminedTransactionList() {
         List<Transaction> lt = transactionRepository.getUnminedTransactionList();
-//        lt.forEach(t -> t.reinflateInputOutputMaps()); // is this needed, here or ever?
+        lt.forEach(t -> t.reinflateInputOutputMaps()); // needed for template!!
         return lt;
     }
 

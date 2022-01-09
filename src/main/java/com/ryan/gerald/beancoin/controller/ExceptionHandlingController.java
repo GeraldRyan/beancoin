@@ -1,17 +1,8 @@
 package com.ryan.gerald.beancoin.controller;
 
-import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+import com.ryan.gerald.beancoin.exception.UsernameNotLoaded;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import java.sql.SQLException;
 
 @ControllerAdvice
 public class ExceptionHandlingController {

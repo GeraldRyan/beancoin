@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.Dao;
+package com.ryan.gerald.beancoin.dao;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -7,12 +7,11 @@ import java.util.List;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import com.ryan.gerald.beancoin.dbConnection.DBConnection;
 import com.ryan.gerald.beancoin.entity.Block;
 import com.ryan.gerald.beancoin.entity.Blockchain;
-import com.ryan.gerald.beancoin.exceptions.BlocksInChainInvalidException;
-import com.ryan.gerald.beancoin.exceptions.ChainTooShortException;
-import com.ryan.gerald.beancoin.exceptions.GenesisBlockInvalidException;
+import com.ryan.gerald.beancoin.exception.BlocksInChainInvalidException;
+import com.ryan.gerald.beancoin.exception.ChainTooShortException;
+import com.ryan.gerald.beancoin.exception.GenesisBlockInvalidException;
 
 @Deprecated
 public class BlockchainDao extends DBConnection {

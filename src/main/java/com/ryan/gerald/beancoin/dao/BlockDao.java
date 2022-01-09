@@ -1,8 +1,7 @@
-package com.ryan.gerald.beancoin.Dao;
+package com.ryan.gerald.beancoin.dao;
 
 import java.util.List;
 
-import com.ryan.gerald.beancoin.dbConnection.DBConnection;
 import com.ryan.gerald.beancoin.entity.Block;
 
 @Deprecated

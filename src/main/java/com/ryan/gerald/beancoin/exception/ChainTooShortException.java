@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.exceptions;
+package com.ryan.gerald.beancoin.exception;
 
 public class ChainTooShortException extends Exception {
 	public ChainTooShortException(String errorMessage) {

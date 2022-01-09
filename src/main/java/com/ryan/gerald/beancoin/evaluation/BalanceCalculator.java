@@ -3,7 +3,7 @@ package com.ryan.gerald.beancoin.evaluation;
 import com.ryan.gerald.beancoin.entity.Block;
 import com.ryan.gerald.beancoin.entity.Blockchain;
 import com.ryan.gerald.beancoin.entity.Transaction;
-import com.ryan.gerald.beancoin.entity.TransactionRepository;
+import com.ryan.gerald.beancoin.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +19,11 @@ public class BalanceCalculator {
     /**
      * Will be best form solution according to this strategy (which may be naive and non-performative).
      */
-    public double calculateBalanceFromChainAndLocalUnminedTxPool(Blockchain bc, String adds, List<Transaction> pendingTransactions) {
+    public double calculateBalanceFromChainAndLocalTxPool(Blockchain bc, String adds, List<Transaction> pendingTransactions) {
         return calculateWalletBalanceByTraversingChain(bc, adds) + this.getBalanceChangeInUnminedTxList(adds, pendingTransactions);
     }
 
-    public double calculateBalanceFromChainAndLocalUnminedTxPool(Blockchain bc, String adds) {
+    public double calculateBalanceFromChainAndLocalTxPool(Blockchain bc, String adds) {
         return calculateWalletBalanceByTraversingChain(bc, adds) + this.getBalanceChangeInUnminedTxList(adds);
     }
 

@@ -5,7 +5,7 @@ import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.UserService;
 import com.ryan.gerald.beancoin.Service.WalletService;
 import com.ryan.gerald.beancoin.entity.*;
-import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
+import com.ryan.gerald.beancoin.exception.TransactionAmountExceedsBalance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,7 +33,6 @@ public class RegistrationController {
     public ModelAndView showRegisterPage(Model model) {
         if ((boolean) model.getAttribute("isloggedin")) {
             ModelAndView modelAndView = new ModelAndView("redirect:/");
-//            modelAndView.addObject("modelAttribute" , new ModelAttribute());
             return modelAndView;
         }
         ModelAndView mv = new ModelAndView("registration/register");

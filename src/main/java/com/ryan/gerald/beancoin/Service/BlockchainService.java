@@ -2,7 +2,7 @@ package com.ryan.gerald.beancoin.Service;
 
 import com.ryan.gerald.beancoin.entity.Block;
 import com.ryan.gerald.beancoin.entity.Blockchain;
-import com.ryan.gerald.beancoin.entity.BlockchainRepository;
+import com.ryan.gerald.beancoin.repository.BlockchainRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

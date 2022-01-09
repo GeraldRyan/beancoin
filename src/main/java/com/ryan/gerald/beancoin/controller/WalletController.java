@@ -7,7 +7,7 @@ import com.ryan.gerald.beancoin.entity.Blockchain;
 import com.ryan.gerald.beancoin.entity.Transaction;
 import com.ryan.gerald.beancoin.entity.Wallet;
 import com.ryan.gerald.beancoin.evaluation.BalanceCalculator;
-import com.ryan.gerald.beancoin.exceptions.UsernameNotLoaded;
+import com.ryan.gerald.beancoin.exception.UsernameNotLoaded;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,41 +26,18 @@ public class WalletController {
 
     public WalletController() throws InterruptedException {}
 
-    @ModelAttribute("wallet")
-    public Wallet initWalletIfNotPresent(Model m) throws UsernameNotLoaded {
-        try {
-            return walletService.getWalletByUsername(String.valueOf(m.getAttribute("username")));
-        } catch (Exception e) {
-            throw new UsernameNotLoaded("USER NAME IS NOT LOADED");
-        }
-    }
-
     @GetMapping("")
     public String displayWallet(Model model) {
-        Wallet w;
-        try {
-            w = walletService.getWalletByUsername(String.valueOf(model.getAttribute("username")));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "redirect:/";
-        }
-        List<Transaction> listTransactionsPending = transactionService.getUnminedTransactionList();
-        Blockchain blockchain = blockchainService.getBlockchainByName("beancoin");
-        double balance = balanceCalculator.calculateBalanceFromChainAndLocalUnminedTxPool(blockchain, w.getAddress(),
-                listTransactionsPending);
-
-        w.setBalance(balance);  // TODO probably wrong place for this logic
-        w.setBalanceAsMined(balanceCalculator.calculateWalletBalanceByTraversingChain(blockchain, w.getAddress()));
-        walletService.saveWallet(w);
+        Wallet w = walletService.getWalletByUsername(String.valueOf(model.getAttribute("username")));
+        if (w == null) {return "redirect:/";}
         model.addAttribute("wallet", w);
-//			return "redirect:/";
         return "wallet/wallet";
     }
 
     @GetMapping("/transact")
     public String transact(Model model) {
         Wallet w = walletService.getWalletByUsername((String) model.getAttribute("username"));
-        w.setBalance(balanceCalculator.calculateBalanceFromChainAndLocalUnminedTxPool(blockchainService.getBlockchainByName(
+        w.setBalance(balanceCalculator.calculateBalanceFromChainAndLocalTxPool(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress(), transactionService.getUnminedTransactionList()));
         w.setBalanceAsMined(balanceCalculator.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
                 "beancoin"), w.getAddress()));

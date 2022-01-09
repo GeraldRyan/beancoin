@@ -75,6 +75,7 @@ public class HomeController {
         model.addAttribute("username", null);
         model.addAttribute("user", null);
         HttpSession httpSession = request.getSession();  // what does this line do?
+        httpSession.invalidate();
         return "redirect:/";
     }
 

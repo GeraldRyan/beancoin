@@ -3,15 +3,14 @@ package com.ryan.gerald.beancoin.entity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ryan.gerald.beancoin.evaluation.SerializableChain;
-import com.ryan.gerald.beancoin.exceptions.BlocksInChainInvalidException;
-import com.ryan.gerald.beancoin.exceptions.ChainTooShortException;
-import com.ryan.gerald.beancoin.exceptions.GenesisBlockInvalidException;
+import com.ryan.gerald.beancoin.exception.BlocksInChainInvalidException;
+import com.ryan.gerald.beancoin.exception.ChainTooShortException;
+import com.ryan.gerald.beancoin.exception.GenesisBlockInvalidException;
 
 import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Entity
@@ -24,7 +23,10 @@ public class Blockchain {
     @OneToMany(targetEntity = Block.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinTable(name = "blockchain_blocks")
     List<Block> chain;
-    LinkedHashMap<String, Block> hashchain;
+
+    // TODO Probably need MongoDB or NoSQL for HashMap and O(1)
+//    @OneToMany(targetEntity = Block.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.EAGER)
+//    LinkedHashMap<String, Block> hashchain;
 
     public Blockchain() {}
 
@@ -32,7 +34,13 @@ public class Blockchain {
         this.name = name;
         this.date_created = new Date().getTime();
         this.chain = new ArrayList<Block>();
-        this.chain.add(Block.genesis_block());
+        Block b = Block.genesis_block();
+        this.chain.add(b);
+
+//        Does not work in JPA because not a Collection; Great that I'm starting to get a reason
+//        this.hashchain = new LinkedHashMap<String, Block>();//
+//        this.hashchain.put(b.getHash(), b);
+
         this.length_of_chain = 1;
     }
 
@@ -51,6 +59,7 @@ public class Blockchain {
     public Block add_block(String txData) throws NoSuchAlgorithmException {
         Block new_block = Block.mine_block(this.chain.get(this.chain.size() - 1), txData);
         this.chain.add(new_block);
+//        this.hashchain.put(new_block.getHash(), new_block); // does not work in JPA because not a collection
         this.length_of_chain++;
         this.date_last_modified = new Date().getTime();
         return new_block;

@@ -1,11 +1,8 @@
-package com.ryan.gerald.beancoin.Dao;
+package com.ryan.gerald.beancoin.dao;
 
 import java.util.NoSuchElementException;
 
-import com.ryan.gerald.beancoin.dbConnection.DBConnection;
 import com.ryan.gerald.beancoin.entity.User;
-import com.ryan.gerald.beancoin.entity.Wallet;
-import com.ryan.gerald.beancoin.entity.WalletForDB;
 
 @Deprecated
 public class UserDao extends DBConnection {
@@ -47,18 +44,6 @@ public class UserDao extends DBConnection {
 		em.remove(u); // how the heck does this work???
 		this.disconnect();
 		return u;
-	}
-
-	
-	public Wallet addWallet(String username, Wallet wallet) {
-		WalletForDB w = new WalletForDB(wallet);
-		this.connect();
-		User u = em.find(User.class, username);
-		em.getTransaction().begin();
-		em.persist(wallet);
-		em.getTransaction().commit();
-		this.disconnect();
-		return wallet;
 	}
 
 	

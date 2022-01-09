@@ -4,12 +4,9 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
-import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
+import com.ryan.gerald.beancoin.exception.TransactionAmountExceedsBalance;
 import com.ryan.gerald.beancoin.utils.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -18,6 +15,7 @@ import com.google.gson.reflect.TypeToken;
  * Document an exchange of currency from a sender to one or more recipients
  */
 @Entity
+@Table(name="unmined_transactions")
 public class Transaction extends AbstractTransaction implements TransactionInterface {
     @Id String uuid;
     String recipientAddress;

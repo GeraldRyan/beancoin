@@ -1,6 +1,5 @@
 package com.ryan.gerald.beancoin.controller;
 
-
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.WalletService;
@@ -34,7 +33,4 @@ public class TransactionController {
         }
         return pool.getMinableTransactionDataString();
     }
-
-
-
 }

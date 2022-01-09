@@ -1,15 +1,10 @@
 package com.ryan.gerald.beancoin.Service;
 
-import com.ryan.gerald.beancoin.Dao.UserDao;
 import com.ryan.gerald.beancoin.entity.User;
-import com.ryan.gerald.beancoin.entity.UserRepository;
-import com.ryan.gerald.beancoin.entity.Wallet;
+import com.ryan.gerald.beancoin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.Optional;
 
 @Service

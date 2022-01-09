@@ -2,7 +2,7 @@ package com.ryan.gerald.beancoin.evaluation;
 
 import com.ryan.gerald.beancoin.entity.Transaction;
 import com.ryan.gerald.beancoin.entity.Wallet;
-import com.ryan.gerald.beancoin.exceptions.InvalidTransactionException;
+import com.ryan.gerald.beancoin.exception.InvalidTransactionException;
 import com.ryan.gerald.beancoin.utils.StringUtils;
 
 import java.io.IOException;

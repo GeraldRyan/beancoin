@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.dbConnection;
+package com.ryan.gerald.beancoin.dao;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -64,7 +64,7 @@ public class BlockchainController {
 //        if (Config.BROADCASTING) { // TODO CHANGE TO KAFKA
 ////            new PubNubApp().broadcastBlock(new_block);
 //        }
-        return new_block.serialize(txList); // later manage max size of block
+        return new SerializableChain(blockchain).new SeralizableBlock(new_block).serialize();
     }
 
     // TODO Make get Block by Hash instead of number in list
