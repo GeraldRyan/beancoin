@@ -46,6 +46,7 @@ public class WalletService {
     // Need to use security here. Good practice to check and apply security policy
     public Wallet adminWallet(String userId, double balance) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         Wallet w = Wallet.createWallet("admin", 1000000); // I know params not passed. keep for now
+        w.setAddress("7777777");
         return walletRepository.save(w);
     }
 

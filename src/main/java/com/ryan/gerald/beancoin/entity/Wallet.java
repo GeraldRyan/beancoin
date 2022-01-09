@@ -112,6 +112,8 @@ public class Wallet {
     public double getBalance() {return balance;}
     public void setBalance(double balance) {this.balance = balance;}
     public String getAddress() {return address;}
+
+    public void setAddress(String address) {this.address = address;}
     public PublicKey getPublickey() {return publickey;}
     public PrivateKey getPrivatekey() {return privatekey;}
     public double getBalanceAsMined() {return balanceAsMined;}

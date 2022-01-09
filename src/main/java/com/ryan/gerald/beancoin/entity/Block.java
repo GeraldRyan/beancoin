@@ -6,10 +6,7 @@ import com.ryan.gerald.beancoin.utils.CryptoHash;
 
 import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Entity
 public class Block {
@@ -36,9 +33,12 @@ public class Block {
         GENESIS_DATA.put("last_hash", "genesis_last_hash");
         GENESIS_DATA.put("timestamp", (long) 1);
         GENESIS_DATA.put("height", 0);
-//        Transaction t = Transaction.createAdminTransaction(); // TODO initailize admin
-//        GENESIS_DATA.put("tx", t.serialize());
-        GENESIS_DATA.put("tx", "[{}]");
+        Transaction t = Transaction.createAdminTransaction();
+        List<Transaction> tl = new ArrayList<>();
+        tl.add(t);
+        GENESIS_DATA.put("tx", new Gson().toJson(tl));
+//        GENESIS_DATA.put("tx", "[{\"output\": \"{\"7777777\" : 1000000}\" }]");
+//        GENESIS_DATA.put("tx", "[{\\\"output\\\": {\\\"7777777\\\": 1000000}}]");
         GENESIS_DATA.put("difficulty", 7);
         GENESIS_DATA.put("nonce", 1);
     }

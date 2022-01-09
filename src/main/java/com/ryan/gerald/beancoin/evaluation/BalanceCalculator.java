@@ -54,7 +54,7 @@ public class BalanceCalculator {
     public double getBalanceChangeInTx(Transaction t, String adds) {
         AtomicReference<Double> change = new AtomicReference<>((double) 0);
         t.reinflateInputOutputMaps();
-        if (t.getInputMap().get("address").equals(adds)) { // wallet is sender -- deduct amt sent
+        if (t.getInputMap() != null && t.getInputMap().get("address").equals(adds)) { // wallet is sender -- deduct amt sent
             t.getOutputMap().keySet().forEach(k -> {
                 if (!k.equals(adds)) {change.updateAndGet(v -> (double) (v - (double) t.getOutputMap().get(k)));}
             });

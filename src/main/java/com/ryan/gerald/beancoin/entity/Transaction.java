@@ -15,18 +15,24 @@ import com.google.gson.reflect.TypeToken;
  * Document an exchange of currency from a sender to one or more recipients
  */
 @Entity
-@Table(name="unmined_transactions")
+@Table(name = "unmined_transactions")
 public class Transaction extends AbstractTransaction implements TransactionInterface {
-    @Id String uuid;
+    @Id
+    String uuid;
     String recipientAddress;
     String senderAddress;
     double amount;
-    @Column(columnDefinition = "varchar(2000) default 'Jon Snow'") String output;
-    @Column(columnDefinition = "varchar(2000) default 'Jon Snow'") String input;
-    @Transient HashMap<String, Object> outputMap;
-    @Transient HashMap<String, Object> inputMap;
+    @Column(columnDefinition = "varchar(2000) default 'Jon Snow'")
+    String output;
+    @Column(columnDefinition = "varchar(2000) default 'Jon Snow'")
+    String input;
+    @Transient
+    HashMap<String, Object> outputMap;
+    @Transient
+    HashMap<String, Object> inputMap;
 
-    public Transaction() {}
+    public Transaction() {
+    }
 
     private Transaction(String toAddress, double toAmount, String fromAddress, String outputJson, String inputJson) {
         this.uuid = StringUtils.getUUID8();
@@ -35,6 +41,16 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         this.senderAddress = fromAddress;
         this.output = outputJson;
         this.input = inputJson;
+        reinflateInputOutputMaps();
+    }
+
+    private Transaction(String outputJson) {
+        this.uuid = StringUtils.getUUID8();
+        this.recipientAddress = null;
+        this.amount = 0;
+        this.senderAddress = null;
+        this.output = outputJson;
+        this.input = null;
         reinflateInputOutputMaps();
     }
 
@@ -50,10 +66,11 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         return new Transaction(toAddress, toAmount, fromAddress, outputJson, inputJson);
     }
 
-    public static Transaction createAdminTransaction(){
+    public static Transaction createAdminTransaction() {
         HashMap<String, Object> om = Transaction.createOutputMap("88888888", "7777777", 10000000, 1000000);
+        om.remove("88888888");
         String output = new Gson().toJson(om);
-        return new Transaction("7777777", 1000000, "88888888", output, "");
+        return new Transaction(output);
     }
 
     /**
@@ -157,7 +174,9 @@ public class Transaction extends AbstractTransaction implements TransactionInter
      * Use this jsonifying method to get the final form for mining of transaction.
      */
     public String serialize() {
-        if (this.getInputMap() == null) {this.reinflateInputOutputMaps();}
+        if (this.getInputMap() == null) {
+            this.reinflateInputOutputMaps();
+        }
         HashMap<String, Object> serializableMap = new HashMap<String, Object>();
         serializableMap.put("input", this.inputMap);
         serializableMap.put("output", this.outputMap);
@@ -225,35 +244,67 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         return true;
     }
 
-    public void setUuid(String uuid) {this.uuid = uuid;}
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
-    public void setRecipientAddress(String recipientAddress) {this.recipientAddress = recipientAddress;}
+    public void setRecipientAddress(String recipientAddress) {
+        this.recipientAddress = recipientAddress;
+    }
 
-    public void setAmount(double amount) {this.amount = amount;}
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
 
-    public void setOutputMap(HashMap<String, Object> outputMap) {this.outputMap = outputMap;}
+    public void setOutputMap(HashMap<String, Object> outputMap) {
+        this.outputMap = outputMap;
+    }
 
-    public void setInputMap(HashMap<String, Object> inputMap) {this.inputMap = inputMap;}
+    public void setInputMap(HashMap<String, Object> inputMap) {
+        this.inputMap = inputMap;
+    }
 
-    public String getUuid() {return uuid;}
+    public String getUuid() {
+        return uuid;
+    }
 
-    public String getRecipientAddress() {return recipientAddress;}
+    public String getRecipientAddress() {
+        return recipientAddress;
+    }
 
-    public double getAmount() {return amount;}
+    public double getAmount() {
+        return amount;
+    }
 
-    public HashMap<String, Object> getOutputMap() {return outputMap;}
+    public HashMap<String, Object> getOutputMap() {
+        return outputMap;
+    }
 
-    public HashMap<String, Object> getInputMap() {return inputMap;}
+    public HashMap<String, Object> getInputMap() {
+        return inputMap;
+    }
 
-    public String getSenderAddress() {return senderAddress;}
+    public String getSenderAddress() {
+        return senderAddress;
+    }
 
-    public void setSenderAddress(String senderAddress) {this.senderAddress = senderAddress;}
+    public void setSenderAddress(String senderAddress) {
+        this.senderAddress = senderAddress;
+    }
 
-    public String getOutput() {return output;}
+    public String getOutput() {
+        return output;
+    }
 
-    public void setOutput(String output) {this.output = output;}
+    public void setOutput(String output) {
+        this.output = output;
+    }
 
-    public String getInput() {return input;}
+    public String getInput() {
+        return input;
+    }
 
-    public void setInput(String input) {this.input = input;}
+    public void setInput(String input) {
+        this.input = input;
+    }
 }
