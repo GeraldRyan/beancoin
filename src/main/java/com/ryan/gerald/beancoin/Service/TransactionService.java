@@ -45,7 +45,6 @@ public class TransactionService {
 
     public Transaction saveTransaction(Transaction t) {
         System.out.println("ADDING TRANASACTION");
-        System.out.println("TRANSACTION REPOSITORY" + transactionRepository);
         return transactionRepository.save(t);
     }
 

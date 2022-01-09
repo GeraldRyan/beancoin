@@ -22,7 +22,6 @@ public class RegistrationService {
         try {
             t = adminWallet.createTransaction(address, 1000);
             transactionService.saveTransaction(t);
-            walletService.getWalletByUsername("admin");
         } catch (Exception e) {
             e.printStackTrace();
         }
