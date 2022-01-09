@@ -92,6 +92,7 @@ public class BlockchainController {
         return ar.get();
     }
 
+    // TODO inefficient- need faster lookup O(1)
     @RequestMapping(value = "/{n}/{thash}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public String getTransactionMFromBlockN(@PathVariable String n, @PathVariable String thash, @ModelAttribute("blockchain") Blockchain blockchain, Model model) {
