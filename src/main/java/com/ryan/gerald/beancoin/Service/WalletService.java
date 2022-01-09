@@ -8,9 +8,8 @@ import com.ryan.gerald.beancoin.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.io.IOException;
+import java.security.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,10 +42,19 @@ public class WalletService {
         return this.saveWallet(w);
     }
 
+    public Transaction createTransaction(Wallet w, String address, double amount) throws NoSuchAlgorithmException, SignatureException, IOException, NoSuchProviderException, InvalidKeyException {
+        Transaction neu = w.createTransaction(address, amount);
+        if (neu == null){
+            System.out.println("Something went wrong; Please check your balance- or wait until enough is mined");
+            return neu;
+        }
+        transactionService.saveTransaction(neu);
+        return neu;
+    };
+
     // Need to use security here. Good practice to check and apply security policy
-    public Wallet adminWallet(String userId, double balance) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
-        Wallet w = Wallet.createWallet("admin", 1000000); // I know params not passed. keep for now
-        w.setAddress("7777777");
+    public Wallet createAdminWallet(String userId, double balance) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+        Wallet w = Wallet.createAdminWallet(); // See if Java SecurityManager can protect this and other things
         return walletRepository.save(w);
     }
 

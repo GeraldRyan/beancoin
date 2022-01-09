@@ -1,7 +1,9 @@
 package com.ryan.gerald.beancoin.entity;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.*;
@@ -64,13 +66,6 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         String inputJson = new Gson().toJson(inputMap);
         System.out.println("New transaction made!");
         return new Transaction(toAddress, toAmount, fromAddress, outputJson, inputJson);
-    }
-
-    public static Transaction createAdminTransaction() {
-        HashMap<String, Object> om = Transaction.createOutputMap("88888888", "7777777", 10000000, 1000000);
-        om.remove("88888888");
-        String output = new Gson().toJson(om);
-        return new Transaction(output);
     }
 
     /**

@@ -46,13 +46,13 @@ public class WalletController {
     @ResponseBody
     public String doTransactionGET(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) {
         try {
-            Transaction neu = w.createTransaction(address, amount);
+            Transaction neu = walletService.createTransaction(w, address, amount);
+            if (neu == null){return "Error transacting. Is your balance great enough. Please wait until your mined balance is sufficient";}
             model.addAttribute("latesttransaction", neu);
-            transactionService.saveTransaction(neu);
             return neu.serialize();
         } catch (Exception e) {
             e.printStackTrace();
-            return "index";
+            return "Error occured with Transaction. Please make sure you have enough of a balance- including as mined";
         }
     }
 

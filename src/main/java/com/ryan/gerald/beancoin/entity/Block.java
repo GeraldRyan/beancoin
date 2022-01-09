@@ -29,16 +29,12 @@ public class Block {
     public static final HashMap<String, Object> GENESIS_DATA = new HashMap<String, Object>();
 
     static {
+        String mintLoader = "[{\"uuid\":\"903cc03b\",\"amount\":0.0,\"output\":\"{\\\"777mint777\\\":5000000.0}\",\"outputMap\":{\"777mint777\":5000000.0}}]";
         GENESIS_DATA.put("hash", "genesis_hash");
         GENESIS_DATA.put("last_hash", "genesis_last_hash");
         GENESIS_DATA.put("timestamp", (long) 1);
         GENESIS_DATA.put("height", 0);
-        Transaction t = Transaction.createAdminTransaction();
-        List<Transaction> tl = new ArrayList<>();
-        tl.add(t);
-        GENESIS_DATA.put("tx", new Gson().toJson(tl));
-//        GENESIS_DATA.put("tx", "[{\"output\": \"{\"7777777\" : 1000000}\" }]");
-//        GENESIS_DATA.put("tx", "[{\\\"output\\\": {\\\"7777777\\\": 1000000}}]");
+        GENESIS_DATA.put("tx", mintLoader);
         GENESIS_DATA.put("difficulty", 7);
         GENESIS_DATA.put("nonce", 1);
     }

@@ -21,12 +21,12 @@ import java.util.UUID;
 @Entity
 public class Wallet {
 
-    @Id String ownerId; // ==> User.username
-    @Lob PrivateKey privatekey;  // keep for now- but maybe even immediately can just store as string base 64
-    @Lob PublicKey publickey;
-    double balance;
-    String address;
-    double balanceAsMined;
+    private @Id String ownerId; // ==> User.username
+    private @Lob PrivateKey privatekey;  // keep for now- but maybe even immediately can just store as string base 64
+    private @Lob PublicKey publickey;
+    private double balance;
+    private String address;
+    private double balanceAsMined;
     final static double STARTING_BALANCE = 0;
     final static String PROVIDER = "SunEC";
     final static String SIGNATURE_ALGORITHM = "SHA256withECDSA";
@@ -45,8 +45,12 @@ public class Wallet {
     }
 
     public Transaction createTransaction(String toAddress, double toAmount) throws NoSuchAlgorithmException, SignatureException, IOException, NoSuchProviderException, InvalidKeyException {
-        if (this.getBalance() < toAmount){
-            System.err.println("Transaction Amount " + toAmount + " exceeds balance of " + this.getBalance());
+        if (this.getBalance() < toAmount) {
+            System.out.println("Transaction Amount " + toAmount + " exceeds balance of " + this.getBalance());
+            return null;
+        }
+        if (this.getBalanceAsMined() < toAmount){
+            System.out.println("Please wait till enough balance has been mined");
             return null;
         }
         // get output (receipt or agreement) to sign
@@ -57,12 +61,12 @@ public class Wallet {
         return Transaction.createTransaction(toAddress, toAmount, this.getAddress(), this.getBalance(), outputMap, signatureB64, publicKeyString, publicKeyFormat);
     }
 
+    // Starting balance will reset to zero anyway if there's not a transfer reflected on the chain according to current consensus protocol (Except mint wallet that has a genesis magic transaction).
     public static Wallet createWallet(String ownerId) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         return Wallet.createWallet(ownerId, STARTING_BALANCE);
     }
 
-    public static Wallet createWallet(String ownerId, double startingBalance)
-            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+    private static Wallet createWallet(String ownerId, double startingBalance) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         String address = String.valueOf(UUID.randomUUID()).substring(0, 8);
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEYPAIR_GEN_ALGORITHM, PROVIDER);
         keyGen.initialize(new ECGenParameterSpec(PARAMETER_SPEC));
@@ -74,6 +78,11 @@ public class Wallet {
         return new Wallet(startingBalance, privateKey, publicKey, address, ownerId);
     }
 
+    public static Wallet createAdminWallet() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+        Wallet w = Wallet.createWallet("admin");
+        w.address = "777mint777";
+        return w;
+    }
 
 
     /**
@@ -109,14 +118,26 @@ public class Wallet {
 
     @Override
     public String toString() {return "Wallet [balance=" + balance + ", publickey=" + publickey + ", address=" + address + "]";}
-    public double getBalance() {return balance;}
-    public void setBalance(double balance) {this.balance = balance;}
-    public String getAddress() {return address;}
 
-    public void setAddress(String address) {this.address = address;}
+    public double getBalance() {return balance;}
+
+    public void setBalance(double balance) {this.balance = balance;}
+
+    public String getAddress() {
+        return this.address;
+    }
+
+    // NOTE when this is defined- even not called, something in spring via controler calls it and mutates the wallet address to the address of recipient!!!!!!!!!!!!!! So keep it LOCKED:D:D:D:D:D:D
+    public final void setAddress(String address) {return;}
+    // DO NOTHING. EVEN DEFINING THIS METHOD IS BAD IN IoC PLACES- a spring loaded trap
+
+
     public PublicKey getPublickey() {return publickey;}
+
     public PrivateKey getPrivatekey() {return privatekey;}
+
     public double getBalanceAsMined() {return balanceAsMined;}
+
     public void setBalanceAsMined(double balanceAsMined) {this.balanceAsMined = balanceAsMined;}
 
     /**
