@@ -47,7 +47,7 @@ public class WalletController {
     public String doTransactionGET(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) {
         try {
             Transaction neu = walletService.createTransaction(w, address, amount);
-            if (neu == null){return "Error transacting. Is your balance great enough. Please wait until your mined balance is sufficient";}
+            if (neu == null){return "Error transacting. Is your balance great enough? Please wait until your mined balance is sufficient. Why don't you go mine a block?";}
             model.addAttribute("latesttransaction", neu);
             return neu.serialize();
         } catch (Exception e) {
