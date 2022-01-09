@@ -43,9 +43,7 @@ public class RegistrationController {
     @PostMapping("")
     public String registerNewUser(Model model, @ModelAttribute("user") @Valid User user) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException, InvalidKeyException {
 
-        if ((boolean) model.getAttribute("isloggedin")) {
-            return "redirect:/";
-        }
+        if ((boolean) model.getAttribute("isloggedin")) {return "redirect:/";}
 
         Optional<User> existingUser = userService.getUserOptionalByName(user.getUsername());
         if (existingUser.isPresent()) {

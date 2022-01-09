@@ -18,6 +18,7 @@ public class RegistrationService {
             System.err.println("ADMIN WALLET IS NULL");
             adminWallet = walletService.createAdminWallet("admin", 1000000);
         }
+        walletService.checkBalance(adminWallet);
         Transaction t;
         try {
             t = adminWallet.createTransaction(address, 1000);
