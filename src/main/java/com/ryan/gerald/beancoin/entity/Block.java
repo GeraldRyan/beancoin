@@ -29,7 +29,7 @@ public class Block {
     public static final HashMap<String, Object> GENESIS_DATA = new HashMap<String, Object>();
 
     static {
-        String mintLoader = "[{\"uuid\":\"903cc03b\",\"amount\":0.0,\"output\":\"{\\\"777mint777\\\":5000000.0}\",\"outputMap\":{\"777mint777\":5000000.0}}]";
+        String mintLoader = "[{\"uuid\":\"mintloader\",\"amount\":0.0,\"output\":\"{\\\"777mint777\\\":5000000.0}\",\"outputMap\":{\"777mint777\":5000000.0}}]";
         GENESIS_DATA.put("hash", "genesis_hash");
         GENESIS_DATA.put("last_hash", "genesis_last_hash");
         GENESIS_DATA.put("timestamp", (long) 1);
