@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.ryan.gerald.beancoin.exceptions.TransactionAmountExceedsBalance;
@@ -24,8 +23,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
     String recipientAddress;
     String senderAddress;
     double amount;
-    @Column(columnDefinition = "varchar(2000) default 'Jon Snow'") String outputJson;
-    @Column(columnDefinition = "varchar(2000) default 'Jon Snow'") String inputJson;
+    @Column(columnDefinition = "varchar(2000) default 'Jon Snow'") String output;
+    @Column(columnDefinition = "varchar(2000) default 'Jon Snow'") String input;
     @Transient HashMap<String, Object> outputMap;
     @Transient HashMap<String, Object> inputMap;
 
@@ -36,8 +35,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         this.recipientAddress = toAddress;
         this.amount = toAmount;
         this.senderAddress = fromAddress;
-        this.outputJson = outputJson;
-        this.inputJson = inputJson;
+        this.output = outputJson;
+        this.input = inputJson;
         reinflateInputOutputMaps();
     }
 
@@ -127,8 +126,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
      */
     public void reinflateInputOutputMaps() {
         if (this.outputMap == null) {
-            this.inputMap = this.deserializeInputJson(this.getInputJson());
-            this.outputMap = this.deserializeOutputJson(this.getOutputJson());
+            this.inputMap = this.deserializeInputJson(this.getInput());
+            this.outputMap = this.deserializeOutputJson(this.getOutput());
         }
     }
 
@@ -139,8 +138,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
      */
     public void serializeInputOutputMaps() {
         if (this.outputMap != null) {
-            this.outputJson = new Gson().toJson(this.outputMap);
-            this.inputJson = new Gson().toJson(this.inputMap);
+            this.output = new Gson().toJson(this.outputMap);
+            this.input = new Gson().toJson(this.inputMap);
         }
     }
 
@@ -246,11 +245,11 @@ public class Transaction extends AbstractTransaction implements TransactionInter
 
     public void setSenderAddress(String senderAddress) {this.senderAddress = senderAddress;}
 
-    public String getOutputJson() {return outputJson;}
+    public String getOutput() {return output;}
 
-    public void setOutputJson(String outputJson) {this.outputJson = outputJson;}
+    public void setOutput(String output) {this.output = output;}
 
-    public String getInputJson() {return inputJson;}
+    public String getInput() {return input;}
 
-    public void setInputJson(String inputJson) {this.inputJson = inputJson;}
+    public void setInput(String input) {this.input = input;}
 }

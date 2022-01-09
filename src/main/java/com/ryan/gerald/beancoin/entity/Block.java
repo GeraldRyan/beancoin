@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ryan.gerald.beancoin.utils.CryptoHash;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,7 +19,7 @@ public class Block {
     private String lastHash;
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    String tx;
+    String tx; // List<Transaction> tx
     int difficulty;
     int nonce;
     static final long MILLISECONDS = 1;
@@ -36,7 +33,7 @@ public class Block {
         GENESIS_DATA.put("timestamp", (long) 1);
         GENESIS_DATA.put("last_hash", "genesis_last_hash");
         GENESIS_DATA.put("hash", "genesis_hash");
-        GENESIS_DATA.put("tx", "GENESIS GENESIS GENESIS");
+        GENESIS_DATA.put("tx", "[]");
         GENESIS_DATA.put("difficulty", 7);
         GENESIS_DATA.put("nonce", 1);
     }
@@ -177,32 +174,32 @@ public class Block {
      * escape characters for different types of object and list serialization.
      * Understand its role by how it is used in this app.
      */
-    public String webworthyJson(List<Transaction> txList) {
-        HashMap<String, Object> serializeThisBundle = new HashMap<String, Object>();
-        serializeThisBundle.put("timestamp", this.timestamp);
-        serializeThisBundle.put("hash", this.hash);
-        serializeThisBundle.put("lasthash", this.lastHash);
-        serializeThisBundle.put("difficulty", this.difficulty);
-        serializeThisBundle.put("nonce", this.nonce);
-        serializeThisBundle.put("tx", txList);
-        return new Gson().toJson(serializeThisBundle);
+    public String serialize(List<Transaction> txList) {
+        HashMap<String, Object> serializableMap = new HashMap<String, Object>();
+        serializableMap.put("timestamp", this.timestamp);
+        serializableMap.put("hash", this.hash);
+        serializableMap.put("lasthash", this.lastHash);
+        serializableMap.put("difficulty", this.difficulty);
+        serializableMap.put("nonce", this.nonce);
+        serializableMap.put("tx", txList);
+        return new Gson().toJson(serializableMap);
     }
 
     /**
      * convert the block to a serialized JSON representation
      */
-    public String toJSONtheBlock() {
+    public String serialize() {
         return new Gson().toJson(this);
     }
 
     public List<Transaction> deserializeTx() {
         java.lang.reflect.Type type = new TypeToken<List<Transaction>>() {
         }.getType();
-        System.out.println("Transaction is: " + this.getTx());
-        return new Gson().fromJson(this.getTx(), type);
-//		List<TransactionRepr> listTR = null;
-//		System.out.println(this.getData());
-//		return listTR;
+        System.out.println("Tx String is: " + this.getTx());
+        List<Transaction> txList = new Gson().fromJson(this.getTx(), type);
+        System.out.println(txList.size());
+        txList.forEach(t-> System.out.println(t.toString()));
+        return txList;
     }
 
     /**

@@ -9,11 +9,10 @@ import org.springframework.stereotype.Service;
 public class Initializer {
 
     public void loadBC(Blockchain blockchain) throws NoSuchAlgorithmException {
-        blockchain.add_block("Dance The Waltz");
-        blockchain.add_block("Dance The Tango");
-        blockchain.add_block("Dance The Quickstep");
-        blockchain.add_block("Dance The Samba");
-        blockchain.add_block("Dance With Us America");
+//        blockchain.add_block("Dance The Waltz");
+//        blockchain.add_block("Dance The Tango");
+//        blockchain.add_block("Dance The Quickstep");
+//        blockchain.add_block("Dance The Samba");
     }
 
 //    /**

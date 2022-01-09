@@ -7,6 +7,7 @@ import com.ryan.gerald.beancoin.entity.Block;
 import com.ryan.gerald.beancoin.entity.Blockchain;
 import com.ryan.gerald.beancoin.entity.Transaction;
 import com.ryan.gerald.beancoin.entity.TransactionPoolMap;
+import com.ryan.gerald.beancoin.evaluation.SerializableBC;
 import com.ryan.gerald.beancoin.initializors.Initializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,7 +46,9 @@ public class BlockchainController {
         Blockchain bc = blockchainService.getBlockchainByName("beancoin");
 
         blockchainService.refreshChain(bc); // make sure ordered by timestamp (properly a persistence layer problem) [will probably be fixed when converging to real bitcoin spec]
-        return bc.serialize();
+        SerializableBC sbc = new SerializableBC(bc);
+        return new Gson().toJson(sbc.getChain());
+//        return bc.serialize();
     }
 
     @RequestMapping(value = "mine", method = RequestMethod.GET, produces = "application/json")
@@ -72,7 +75,7 @@ public class BlockchainController {
 //        if (Config.BROADCASTING) { // TODO CHANGE TO KAFKA
 ////            new PubNubApp().broadcastBlock(new_block);
 //        }
-        return new_block.webworthyJson(txList); // later manage max size of block
+        return new_block.serialize(txList); // later manage max size of block
     }
 
     @RequestMapping(value = "/{n}", method = RequestMethod.GET, produces = "application/json")
@@ -85,7 +88,7 @@ public class BlockchainController {
                 return new Gson().toJson(b);
             }
             List<Transaction> txList = b.deserializeTx();
-            return b.webworthyJson(txList);
+            return b.serialize(txList);
         } catch (NullPointerException e) {
             e.printStackTrace();
             return "This index doesn't exist yet in our chain. Try a different number";

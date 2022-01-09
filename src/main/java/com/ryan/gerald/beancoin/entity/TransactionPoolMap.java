@@ -41,37 +41,6 @@ public class TransactionPoolMap {
     }
 
     /**
-     * Finds existing transaction of given Wallet if exists in pool, otherwise
-     * returns null
-     *
-     * @return
-     */
-    public Transaction findExistingTransactionByWallet(String walletAddress) {
-        if (this.getTransactionMap().keySet().size() == 0) {
-            System.err.println("KEYSET IS SIZE 00000000");
-            return null;
-        }
-        HashMap<String, Object> tmpinput;
-        for (String uuid : this.getTransactionMap().keySet()) {
-
-            System.err.println("UUID OF TRANSACTION IS " + uuid);
-            Transaction t = (Transaction) this.getTransactionMap().get(uuid);
-            System.err.println("INPUT JSON");
-            System.err.println(t.getInputJson());
-            System.err.println("OUTPUT JSON");
-            System.err.println(t.getOutputJson());
-            tmpinput = new Gson().fromJson(t.getInputJson(), HashMap.class);
-            if (tmpinput == null) {
-                return null; // TODO : empty transaction with only an ID happened. I don't know how.
-            }
-            if (tmpinput.get("address").equals(walletAddress)) {
-                return t;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Return the transactions of the transaction pool as a string that is suited to
      * add to block data field, fit for mining, represented in json serialized form
      *

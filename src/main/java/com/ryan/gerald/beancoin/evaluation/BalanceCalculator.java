@@ -36,10 +36,7 @@ public class BalanceCalculator {
         double balance = STARTING_BALANCE;
         if (bc == null) {throw new NullPointerException("Blockchain is null");}
         System.out.println("Looking up balance for " + adds);
-        int i = 0;
         for (Block b : bc.getChain()) {
-            i++;
-            if (i < 7) {continue;} // dummy data blocks, breaks deserialization otherwise
             balance += this.getBalanceChangeInBlock(b, adds);
         }
         return balance;

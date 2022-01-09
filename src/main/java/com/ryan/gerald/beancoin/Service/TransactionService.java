@@ -59,11 +59,8 @@ public class TransactionService {
 
     // Naive solution- will use Merkle Technology later.
     public long FindTransactionInChain(Blockchain blockchain, String txId) {
-        int i = 0;
         // traverse all blocks in our chain version, skipping genesis blocks (throws Gson error but TODO handle better)
         for (Block b : blockchain.getChain()) {
-            i++;
-            if (i < 7) {continue;}
             List<Transaction> txList = b.deserializeTx();
             if (transactionFoundInBlock(b, txId)) {return b.getTimestamp();}
         }
