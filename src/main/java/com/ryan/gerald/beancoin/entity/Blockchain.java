@@ -11,19 +11,20 @@ import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Entity
 @Table(name = "blockchain")
 public class Blockchain {
-    @Id
-    String name;
+    @Id String name;
     long date_created;
     long date_last_modified;
     int length_of_chain;
     @OneToMany(targetEntity = Block.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinTable(name = "blockchain_blocks")
     List<Block> chain;
+    LinkedHashMap<String, Block> hashchain;
 
     public Blockchain() {}
 
@@ -35,12 +36,7 @@ public class Blockchain {
         this.length_of_chain = 1;
     }
 
-    /**
-     * Factory method public API to create a new named blockchain
-     *
-     * @param name
-     * @return
-     */
+
     public static Blockchain createBlockchain(String name) {return new Blockchain(name);}
 
     /**
