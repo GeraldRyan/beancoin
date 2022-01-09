@@ -14,26 +14,31 @@ import java.util.List;
 @Entity
 public class Block {
 
-    @Id Long timestamp;
-    private String hash;
+    @Id String hash;
     private String lastHash;
+    private long timestamp;
+    private Integer height;
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    String tx; // List<Transaction> tx
+    String tx; // deserializes to List<Transaction> tx ----- only for you SQL
     int difficulty;
     int nonce;
+
+
     static final long MILLISECONDS = 1;
     static final long SECONDS = 1000 * MILLISECONDS;
     static final long MINE_RATE = 2 * SECONDS;
-//	List<TransactionRepr> transactionList;
 
     public static final HashMap<String, Object> GENESIS_DATA = new HashMap<String, Object>();
 
     static {
-        GENESIS_DATA.put("timestamp", (long) 1);
-        GENESIS_DATA.put("last_hash", "genesis_last_hash");
         GENESIS_DATA.put("hash", "genesis_hash");
-        GENESIS_DATA.put("tx", "[]");
+        GENESIS_DATA.put("last_hash", "genesis_last_hash");
+        GENESIS_DATA.put("timestamp", (long) 1);
+        GENESIS_DATA.put("height", 0);
+//        Transaction t = Transaction.createAdminTransaction(); // TODO initailize admin
+//        GENESIS_DATA.put("tx", t.serialize());
+        GENESIS_DATA.put("tx", "[{}]");
         GENESIS_DATA.put("difficulty", 7);
         GENESIS_DATA.put("nonce", 1);
     }
@@ -43,11 +48,12 @@ public class Block {
     /**
      * A block is a unit of storage for a blockchain that supports a cryptocurrency.
      */
-    private Block(long timestamp, String lastHash, String hash, String tx, int difficulty, int nonce) {
+    private Block(String hash, String lastHash, long timestamp, int height, int difficulty, int nonce, String tx) {
         super();
-        this.timestamp = timestamp;
-        this.lastHash = lastHash;
         this.hash = hash;
+        this.lastHash = lastHash;
+        this.timestamp = timestamp;
+        this.height = height;
         this.tx = tx;
         this.difficulty = difficulty;
         this.nonce = nonce;
@@ -58,9 +64,7 @@ public class Block {
      * instances of blockchain
      */
     public static Block genesis_block() {
-        return new Block((Long) GENESIS_DATA.get("timestamp"), (String) GENESIS_DATA.get("last_hash"),
-                (String) GENESIS_DATA.get("hash"), (String) GENESIS_DATA.get("tx"),
-                (Integer) GENESIS_DATA.get("difficulty"), (Integer) GENESIS_DATA.get("nonce"));
+        return new Block((String) GENESIS_DATA.get("hash"), (String) GENESIS_DATA.get("last_hash"), (Long) GENESIS_DATA.get("timestamp"), (Integer) GENESIS_DATA.get("height"), (Integer) GENESIS_DATA.get("difficulty"), (Integer) GENESIS_DATA.get("nonce"), (String) GENESIS_DATA.get("tx"));
     }
 
     /**
@@ -68,8 +72,9 @@ public class Block {
      * that meets the leading 0's Proof of Work requirement.
      */
     public static Block mine_block(Block last_block, String txArrJson) throws NoSuchAlgorithmException {
-        long timestamp = new Date().getTime();
         String last_hash = last_block.getHash();
+        Integer height = last_block.getHeight() + 1;
+        long timestamp = new Date().getTime();
         int difficulty = Block.adjust_difficulty(last_block, timestamp);
         int nonce = 0;
         String hash = CryptoHash.getSHA256(timestamp, last_block.getHash(), txArrJson, difficulty, nonce);
@@ -92,7 +97,7 @@ public class Block {
         System.out.println("binary_Hash_work_end " + binary_hash_work_end);
         System.out.println("binary hash " + binary_hash);
         System.out.println("BLOCK MINED!");
-        return new Block(timestamp, last_hash, hash, txArrJson, difficulty, nonce);
+        return new Block(hash, last_hash, timestamp, height, difficulty, nonce, txArrJson);
     }
 
     /**
@@ -195,10 +200,10 @@ public class Block {
     public List<Transaction> deserializeTx() {
         java.lang.reflect.Type type = new TypeToken<List<Transaction>>() {
         }.getType();
-        System.out.println("Tx String is: " + this.getTx());
+//        System.out.println("Tx String is: " + this.getTx());
         List<Transaction> txList = new Gson().fromJson(this.getTx(), type);
         System.out.println(txList.size());
-        txList.forEach(t-> System.out.println(t.toString()));
+        txList.forEach(t -> System.out.println(t.toString()));
         return txList;
     }
 
@@ -236,6 +241,34 @@ public class Block {
 
     public int getNonce() {
         return nonce;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public void setLastHash(String lastHash) {
+        this.lastHash = lastHash;
+    }
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
+
+    public void setTx(String tx) {
+        this.tx = tx;
+    }
+
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public void setNonce(int nonce) {
+        this.nonce = nonce;
     }
 
     @Override
@@ -283,14 +316,4 @@ public class Block {
             return false;
         return true;
     }
-
-    public static void main(String[] args) throws NoSuchAlgorithmException {
-//		String md = CryptoHash.getSHA256("foobar");
-        Block genesis = genesis_block();
-        System.out.println(genesis.toStringFormatted());
-        genesis.setTimestamp(new Date().getTime());
-//		new BlockService().addBlockService(genesis);
-
-    }
-
 }

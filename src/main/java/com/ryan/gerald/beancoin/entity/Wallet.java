@@ -46,7 +46,7 @@ public class Wallet {
 
     public Transaction createTransaction(String toAddress, double toAmount) throws NoSuchAlgorithmException, SignatureException, IOException, NoSuchProviderException, InvalidKeyException {
         if (this.getBalance() < toAmount){
-            System.err.println("Transaction Amount exceeds balance");
+            System.err.println("Transaction Amount " + toAmount + " exceeds balance of " + this.getBalance());
             return null;
         }
         // get output (receipt or agreement) to sign

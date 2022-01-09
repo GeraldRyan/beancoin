@@ -1,6 +1,6 @@
 package com.ryan.gerald.beancoin.dto;
 
-
+// TODO This is probably not correct, but maybe it is close
 public class TransactionDTO {
 
     private String fromAddress;
@@ -8,7 +8,6 @@ public class TransactionDTO {
     private String toAddress;
     private double toAmount;
     private String publickey;
-    private String privatekey;
     private String format;
 
     public String getToAddress() {
@@ -33,14 +32,6 @@ public class TransactionDTO {
 
     public void setPublickey(String publickey) {
         this.publickey = publickey;
-    }
-
-    public String getPrivatekey() {
-        return privatekey;
-    }
-
-    public void setPrivatekey(String privatekey) {
-        this.privatekey = privatekey;
     }
 
     public String getFromAddress() {

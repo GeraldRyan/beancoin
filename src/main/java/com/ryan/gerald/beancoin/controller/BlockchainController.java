@@ -1,12 +1,9 @@
 package com.ryan.gerald.beancoin.controller;
 
-import com.google.gson.Gson;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.entity.Block;
 import com.ryan.gerald.beancoin.entity.Blockchain;
-import com.ryan.gerald.beancoin.entity.Transaction;
-import com.ryan.gerald.beancoin.entity.TransactionPoolMap;
 import com.ryan.gerald.beancoin.evaluation.SerializableChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Controller
@@ -44,27 +40,12 @@ public class BlockchainController {
     @ResponseBody
     public String doMineAsGET(Model model)
             throws NoSuchAlgorithmException {
-        Blockchain blockchain = blockchainService.getBlockchainByName("beancoin"); // later will cache
-        List<Transaction> txList = transactionService.getUnminedTransactionList();
-        if (txList.isEmpty()) {return "No data to mine. Tell your friends to make transactions";}
-        TransactionPoolMap pool = new TransactionPoolMap(txList); // What's use of this TransactionMap
-        String txListString = pool.getMinableTransactionDataString();  // payload of block TODO THIS IS BROKEN, ESCAPES STRING
-//        String txJsonArray = new Gson().toJson(txList);
-        String txListJson = new Gson().toJson(txList);
-        Block new_block = blockchain.add_block(txListJson);
-
-        model.addAttribute("blockchain", blockchain);  // why? DELETE, REFACTOR, RESTORE
+        SerializableChain.SeralizableBlock new_block = blockchainService.mineBlock();
+        if (new_block == null) {
+            return "No data to mine. Tell your friends to make transactions";
+        }
         model.addAttribute("minedblock", new_block);
-
-        // delete from transaction table. This deletes local listing. Network protocol ensures others are managing their house well.
-        transactionService.deletTransactionsInList(txList);
-        blockchainService.saveBlockchain(blockchain); // refresh blockchain by adding chain
-        System.out.println("NEW BLOCK MINED: " + new_block.toStringConsole());
-
-//        if (Config.BROADCASTING) { // TODO CHANGE TO KAFKA
-////            new PubNubApp().broadcastBlock(new_block);
-//        }
-        return new SerializableChain(blockchain).new SeralizableBlock(new_block).serialize();
+        return new_block.serialize();
     }
 
     // TODO Make get Block by Hash instead of number in list
@@ -84,9 +65,9 @@ public class BlockchainController {
         AtomicReference<String> ar = new AtomicReference<>("[]");
         Blockchain bc = blockchainService.getBlockchainByName("beancoin");
         SerializableChain sc = new SerializableChain(bc);
-        sc.getChain().forEach(b->{
-            if (b.getHash().equals(blockhash)){
-                ar.updateAndGet(x-> b.serialize());
+        sc.getChain().forEach(b -> {
+            if (b.getHash().equals(blockhash)) {
+                ar.updateAndGet(x -> b.serialize());
             }
         });
         return ar.get();

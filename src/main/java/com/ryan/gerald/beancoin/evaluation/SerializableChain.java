@@ -31,18 +31,20 @@ public class SerializableChain {
     }
 
     public class SeralizableBlock {
-        Long timestamp;
         private String hash;
         private String lastHash;
+        Long timestamp;
+        Integer height;
         List<SerializableTransaction> tx;
         int difficulty;
         int nonce;
 
 
         public SeralizableBlock(Block b) {
-            this.timestamp = b.getTimestamp();
             this.hash = b.getHash();
             this.lastHash = b.getLastHash();
+            this.timestamp = b.getTimestamp();
+            this.height = b.getHeight();
             this.difficulty = b.getDifficulty();
             this.nonce = b.getNonce();
             List<Transaction> listTx = b.deserializeTx();

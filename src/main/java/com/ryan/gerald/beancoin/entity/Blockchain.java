@@ -21,6 +21,7 @@ public class Blockchain {
     long date_last_modified;
     int length_of_chain;
     @OneToMany(targetEntity = Block.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OrderColumn(name="timestamp")
     @JoinTable(name = "blockchain_blocks")
     List<Block> chain;
 
@@ -57,8 +58,12 @@ public class Blockchain {
      * @throws NoSuchAlgorithmException
      */
     public Block add_block(String txData) throws NoSuchAlgorithmException {
-        Block new_block = Block.mine_block(this.chain.get(this.chain.size() - 1), txData);
+        Block last_block = this.chain.get(this.chain.size() - 1);
+        Block new_block = Block.mine_block(last_block, txData);
         this.chain.add(new_block);
+        System.out.println("LENGTH OF CHAIN: " + this.chain.size());
+        System.out.println("LAST BLOCK: " + last_block.toStringConsole());
+        this.chain.forEach(b-> System.out.println(b.toStringConsole()));
 //        this.hashchain.put(new_block.getHash(), new_block); // does not work in JPA because not a collection
         this.length_of_chain++;
         this.date_last_modified = new Date().getTime();

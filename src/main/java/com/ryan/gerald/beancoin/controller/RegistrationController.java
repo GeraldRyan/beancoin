@@ -2,10 +2,10 @@ package com.ryan.gerald.beancoin.controller;
 
 import com.google.gson.Gson;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
+import com.ryan.gerald.beancoin.Service.RegistrationService;
 import com.ryan.gerald.beancoin.Service.UserService;
 import com.ryan.gerald.beancoin.Service.WalletService;
 import com.ryan.gerald.beancoin.entity.*;
-import com.ryan.gerald.beancoin.exception.TransactionAmountExceedsBalance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +27,7 @@ public class RegistrationController {
     @Autowired private UserService userService;
     @Autowired private WalletService walletService;
     @Autowired private BlockchainService blockchainService;
-
+    @Autowired private RegistrationService registrationService;
 
     @GetMapping("")
     public ModelAndView showRegisterPage(Model model) {
@@ -41,34 +41,20 @@ public class RegistrationController {
     }
 
     @PostMapping("")
-    public String registerUser(Model model, @ModelAttribute("user") @Valid User user) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException, InvalidKeyException, TransactionAmountExceedsBalance {
+    public String registerNewUser(Model model, @ModelAttribute("user") @Valid User user) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException, InvalidKeyException {
 
         if ((boolean) model.getAttribute("isloggedin")) {
             return "redirect:/";
         }
 
-        // TODO BELONGS IN NEW USER SERVICE!! TOO MUCH LOGIC HERE!!!
         Optional<User> existingUser = userService.getUserOptionalByName(user.getUsername());
         if (existingUser.isPresent()) {
             model.addAttribute("existsmsg", "User already exists. Choose another name or log in");
             return "registration/register";
         }
-        Wallet wallet = Wallet.createWallet(user.getUsername());
-        userService.saveUser(user);
-        walletService.saveWallet(wallet);
-        Blockchain bc = blockchainService.getBlockchainByName("beancoin");
-        Wallet adminWallet;
-        adminWallet = walletService.getWalletByUsername("admin");
-        if (adminWallet == null) {adminWallet = Wallet.createWallet("admin");}
-        Transaction newUserTransfer = null;
-        try {newUserTransfer = adminWallet.createTransaction(wallet.getAddress(), 1000);} catch (SignatureException e) {
-            e.printStackTrace();
-        }
-        List<Transaction> singleList = new ArrayList<Transaction>();
-        singleList.add(newUserTransfer);
-        String singleListJson = new Gson().toJson(singleList);
-        bc.add_block(singleListJson); // does need to serialize as list not as individual?
-        blockchainService.saveBlockchain(bc);  // go straight to blockchain, no need to mine this type
+        Wallet wallet = walletService.newWallet(user.getUsername());
+        userService.saveOrAddUser(user);
+        registrationService.loadWallet(wallet.getAddress());
         model.addAttribute("isloggedin", true);
         model.addAttribute("user", user);
         model.addAttribute("wallet", wallet);
@@ -79,8 +65,7 @@ public class RegistrationController {
     @GetMapping("welcome")
     public String getWelcome(Model model) {
         User u = ((User) model.getAttribute("user"));
-        Wallet w = walletService.getWalletByUsername(u.getUsername()); // I find that extra protection
-        // prevents unexpected crashes
+        Wallet w = walletService.getWalletByUsername(u.getUsername());
         model.addAttribute("wallet", w);
         return "registration/welcomepage";
     }

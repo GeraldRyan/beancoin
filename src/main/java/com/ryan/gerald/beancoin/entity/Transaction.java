@@ -50,6 +50,12 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         return new Transaction(toAddress, toAmount, fromAddress, outputJson, inputJson);
     }
 
+    public static Transaction createAdminTransaction(){
+        HashMap<String, Object> om = Transaction.createOutputMap("88888888", "7777777", 10000000, 1000000);
+        String output = new Gson().toJson(om);
+        return new Transaction("7777777", 1000000, "88888888", output, "");
+    }
+
     /**
      * API METHOD for POSTing transactions. Input and output JSON strings must conform to spec (or should I persist these objects in separate tables -
      * transaction input hash transaction output hash

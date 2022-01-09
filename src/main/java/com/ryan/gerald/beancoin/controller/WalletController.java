@@ -3,6 +3,7 @@ package com.ryan.gerald.beancoin.controller;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.WalletService;
+import com.ryan.gerald.beancoin.dto.TransactionDTO;
 import com.ryan.gerald.beancoin.entity.Blockchain;
 import com.ryan.gerald.beancoin.entity.Transaction;
 import com.ryan.gerald.beancoin.entity.Wallet;
@@ -37,12 +38,7 @@ public class WalletController {
     @GetMapping("/transact")
     public String transact(Model model) {
         Wallet w = walletService.getWalletByUsername((String) model.getAttribute("username"));
-        w.setBalance(balanceCalculator.calculateBalanceFromChainAndLocalTxPool(blockchainService.getBlockchainByName(
-                "beancoin"), w.getAddress(), transactionService.getUnminedTransactionList()));
-        w.setBalanceAsMined(balanceCalculator.calculateWalletBalanceByTraversingChain(blockchainService.getBlockchainByName(
-                "beancoin"), w.getAddress()));
         model.addAttribute("wallet", w);
-        walletService.saveWallet(w);
         return "wallet/transact";
     }
 
@@ -54,39 +50,14 @@ public class WalletController {
             model.addAttribute("latesttransaction", neu);
             transactionService.saveTransaction(neu);
             return neu.serialize();
-
-            // REMOVE ME?? REMOVE UPDATE TRANSACTION FUNCTION TO MAKE EACH ONE SINGULAR??
-//            TransactionPoolMap pool = new TransactionPoolMap(transactionService.getTransactionList());
-//            Transaction existing = pool.findExistingTransactionByWallet(neu.getSenderAddress());
-//            if (existing == null) {
-//                model.addAttribute("latesttransaction", neu);
-//                transactionService.saveTransaction(neu);
-////                if (Config.BROADCASTING) {broadcastTransaction(neu);} // TODO KAFKA
-//                return neu.toJSONtheTransaction();
-//            } else {
-//                Transaction merged = transactionService.getTransactionById(existing.getUuid());
-//                merged.updateTransaction(w, neu.getRecipientAddress(), neu.getAmount());
-//                merged.rebuildOutputInput();
-//                transactionService.saveTransaction(merged);
-//                model.addAttribute("latesttransaction", merged);
-////                if (Config.BROADCASTING) {broadcastTransaction(merged);} // TODO KAFKA
-//                return merged.toJSONtheTransaction();
-//            }
-//        } catch (TransactionAmountExceedsBalance | Exception e) {
-//            System.err.println("Transaction Amount Exceeds Balance");
-//            model.addAttribute("exceedsBalance", "Transaction Amount Exceeds Balance. Please enter a lower amount");
-//            return "Transaction Amount Exceeds Balance. Please enter a lower amount";
-
-            // REMOVE ABOVE AND MAKE TRANSACTIONS GRANULAR?
-
         } catch (Exception e) {
             e.printStackTrace();
             return "index";
         }
     }
 
-
-//        @RequestMapping(value = "/transaction", method = RequestMethod.POST, produces = "application/json")
+//
+//        @RequestMapping(value = "/transact", method = RequestMethod.POST, produces = "application/json")
 //        @ResponseBody
 //        public String doTransactionPOST(@RequestBody TransactionDTO transactionDTO){
 //            Transaction t = new Transaction(transactionDTO.getToAddress(),transactionDTO.getToAmount())
