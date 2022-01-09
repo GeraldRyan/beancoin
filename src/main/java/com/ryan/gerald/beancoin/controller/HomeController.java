@@ -6,7 +6,6 @@ import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.UserService;
 import com.ryan.gerald.beancoin.Service.WalletService;
 import com.ryan.gerald.beancoin.entity.*;
-import com.ryan.gerald.beancoin.initializors.Initializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
@@ -18,7 +17,6 @@ import javax.servlet.http.HttpSession;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
-
 @Controller
 @SessionAttributes({"username", "isloggedin", "user", "wallet"})
 public class HomeController {
@@ -27,19 +25,19 @@ public class HomeController {
     @Autowired private TransactionService transactionService;
     @Autowired private UserService userService;
     @Autowired private WalletService walletService;
-    @Autowired Initializer initializer;
     @Autowired private Environment env; // Not using I believe but keep for example
 
     public HomeController() throws InterruptedException {}
 
-    @ModelAttribute("isloggedin")
-    public boolean isLoggedIn() {
-        return false;
-    }
-
+    // TODO make into global cache object- for ALL users in Redis.
     @ModelAttribute("blockchain")
     public Blockchain loadOrCreateBlockchain() throws NoSuchAlgorithmException {
         return blockchainService.loadOrCreateBlockchain("beancoin");
+    }
+
+    @ModelAttribute("isloggedin")
+    public boolean isLoggedIn() {
+        return false;
     }
 
     @GetMapping("/")
@@ -53,7 +51,7 @@ public class HomeController {
 
     @PostMapping("/login")
     public String processLogin(Model model, @ModelAttribute("login") Login login) {
-        String result = validateUserAndPassword(login.getUsername(), login.getPassword());
+        String result = userService.validateUserAndPassword(login.getUsername(), login.getPassword());
         if (result == "true") {
             model.addAttribute("username", login.getUsername());
             model.addAttribute("isloggedin", true);
@@ -78,13 +76,6 @@ public class HomeController {
         model.addAttribute("user", null);
         HttpSession httpSession = request.getSession();  // what does this line do?
         return "redirect:/";
-    }
-
-    public String validateUserAndPassword(String username, String password) {
-        Optional<User> user = userService.getUserOptionalByName(username);
-        if (user.isEmpty()) {return "user not found";}
-        if (user.get().getPassword().equalsIgnoreCase(password)) {return "true";}
-        return "false";
     }
 
     @ControllerAdvice

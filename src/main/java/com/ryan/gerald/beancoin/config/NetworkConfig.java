@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.initializors;
+package com.ryan.gerald.beancoin.config;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -30,7 +30,7 @@ import com.google.gson.reflect.TypeToken;
  * @author Gerald Ryan
  *
  */
-public class SyncToNetwork {
+public class NetworkConfig {
 
 	/**
 	 * Returns blockchain's chain in the network from remote node as specified by

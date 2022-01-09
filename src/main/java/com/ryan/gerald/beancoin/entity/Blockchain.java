@@ -1,6 +1,8 @@
 package com.ryan.gerald.beancoin.entity;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.ryan.gerald.beancoin.evaluation.SerializableChain;
 import com.ryan.gerald.beancoin.exceptions.BlocksInChainInvalidException;
 import com.ryan.gerald.beancoin.exceptions.ChainTooShortException;
 import com.ryan.gerald.beancoin.exceptions.GenesisBlockInvalidException;
@@ -249,10 +251,15 @@ public class Blockchain {
     /**
      * Uses GSON library to serialize blockchain chain as json string.
      */
-    public String serialize() {return new Gson().toJson(chain);}
+    public String serialize() {
+        SerializableChain sbc = new SerializableChain(this);
+        return new Gson().toJson(sbc.getChain());
+    }
 
-    public ArrayList fromJSONtheChain(String json) {
-        return new Gson().fromJson(json, ArrayList.class);
+    // may be required reading from network
+    public List<Block> deserializeChain(String json) {
+        java.lang.reflect.Type type = new TypeToken<List<Block>>() {}.getType();
+        return new Gson().fromJson(json, type);
     }
 
     /**
@@ -270,7 +277,7 @@ public class Blockchain {
             if (n * -1 > last_index) {
                 return this.getChain().get(0);
             } else {
-                return this.getChain().get(getLength_of_chain() + n);
+                return this.getChain().get(getLength_of_chain() + n);  // Backstep -> i.e. length 8 + -2 => block 6
             }
         } else {
             return this.getChain().get(n);

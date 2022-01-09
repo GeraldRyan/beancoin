@@ -1,4 +1,4 @@
-package com.ryan.gerald.beancoin.initializors;
+package com.ryan.gerald.beancoin.config;
 
 /**
  * Generic Blockchain Config

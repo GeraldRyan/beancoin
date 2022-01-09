@@ -181,33 +181,6 @@ public class WalletController {
 //    }
 
 
-//    /**
-//     * Dev method, not necessary. Able to post various combinations to make multiple
-//     * random type dev transactions. Because over the network and server, this can
-//     * get buggy and consume resources. Easier to run dummy transactions in main
-//     * method of initializer. Safest to ignore
-//     */
-//    @PostMapping("/transactt")
-//    @ResponseBody
-//    public String postDummyTransactions(Model model, @RequestBody Map<String, Object> body) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidAlgorithmParameterException {
-//
-//        String numString = (String) body.get("number");
-//        List<Transaction> list = new ArrayList();
-//        int n = 1;
-//        if (numString != null) {
-//            n = new Random().nextInt(999);
-//        }
-//        String fromaddress = (String) body.get("fromaddress");
-//        if (fromaddress == null) {
-//            list = new Initializer().postNTransactions(n);
-//        } else {
-//            list = new Initializer().postNTransactions(n, fromaddress);
-//        }
-//
-//        pool = TransactionPool.fillTransactionPool(transactionRepository.getListOfTransactions());
-//        model.addAttribute("pool", pool);
-//        return new Gson().toJson(list);
-//    }
 
     public void broadcastTransaction(Transaction t) throws InterruptedException {
         //            new PubNubApp().broadcastTransaction(t);

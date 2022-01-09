@@ -18,7 +18,6 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-
     public User getUserByUsername(String username) {
         return nullChecker(userRepository.findById(username));
     }
@@ -29,6 +28,13 @@ public class UserService {
 
     public User saveUser(User user) {
         return userRepository.save(user);
+    }
+
+    public String validateUserAndPassword(String username, String password) {
+        Optional<User> user = this.getUserOptionalByName(username);
+        if (user.isEmpty()) {return "user not found";}
+        if (user.get().getPassword().equalsIgnoreCase(password)) {return "true";}
+        return "false";
     }
 
 
