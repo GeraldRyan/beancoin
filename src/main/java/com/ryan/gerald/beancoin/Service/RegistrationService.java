@@ -22,6 +22,7 @@ public class RegistrationService {
         Transaction t;
         try {
             t = adminWallet.createTransaction(address, 1000);
+            System.out.println("TRANSACTION TO BE MADE: " + t);
             transactionService.saveTransaction(t);
         } catch (Exception e) {
             e.printStackTrace();
