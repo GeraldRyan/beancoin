@@ -46,6 +46,10 @@ dependencies {
 
 	// Spring Admin Dashboard (not a Spring project obviously
 	implementation 'de.codecentric:spring-boot-admin-starter-client:2.5.1'
+
+	// MongoDB
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 
