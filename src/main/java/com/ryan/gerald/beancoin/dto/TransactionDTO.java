@@ -8,6 +8,7 @@ public class TransactionDTO {
     private String toAddress;
     private double toAmount;
     private String publickey;
+    private String signature;
     private String format;
 
     public String getToAddress() {
@@ -56,5 +57,13 @@ public class TransactionDTO {
 
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }

@@ -46,6 +46,12 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         reinflateInputOutputMaps();
     }
 
+    public static Transaction postTransaction(String toAddress, double toAmount, String fromAddress, double fromAmount, String signature, String publicKey, String pkFormat) {
+        String out = new Gson().toJson(Transaction.createOutputMap(fromAddress, toAddress, fromAmount, toAmount));
+        String in = new Gson().toJson(Transaction.createInputMap(fromAddress, fromAmount, signature, publicKey, pkFormat));
+        return new Transaction(toAddress, toAmount, fromAddress, out, in );
+    }
+
     public static Transaction createTransaction(String toAddress, double toAmount, String fromAddress, double fromBalance, HashMap<String, Object> outputMap, String signatureB64, String publicKeyB64, String format) {
         if (toAmount > fromBalance) {
             System.err.println("Amount exceeds balance");

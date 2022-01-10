@@ -62,10 +62,11 @@ public class WalletController {
     }
 
 
-    // Nothing fancy but it proves it works. This output Map will be signed, and then just have to send a signature string (to be verified by other nodes) and public key string and then these core deets. This node should be able to take it from there. 
+    // TODO move to Transaction class. TODO differentiate "Transaction" as entity with location it first goes- unmined table. Maybe just move it to other table or have a boole field stating if mined. Anyway focus on API and convergence to real bitcoin std and this will self-fix
+    // Nothing fancy but it proves it works. This output Map will be signed, and then just have to send a signature string (to be verified by other nodes) and public key string and then these core deets. This node should be able to take it from there.
     @RequestMapping(value = "outputmap", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public String doGetOutputMap(@RequestBody TransactionDTO dto){
+    public String doGetOutputMap(@RequestBody TransactionDTO dto) {
         HashMap<String, Object> m = Transaction.createOutputMap(dto.getFromAddress(), dto.getToAddress(), dto.getFromBalance(), dto.getToAmount());
         return new Gson().toJson(m);
     }
@@ -74,7 +75,10 @@ public class WalletController {
     @RequestMapping(value = "/transact", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public String doTransactionPOST(@RequestBody TransactionDTO transactionDTO) {
-        Transaction t = new Transaction();
+        Transaction t = Transaction.postTransaction(transactionDTO.getToAddress(), transactionDTO.getToAmount(), transactionDTO.getFromAddress(), transactionDTO.getFromBalance(), transactionDTO.getSignature(), transactionDTO.getPublickey(), transactionDTO.getFormat());
+        // TODO verify key signature and sender balance according to spec; then insert via service into pool
+        // for now just accept and serialize
+        transactionService.saveTransaction(t);
         return t.serialize();
     }
 
