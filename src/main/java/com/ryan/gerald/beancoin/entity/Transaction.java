@@ -46,16 +46,6 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         reinflateInputOutputMaps();
     }
 
-    private Transaction(String outputJson) {
-        this.uuid = StringUtils.getUUID8();
-        this.recipientAddress = null;
-        this.amount = 0;
-        this.senderAddress = null;
-        this.output = outputJson;
-        this.input = null;
-        reinflateInputOutputMaps();
-    }
-
     public static Transaction createTransaction(String toAddress, double toAmount, String fromAddress, double fromBalance, HashMap<String, Object> outputMap, String signatureB64, String publicKeyB64, String format) {
         if (toAmount > fromBalance) {
             System.err.println("Amount exceeds balance");

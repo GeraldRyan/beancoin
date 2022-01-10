@@ -1,5 +1,6 @@
 package com.ryan.gerald.beancoin.controller;
 
+import com.google.gson.Gson;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.WalletService;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.print.attribute.standard.ReferenceUriSchemesSupported;
+import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -47,7 +50,9 @@ public class WalletController {
     public String doTransactionGET(@ModelAttribute("wallet") Wallet w, Model model, @RequestParam("address") String address, @RequestParam("amount") double amount) {
         try {
             Transaction neu = walletService.createTransaction(w, address, amount);
-            if (neu == null){return "Error transacting. Is your balance great enough? Please wait until your mined balance is sufficient. Why don't you go mine a block?";}
+            if (neu == null) {
+                return "Error transacting. Is your balance great enough? Please wait until your mined balance is sufficient. Why don't you go mine a block?";
+            }
             model.addAttribute("latesttransaction", neu);
             return neu.serialize();
         } catch (Exception e) {
@@ -56,13 +61,22 @@ public class WalletController {
         }
     }
 
-//
-//        @RequestMapping(value = "/transact", method = RequestMethod.POST, produces = "application/json")
-//        @ResponseBody
-//        public String doTransactionPOST(@RequestBody TransactionDTO transactionDTO){
-//            Transaction t = new Transaction(transactionDTO.getToAddress(),transactionDTO.getToAmount())
-//            return "";
-//        }
+
+    // Nothing fancy but it proves it works. This output Map will be signed, and then just have to send a signature string (to be verified by other nodes) and public key string and then these core deets. This node should be able to take it from there. 
+    @RequestMapping(value = "outputmap", method = RequestMethod.POST, produces = "application/json")
+    @ResponseBody
+    public String doGetOutputMap(@RequestBody TransactionDTO dto){
+        HashMap<String, Object> m = Transaction.createOutputMap(dto.getFromAddress(), dto.getToAddress(), dto.getFromBalance(), dto.getToAmount());
+        return new Gson().toJson(m);
+    }
+
+
+    @RequestMapping(value = "/transact", method = RequestMethod.POST, produces = "application/json")
+    @ResponseBody
+    public String doTransactionPOST(@RequestBody TransactionDTO transactionDTO) {
+        Transaction t = new Transaction();
+        return t.serialize();
+    }
 
 
     //    @PostMapping("/transact")
@@ -127,7 +141,6 @@ public class WalletController {
 //    public String getBetterWallet(Model model) {
 //        return "wallet/betterwallet";
 //    }
-
 
 
     public void broadcastTransaction(Transaction t) throws InterruptedException {

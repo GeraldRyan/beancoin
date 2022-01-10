@@ -128,8 +128,8 @@ public class Wallet {
     }
 
     // NOTE when this is defined- even not called, something in spring via controler calls it and mutates the wallet address to the address of recipient!!!!!!!!!!!!!! So keep it LOCKED:D:D:D:D:D:D
-    public final void setAddress(String address) {return;}
-    // DO NOTHING. EVEN DEFINING THIS METHOD IS BAD IN IoC PLACES- a spring loaded trap
+    public void setAddress(String address) {return;}
+    // DO NOTHING. EVEN DEFINING THIS METHOD IS BAD IN IoC PLACES- a spring loaded trap. Setter methods of lazy classes cannot be final.
 
 
     public PublicKey getPublickey() {return publickey;}
