@@ -3,13 +3,20 @@ package com.ryan.gerald.beancoin.entity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ryan.gerald.beancoin.utils.CryptoHash;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Entity
+@Repository
 public class Block {
+
+    @Transient
+    @Autowired private static Gson gson;
 
     @Id String hash;
     private String lastHash;
@@ -197,7 +204,8 @@ public class Block {
         java.lang.reflect.Type type = new TypeToken<List<Transaction>>() {
         }.getType();
 //        System.out.println("Tx String is: " + this.getTx());
-        List<Transaction> txList = new Gson().fromJson(this.getTx(), type);
+        System.out.println("-" + gson.hashCode());
+        List<Transaction> txList = gson.fromJson(this.getTx(), type);
         System.out.println(txList.size());
         txList.forEach(t -> System.out.println(t.toString()));
         return txList;

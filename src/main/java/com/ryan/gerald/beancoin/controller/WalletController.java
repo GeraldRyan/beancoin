@@ -27,6 +27,7 @@ public class WalletController {
     @Autowired private TransactionService transactionService;
     @Autowired private WalletService walletService;
     @Autowired private BalanceCalculator balanceCalculator;
+    @Autowired private Gson gson;
 
     public WalletController() throws InterruptedException {}
 
@@ -62,13 +63,15 @@ public class WalletController {
     }
 
 
-    // TODO move to Transaction class. TODO differentiate "Transaction" as entity with location it first goes- unmined table. Maybe just move it to other table or have a boole field stating if mined. Anyway focus on API and convergence to real bitcoin std and this will self-fix
+    // TODO probably a non-needed feature but keep for now
     // Nothing fancy but it proves it works. This output Map will be signed, and then just have to send a signature string (to be verified by other nodes) and public key string and then these core deets. This node should be able to take it from there.
     @RequestMapping(value = "outputmap", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public String doGetOutputMap(@RequestBody TransactionDTO dto) {
         HashMap<String, Object> m = Transaction.createOutputMap(dto.getFromAddress(), dto.getToAddress(), dto.getFromBalance(), dto.getToAmount());
-        return new Gson().toJson(m);
+//        Gson gson = new Gson();
+        System.out.println("-" + gson.hashCode());
+        return gson.toJson(m);
     }
 
 
