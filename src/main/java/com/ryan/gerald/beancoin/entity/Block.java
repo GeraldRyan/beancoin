@@ -15,8 +15,7 @@ import java.util.*;
 @Repository
 public class Block {
 
-    @Transient
-    @Autowired private static Gson gson;
+    private static Gson gson = new Gson();
 
     @Id String hash;
     private String lastHash;
