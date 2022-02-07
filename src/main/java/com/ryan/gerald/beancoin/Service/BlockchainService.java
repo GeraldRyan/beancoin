@@ -7,6 +7,7 @@ import com.ryan.gerald.beancoin.entity.Transaction;
 import com.ryan.gerald.beancoin.entity.TransactionPoolMap;
 import com.ryan.gerald.beancoin.evaluation.SerializableChain;
 import com.ryan.gerald.beancoin.repository.BlockchainRepository;
+import io.swagger.annotations.ApiImplicitParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class BlockchainService {
     @Autowired BlockchainRepository blockchainRepository;
     @Autowired TransactionService transactionService;
+    @Autowired Gson gson;
 
     public Blockchain saveBlockchain(Blockchain bc) {
         return blockchainRepository.save(bc);

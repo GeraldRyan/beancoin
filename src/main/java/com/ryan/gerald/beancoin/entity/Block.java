@@ -3,13 +3,23 @@ package com.ryan.gerald.beancoin.entity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ryan.gerald.beancoin.utils.CryptoHash;
+import org.springframework.stereotype.Repository;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 @Entity
+@Repository
 public class Block {
+
+    private static Gson gson = new Gson();
 
     @Id String hash;
     private String lastHash;
@@ -183,21 +193,20 @@ public class Block {
         serializableMap.put("difficulty", this.difficulty);
         serializableMap.put("nonce", this.nonce);
         serializableMap.put("tx", txList);
-        return new Gson().toJson(serializableMap);
+        return gson.toJson(serializableMap);
     }
 
     /**
      * convert the block to a serialized JSON representation
      */
     public String serialize() {
-        return new Gson().toJson(this);
+        return gson.toJson(this);
     }
 
     public List<Transaction> deserializeTx() {
         java.lang.reflect.Type type = new TypeToken<List<Transaction>>() {
         }.getType();
-//        System.out.println("Tx String is: " + this.getTx());
-        List<Transaction> txList = new Gson().fromJson(this.getTx(), type);
+        List<Transaction> txList = gson.fromJson(this.getTx(), type);
         System.out.println(txList.size());
         txList.forEach(t -> System.out.println(t.toString()));
         return txList;
@@ -208,7 +217,6 @@ public class Block {
      * block
      */
     public static Block fromJsonToBlock(String jsonel) {
-        Gson gson = new Gson();
         Block block_restored = gson.fromJson(jsonel, Block.class);
         return block_restored;
     }

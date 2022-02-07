@@ -33,6 +33,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
     @Transient
     HashMap<String, Object> inputMap;
 
+
+
     public Transaction() {
     }
 
@@ -47,8 +49,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
     }
 
     public static Transaction postTransaction(String toAddress, double toAmount, String fromAddress, double fromAmount, String signature, String publicKey, String pkFormat) {
-        String out = new Gson().toJson(Transaction.createOutputMap(fromAddress, toAddress, fromAmount, toAmount));
-        String in = new Gson().toJson(Transaction.createInputMap(fromAddress, fromAmount, signature, publicKey, pkFormat));
+        String out = gson.toJson(Transaction.createOutputMap(fromAddress, toAddress, fromAmount, toAmount));
+        String in = gson.toJson(Transaction.createInputMap(fromAddress, fromAmount, signature, publicKey, pkFormat));
         return new Transaction(toAddress, toAmount, fromAddress, out, in );
     }
 
@@ -58,8 +60,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
             return null;
         }
         HashMap<String, Object> inputMap = Transaction.createInputMap(fromAddress, fromBalance, signatureB64, publicKeyB64, format);
-        String outputJson = new Gson().toJson(outputMap);
-        String inputJson = new Gson().toJson(inputMap);
+        String outputJson = gson.toJson(outputMap);
+        String inputJson = gson.toJson(inputMap);
         System.out.println("New transaction made!");
         return new Transaction(toAddress, toAmount, fromAddress, outputJson, inputJson);
     }
@@ -83,8 +85,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
 //        double amount = t.getToAmount();
 //        HashMap<String, Object> outputMap = this.createOutputMap(senderAddress, recipientAddress, senderBalance, toAmount);
 //        HashMap<String, Object> inputMap = this.createInputMap(senderAddress,senderBalance,t.getPrivatekey(), t.getPublickey(), t.getFormat());
-//        String outputjson = new Gson().toJson(outputMap);
-//        String inputjson = new Gson().toJson(inputMap);
+//        String outputjson = gson.toJson(outputMap);
+//        String inputjson = gson.toJson(inputMap);
 //        return new Transaction(recipientAddress, senderAddress, amount, outputjson, inputjson);
 //    }
 
@@ -99,8 +101,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
     public static boolean verifyInputOutputStrings(String in, String out) {
         Type type = new TypeToken<HashMap<String, Object>>() {
         }.getType();
-        Map<String, Object> inputHash = new Gson().fromJson(in, type);  // TODO TEST
-        Map<String, Object> outputHash = new Gson().fromJson(in, type);  // TODO TEST
+        Map<String, Object> inputHash = gson.fromJson(in, type);  // TODO TEST
+        Map<String, Object> outputHash = gson.fromJson(in, type);  // TODO TEST
         for (String key : inputHash.keySet()) {
             System.out.println("key: " + key);
             System.out.println("value: " + inputHash.get(key));
@@ -150,8 +152,8 @@ public class Transaction extends AbstractTransaction implements TransactionInter
      */
     public void serializeInputOutputMaps() {
         if (this.outputMap != null) {
-            this.output = new Gson().toJson(this.outputMap);
-            this.input = new Gson().toJson(this.inputMap);
+            this.output = gson.toJson(this.outputMap);
+            this.input = gson.toJson(this.inputMap);
         }
     }
 
@@ -172,11 +174,11 @@ public class Transaction extends AbstractTransaction implements TransactionInter
         serializableMap.put("input", this.inputMap);
         serializableMap.put("output", this.outputMap);
         serializableMap.put("id", this.uuid);
-        return new Gson().toJson(serializableMap);
+        return gson.toJson(serializableMap);
     }
 
     public Transaction deserialize(String s) {
-        return new Gson().fromJson(s, Transaction.class);
+        return gson.fromJson(s, Transaction.class);
     }
 
     public static String transactionStringSingleton(Transaction t) {

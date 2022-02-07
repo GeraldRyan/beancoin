@@ -14,6 +14,8 @@ import java.util.HashMap;
 
 public class AbstractTransaction {
 
+    protected static Gson gson = new Gson();
+
     /**
      * Structures output data of wallet - a hashmap of two items, currency going to
      * recipient at address and change going back to sender
@@ -44,17 +46,18 @@ public class AbstractTransaction {
     }
 
     protected HashMap<String, Object> deserializeOutputJson(String outputJson){
-        return new Gson().fromJson(outputJson, HashMap.class);
+
+        return gson.fromJson(outputJson, HashMap.class);
     }
     protected HashMap<String, Object> deserializeInputJson(String inputJson){
-        return new Gson().fromJson(inputJson, HashMap.class);
+        return gson.fromJson(inputJson, HashMap.class);
     }
 
     protected String serializeOutpuMap(HashMap<String, Object> outputMap){
-        return new Gson().toJson(outputMap);
+        return gson.toJson(outputMap);
     }
     protected String serializeInputMap(HashMap<String, Object> inputMap){
-        return new Gson().toJson(inputMap);
+        return gson.toJson(inputMap);
     }
 
     /**

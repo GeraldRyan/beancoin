@@ -16,6 +16,9 @@ import java.util.List;
 @Entity
 @Table(name = "blockchain")
 public class Blockchain {
+
+    private static Gson gson = new Gson();
+
     @Id String name;
     long date_created;
     long date_last_modified;
@@ -263,13 +266,13 @@ public class Blockchain {
      */
     public String serialize() {
         SerializableChain sbc = new SerializableChain(this);
-        return new Gson().toJson(sbc.getChain());
+        return gson.toJson(sbc.getChain());
     }
 
     // may be required reading from network
     public List<Block> deserializeChain(String json) {
         java.lang.reflect.Type type = new TypeToken<List<Block>>() {}.getType();
-        return new Gson().fromJson(json, type);
+        return gson.fromJson(json, type);
     }
 
     /**

@@ -5,19 +5,15 @@ import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.TransactionService;
 import com.ryan.gerald.beancoin.Service.WalletService;
 import com.ryan.gerald.beancoin.dto.TransactionDTO;
-import com.ryan.gerald.beancoin.entity.Blockchain;
 import com.ryan.gerald.beancoin.entity.Transaction;
 import com.ryan.gerald.beancoin.entity.Wallet;
 import com.ryan.gerald.beancoin.evaluation.BalanceCalculator;
-import com.ryan.gerald.beancoin.exception.UsernameNotLoaded;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.print.attribute.standard.ReferenceUriSchemesSupported;
 import java.util.HashMap;
-import java.util.List;
 
 @Controller
 @RequestMapping("wallet")
@@ -27,6 +23,7 @@ public class WalletController {
     @Autowired private TransactionService transactionService;
     @Autowired private WalletService walletService;
     @Autowired private BalanceCalculator balanceCalculator;
+    @Autowired private Gson gson;
 
     public WalletController() throws InterruptedException {}
 
@@ -36,6 +33,14 @@ public class WalletController {
         if (w == null) {return "redirect:/";}
         model.addAttribute("wallet", w);
         return "wallet/wallet";
+    }
+
+    @GetMapping("info")
+    @ResponseBody
+    public String infoGET(Model model) {
+        Wallet w = walletService.getWalletByUsername(String.valueOf(model.getAttribute("username")));
+        if (w == null) {return "{\"address\": \"NULL\", \"balance\":\"00000\"}";}
+        return gson.toJson(w); // TODO ENSURE CORRECT!! THIS IS A CRITICAL API ENDPOINT TO DEV OUT FOR FE CLIENT
     }
 
     @GetMapping("/transact")
@@ -62,13 +67,13 @@ public class WalletController {
     }
 
 
-    // TODO move to Transaction class. TODO differentiate "Transaction" as entity with location it first goes- unmined table. Maybe just move it to other table or have a boole field stating if mined. Anyway focus on API and convergence to real bitcoin std and this will self-fix
+    // TODO probably a non-needed feature but keep for now
     // Nothing fancy but it proves it works. This output Map will be signed, and then just have to send a signature string (to be verified by other nodes) and public key string and then these core deets. This node should be able to take it from there.
     @RequestMapping(value = "outputmap", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public String doGetOutputMap(@RequestBody TransactionDTO dto) {
         HashMap<String, Object> m = Transaction.createOutputMap(dto.getFromAddress(), dto.getToAddress(), dto.getFromBalance(), dto.getToAmount());
-        return new Gson().toJson(m);
+        return gson.toJson(m);
     }
 
 

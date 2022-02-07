@@ -1,11 +1,11 @@
 package com.ryan.gerald.beancoin.controller;
 
-import com.google.gson.Gson;
 import com.ryan.gerald.beancoin.Service.BlockchainService;
 import com.ryan.gerald.beancoin.Service.RegistrationService;
 import com.ryan.gerald.beancoin.Service.UserService;
 import com.ryan.gerald.beancoin.Service.WalletService;
-import com.ryan.gerald.beancoin.entity.*;
+import com.ryan.gerald.beancoin.entity.User;
+import com.ryan.gerald.beancoin.entity.Wallet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,9 +14,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.security.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.Optional;
 
 @Controller
